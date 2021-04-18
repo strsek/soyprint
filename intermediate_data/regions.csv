@@ -1,0 +1,296 @@
+"";"CO_COMEX";"CO_FAO";"CO_BTD";"ISO_BTD";"CO_PAIS_ISON3";"CO_PAIS_ISOA3";"NO_PAIS";"NO_PAIS_ING";"NO_PAIS_ESP";"name";"eia";"iea";"water_code";"water_area";"baci";"fish";"region_code";"region";"cbs";"EU27";"btd"
+"1";0;999;999;"ROW";999;"ROW";"Não Definido";"Not defined";"No definido";"RoW";"";"";999;"Global average";NA;NA;NA;"";TRUE;FALSE;TRUE
+"2";13;2;2;"AFG";4;"AFG";"Afeganistão";"Afghanistan";"Afganistan";"Afghanistan";"Afghanistan";"";2;"Afghanistan";4;4;13;"South Asia";TRUE;FALSE;TRUE
+"3";15;999;999;"ROW";248;"ALA";"Aland, Ilhas";"Aland Islands";"Alans, Islas";NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;TRUE
+"4";17;3;3;"ALB";8;"ALB";"Albânia";"Albania";"Albania";"Albania";"Albania";"Albania";3;"Albania";8;8;10;"Eastern Europe";TRUE;FALSE;TRUE
+"5";20;203;203;"ESP";724;"ESP";"Alboran-Perejil, Ilhas";"Alboran-Perejil, Islands";"Alboran-Perejil, Islas";"Spain";"Spain";"Spain";203;"Spain";724;724;9;"OECD Europe";TRUE;TRUE;TRUE
+"6";23;79;79;"DEU";276;"DEU";"Alemanha";"Germany";"Alemania";"Germany";"Germany";"Germany";79;"Germany";276;276;9;"OECD Europe";TRUE;TRUE;TRUE
+"7";25;79;79;"DEU";278;"DEU";"Alemanha Oriental";"East Germany";"Alemania del Este";"Germany";"Germany";"Germany";79;"Germany";276;276;9;"OECD Europe";TRUE;TRUE;TRUE
+"8";31;233;233;"BFA";854;"BFA";"Burkina Faso";"Burkina Faso";"Burkina Faso";"Burkina Faso";"Burkina Faso";"";233;"Burkina Faso";854;854;6;"Western Africa";TRUE;FALSE;TRUE
+"9";37;6;999;"ROW";20;"AND";"Andorra";"Andorra";"Andorra";"Andorra";"";"";999;"Global average";20;20;9;"OECD Europe";FALSE;FALSE;FALSE
+"10";40;7;7;"AGO";24;"AGO";"Angola";"Angola";"Angola";"Angola";"Angola";"Angola";7;"Angola";24;24;8;"Southern Africa";TRUE;FALSE;TRUE
+"11";41;258;999;"ROW";660;"AIA";"Anguilla";"Anguilla";"Anguilla";"Anguilla";"";"";999;"Global average";660;660;3;"Central America";FALSE;FALSE;FALSE
+"12";42;30;999;"ROW";10;"ATA";"Antártica";"Antarctica";"Antártida";"Antarctica";"Antarctica";"";999;"Global average";NA;10;19;"Antarctica";FALSE;FALSE;FALSE
+"13";43;8;8;"ATG";28;"ATG";"Antígua e Barbuda";"Antigua and Barbuda";"Antigua y Barbuda";"Antigua and Barbuda";"Antigua and Barbuda";"";8;"Antigua and Barbuda";28;28;3;"Central America";TRUE;FALSE;TRUE
+"14";47;151;151;"ANT";530;"ANT";"Antilhas Holandesas";"Netherlands Antilles";"Antillas Holandesas";"Netherlands Antilles";"Netherlands Antilles";"Netherlands Antilles / CuraÃ§ao";999;"Global average";530;530;3;"Central America";TRUE;FALSE;TRUE
+"15";53;194;194;"SAU";682;"SAU";"Arábia Saudita";"Saudi Arabia";"Arabia Saudita";"Saudi Arabia";"Saudi Arabia";"Saudi Arabia";194;"Saudi Arabia";682;682;12;"Middle East";TRUE;FALSE;TRUE
+"16";59;4;4;"DZA";12;"DZA";"Argélia";"Algeria";"Argelia";"Algeria";"Algeria";"Algeria";4;"Algeria";12;12;5;"Northern Africa";TRUE;FALSE;TRUE
+"17";63;9;9;"ARG";32;"ARG";"Argentina";"Argentina";"Argentina";"Argentina";"Argentina";"Argentina";9;"Argentina";32;32;4;"South America";TRUE;FALSE;TRUE
+"18";64;1;1;"ARM";51;"ARM";"Armênia";"Armenia";"Armenia";"Armenia";"Armenia";"Armenia";1;"Armenia";51;51;11;"Former USSR";TRUE;FALSE;TRUE
+"19";65;22;999;"ROW";533;"ABW";"Aruba";"Aruba";"Aruba";"Aruba";"Aruba";"";999;"Global average";533;533;3;"Central America";FALSE;FALSE;FALSE
+"20";69;10;10;"AUS";36;"AUS";"Austrália";"Australia";"Australia";"Australia";"Australia";"Australia";10;"Australia";36;36;16;"Oceania";TRUE;FALSE;TRUE
+"21";72;11;11;"AUT";40;"AUT";"Áustria";"Austria";"Austria";"Austria";"Austria";"Austria";11;"Austria";40;40;9;"OECD Europe";TRUE;TRUE;TRUE
+"22";73;52;52;"AZE";31;"AZE";"Azerbaijão";"Azerbaijan";"Acerbaiyan";"Azerbaijan";"Azerbaijan";"Azerbaijan";52;"Azerbaijan";31;31;11;"Former USSR";TRUE;FALSE;TRUE
+"23";77;12;12;"BHS";44;"BHS";"Bahamas";"Bahamas";"Bahamas";"Bahamas";"Bahamas, The";"";12;"Bahamas";44;44;3;"Central America";TRUE;FALSE;TRUE
+"24";80;13;13;"BHR";48;"BHR";"Barein";"Bahrein";"Bahrein";"Bahrain";"Bahrain";"Bahrain";13;"Bahrain";48;48;12;"Middle East";TRUE;FALSE;TRUE
+"25";81;16;16;"BGD";50;"BGD";"Bangladesh";"Bangladesh";"Bangladesh";"Bangladesh";"Bangladesh";"Bangladesh";16;"Bangladesh";50;50;13;"South Asia";TRUE;FALSE;TRUE
+"26";83;14;14;"BRB";52;"BRB";"Barbados";"Barbados";"Barbados";"Barbados";"Barbados";"";14;"Barbados";52;52;3;"Central America";TRUE;FALSE;TRUE
+"27";85;57;57;"BLR";112;"BLR";"Belarus";"Belarus";"Belarús";"Belarus";"Belarus";"Belarus";57;"Belarus";112;112;11;"Former USSR";TRUE;FALSE;TRUE
+"28";87;255;255;"BEL";56;"BEL";"Bélgica";"Belgium";"Bélgica";"Belgium";"Belgium";"Belgium";255;"Belgium";58;56;9;"OECD Europe";TRUE;TRUE;TRUE
+"29";88;23;23;"BLZ";84;"BLZ";"Belize";"Belize";"Belice";"Belize";"Belize";"";23;"Belize";84;84;3;"Central America";TRUE;FALSE;TRUE
+"30";90;17;999;"ROW";60;"BMU";"Bermudas";"Bermuda";"Bermuda";"Bermuda";"Bermuda";"";17;"Bermuda";60;60;3;"Central America";FALSE;FALSE;FALSE
+"31";93;28;28;"MMR";104;"MMR";"Mianmar";"Myanmar";"Myanmar";"Myanmar";"Burma (Myanmar)";"Myanmar";28;"Myanmar";104;104;15;"South East Asia";TRUE;FALSE;TRUE
+"32";97;19;19;"BOL";68;"BOL";"Bolívia";"Bolivia";"Bolivia";"Bolivia (Plurinational State of)";"Bolivia";"Bolivia";19;"Bolivia";68;68;4;"South America";TRUE;FALSE;TRUE
+"33";98;80;80;"BIH";70;"BIH";"Bósnia-Herzegovina";"Bosnia and Herzegovina";"Bosnia y Herzegovina";"Bosnia and Herzegovina";"Bosnia and Herzegovina";"Bosnia and Herzegovina";80;"Bosnia and Herzegovina";70;70;10;"Eastern Europe";TRUE;FALSE;TRUE
+"34";99;999;999;"ROW";535;"BES";"Bonaire, Saint Eustatius e Saba";"Bonaire, Saint Eustatius and Saba";"Bonaire, Saint Eustatius y Saba";NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;TRUE
+"35";100;21;21;"BRA";999;"BRA";"Internação na Zona Franca de Manaus";"Internment in the Manaus Free Trade Zone";"Internamiento de la Zona Franca de Manaus";"Brazil";"Brazil";"Brazil";21;"Brazil";76;76;4;"South America";TRUE;FALSE;TRUE
+"36";101;20;20;"BWA";72;"BWA";"Botsuana";"Botswana";"Botswana";"Botswana";"Botswana";"Botswana";20;"Botswana";NA;72;8;"Southern Africa";TRUE;FALSE;TRUE
+"37";102;31;999;"ROW";74;"BVT";"Bouvet, Ilha";"Bouvet Island";"Bouvet, Isla";"Bouvet Island";"";"";999;"Global average";NA;74;4;"South America";FALSE;FALSE;FALSE
+"38";105;21;21;"BRA";76;"BRA";"Brasil";"Brazil";"Brasil";"Brazil";"Brazil";"Brazil";21;"Brazil";76;76;4;"South America";TRUE;FALSE;TRUE
+"39";108;26;26;"BRN";96;"BRN";"Brunei";"Brunei";"Brunei";"Brunei Darussalam";"Brunei";"Brunei Darussalam";26;"Brunei Darussalam";96;96;15;"South East Asia";TRUE;FALSE;TRUE
+"40";111;27;27;"BGR";100;"BGR";"Bulgária";"Bulgaria";"Bulgaria";"Bulgaria";"Bulgaria";"Bulgaria";27;"Bulgaria";100;100;10;"Eastern Europe";TRUE;TRUE;TRUE
+"41";115;29;29;"BDI";108;"BDI";"Burundi";"Burundi";"Burundi";"Burundi";"Burundi";"";29;"Burundi";108;108;7;"Eastern Africa";TRUE;FALSE;TRUE
+"42";119;18;999;"ROW";64;"BTN";"Butão";"Bhutan";"Bhután";"Bhutan";"Bhutan";"";18;"Bhutan";64;64;13;"South Asia";FALSE;FALSE;FALSE
+"43";127;35;35;"CPV";132;"CPV";"Cabo Verde";"Cape Verde";"Cabo Verde";"Cabo Verde";"Cape Verde";"";35;"Cape Verde";132;132;6;"Western Africa";TRUE;FALSE;TRUE
+"44";137;36;999;"ROW";136;"CYM";"Cayman, Ilhas";"Cayman Islands";"Caimán, Islas";"Cayman Islands";"Cayman Islands";"";36;"Cayman Islands";136;136;3;"Central America";FALSE;FALSE;FALSE
+"45";141;115;115;"KHM";116;"KHM";"Camboja";"Cambodia";"Camboya";"Cambodia";"Cambodia";"Cambodia";115;"Cambodia";116;116;15;"South East Asia";TRUE;FALSE;TRUE
+"46";145;32;32;"CMR";120;"CMR";"Camarões";"Cameroon";"Camerún";"Cameroon";"Cameroon";"Cameroon";32;"Cameroon";120;120;6;"Western Africa";TRUE;FALSE;TRUE
+"47";149;33;33;"CAN";124;"CAN";"Canadá";"Canada";"Canadá";"Canada";"Canada";"Canada";33;"Canada";124;124;1;"Canada";TRUE;FALSE;TRUE
+"48";150;999;999;"ROW";831;"GGY";"Canal, Ilhas do (Guernsey)";"Guernsey";"Guernsey";NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;TRUE
+"49";151;203;203;"ESP";724;"ESP";"Canárias, Ilhas";"Canary, Islands";"Canarias, Islas";"Spain";"Spain";"Spain";203;"Spain";724;724;9;"OECD Europe";TRUE;TRUE;TRUE
+"50";152;229;229;"GBR";826;"GBR";"Canal, Ilhas do (Jersey)";"Jersey";"Jersey";"United Kingdom";"United Kingdom";"United Kingdom";229;"United Kingdom";826;826;9;"OECD Europe";TRUE;FALSE;TRUE
+"51";153;108;108;"KAZ";398;"KAZ";"Cazaquistão";"Kazakhstan";"Kazakhstán";"Kazakhstan";"Kazakhstan";"Kazakhstan";108;"Kazakhstan";398;398;11;"Former USSR";TRUE;FALSE;TRUE
+"52";154;179;179;"QAT";634;"QAT";"Catar";"Qatar";"Qatar";"Qatar";"Qatar";"Qatar";179;"Qatar";634;634;12;"Middle East";TRUE;FALSE;TRUE
+"53";158;40;40;"CHL";152;"CHL";"Chile";"Chile";"Chile";"Chile";"Chile";"Chile";40;"Chile";152;152;4;"South America";TRUE;FALSE;TRUE
+"54";160;41;41;"CHN";156;"CHN";"China";"China";"China";"China, mainland";"China";"People's Republic of China";351;"China";156;156;14;"East Asia";TRUE;FALSE;TRUE
+"55";161;214;214;"TWN";158;"TWN";"Taiwan (Formosa)";"Taiwan";"Taiwán";"China, Taiwan Province of";"Taiwan";"Chinese Taipei";351;"China";NA;158;14;"East Asia";TRUE;FALSE;TRUE
+"56";163;50;50;"CYP";196;"CYP";"Chipre";"Cyprus";"Chipre";"Cyprus";"Cyprus";"Cyprus";50;"Cyprus";196;196;12;"Middle East";TRUE;TRUE;TRUE
+"57";165;43;999;"ROW";166;"CCK";"Cocos (Keeling), Ilhas";"Cocos (Keeling) Islands";"Cocos (Keeling), Islas";"Cocos (Keeling) Islands";"";"";999;"Global average";166;166;16;"Oceania";FALSE;FALSE;FALSE
+"58";169;44;44;"COL";170;"COL";"Colômbia";"Colombia";"Colombia";"Colombia";"Colombia";"Colombia";44;"Colombia";170;170;4;"South America";TRUE;FALSE;TRUE
+"59";173;45;999;"ROW";174;"COM";"Comores";"Comoros";"Comoras";"Comoros";"Comoros";"";45;"Comoros";174;174;7;"Eastern Africa";FALSE;FALSE;FALSE
+"60";177;46;46;"COG";178;"COG";"Congo";"Congo";"Congo";"Congo";"Congo (Brazzaville)";"Republic of the Congo";46;"Congo";178;178;6;"Western Africa";TRUE;FALSE;TRUE
+"61";183;47;999;"ROW";184;"COK";"Cook, Ilhas";"Cook Islands";"Cook, Islas";"Cook Islands";"Cook Islands";"";47;"Cook Islands";184;184;16;"Oceania";FALSE;FALSE;FALSE
+"62";187;116;116;"PRK";408;"PRK";"Coreia do Norte";"North Korea";"Corea (Norte)";"Democratic People's Republic of Korea";"Korea, North";"Democratic People's Republic of Korea";116;"Korea, Democratic People's Republic of";408;408;14;"East Asia";TRUE;FALSE;TRUE
+"63";190;117;117;"KOR";410;"KOR";"Coreia do Sul";"South Korea";"Corea (Sur)";"Republic of Korea";"Korea, South";"Korea";117;"Korea, Republic of";410;410;14;"East Asia";TRUE;FALSE;TRUE
+"64";193;107;107;"CIV";384;"CIV";"Costa do Marfim";"Cote D'Ivore";"Costa de Marfil";"CÃ´te d'Ivoire";"Cote dIvoire (IvoryCoast)";"CÃ´te d'Ivoire";107;"CÃ´te d'Ivoire";384;384;6;"Western Africa";TRUE;FALSE;TRUE
+"65";195;98;98;"HRV";191;"HRV";"Croácia";"Croatia";"Croacia";"Croatia";"Croatia";"Croatia";98;"Croatia";191;191;10;"Eastern Europe";TRUE;TRUE;TRUE
+"66";196;48;48;"CRI";188;"CRI";"Costa Rica";"Costa Rica";"Costa Rica";"Costa Rica";"Costa Rica";"Costa Rica";48;"Costa Rica";188;188;3;"Central America";TRUE;FALSE;TRUE
+"67";198;118;118;"KWT";414;"KWT";"Coveite (Kuweit)";"Kuwait";"Kuwait";"Kuwait";"Kuwait";"Kuwait";118;"Kuwait";414;414;12;"Middle East";TRUE;FALSE;TRUE
+"68";199;49;49;"CUB";192;"CUB";"Cuba";"Cuba";"Cuba";"Cuba";"Cuba";"Cuba";49;"Cuba";192;192;3;"Central America";TRUE;FALSE;TRUE
+"69";200;279;999;"ROW";531;"CUW";"Curaçao";"Curaçao";"Curazao";"CuraÃ§ao";"";"";999;"Global average";531;NA;3;"Central America";FALSE;FALSE;FALSE
+"70";229;53;53;"BEN";204;"BEN";"Benin";"Benin";"Benin";"Benin";"Benin";"Benin";53;"Benin";204;204;6;"Western Africa";TRUE;FALSE;TRUE
+"71";232;54;54;"DNK";208;"DNK";"Dinamarca";"Denmark";"Dinamarca";"Denmark";"Denmark";"Denmark";54;"Denmark";208;208;9;"OECD Europe";TRUE;TRUE;TRUE
+"72";235;55;55;"DMA";212;"DMA";"Dominica";"Dominica Island";"Dominica";"Dominica";"Dominica";"";55;"Dominica";212;212;3;"Central America";TRUE;FALSE;TRUE
+"73";237;225;225;"ARE";784;"ARE";"Dubai";"Dubai";"Dubai";"United Arab Emirates";"United Arab Emirates";"United Arab Emirates";225;"United Arab Emirates";784;784;12;"Middle East";TRUE;FALSE;TRUE
+"74";239;58;58;"ECU";218;"ECU";"Equador";"Ecuador";"Ecuador";"Ecuador";"Ecuador";"Ecuador";58;"Ecuador";218;218;4;"South America";TRUE;FALSE;TRUE
+"75";240;59;59;"EGY";818;"EGY";"Egito";"Egypt";"Egipto";"Egypt";"Egypt";"Egypt";59;"Egypt";818;818;5;"Northern Africa";TRUE;FALSE;TRUE
+"76";243;178;178;"ERI";232;"ERI";"Eritreia";"Eritrea";"Eritrea";"Eritrea";"Eritrea";"Eritrea";178;"Eritrea";232;232;7;"Eastern Africa";TRUE;FALSE;TRUE
+"77";244;225;225;"ARE";784;"ARE";"Emirados Árabes Unidos";"United Arab Emirates";"Emiratos Árabes Unidos";"United Arab Emirates";"United Arab Emirates";"United Arab Emirates";225;"United Arab Emirates";784;784;12;"Middle East";TRUE;FALSE;TRUE
+"78";245;203;203;"ESP";724;"ESP";"Espanha";"Spain";"España";"Spain";"Spain";"Spain";203;"Spain";724;724;9;"OECD Europe";TRUE;TRUE;TRUE
+"79";246;198;198;"SVN";705;"SVN";"Eslovênia";"Slovenia";"Eslovenia";"Slovenia";"Slovenia";"Slovenia";198;"Slovenia";705;705;10;"Eastern Europe";TRUE;TRUE;TRUE
+"80";247;199;199;"SVK";703;"SVK";"Eslováquia";"Slovakia";"Eslovaquia";"Slovakia";"Slovakia";"Slovak Republic";199;"Slovakia";703;703;10;"Eastern Europe";TRUE;TRUE;TRUE
+"81";249;231;231;"USA";840;"USA";"Estados Unidos";"United States";"Estados Unidos";"United States of America";"United States";"United States";231;"United States of America";842;840;2;"USA";TRUE;FALSE;TRUE
+"82";251;63;63;"EST";233;"EST";"Estônia";"Estonia";"Estonia";"Estonia";"Estonia";"Estonia";63;"Estonia";233;233;11;"Former USSR";TRUE;TRUE;TRUE
+"83";253;238;238;"ETH";231;"ETH";"Etiópia";"Ethiopia";"Etiopía";"Ethiopia";"Ethiopia";"Ethiopia";238;"Ethiopia";231;231;7;"Eastern Africa";TRUE;FALSE;TRUE
+"84";255;65;999;"ROW";238;"FLK";"Falkland (Malvinas)";"Falkland Islands (Malvinas)";"Malvinas (Falkland), Islas";"Falkland Islands (Malvinas)";"Falkland Islands (Islas Malvinas)";"";999;"Global average";238;238;4;"South America";FALSE;FALSE;FALSE
+"85";259;64;999;"ROW";234;"FRO";"Faroe, Ilhas";"Faroe Islands";"Feroé, Islas";"Faroe Islands";"Faroe Islands";"";64;"Faroe Islands";NA;234;9;"OECD Europe";FALSE;FALSE;FALSE
+"86";267;171;171;"PHL";608;"PHL";"Filipinas";"Philippines";"Filipinas";"Philippines";"Philippines";"Philippines";171;"Philippines";608;608;15;"South East Asia";TRUE;FALSE;TRUE
+"87";271;67;67;"FIN";246;"FIN";"Finlândia";"Finland";"Finlandia";"Finland";"Finland";"Finland";67;"Finland";246;246;9;"OECD Europe";TRUE;TRUE;TRUE
+"88";275;68;68;"FRA";250;"FRA";"França";"France";"Francia";"France";"France";"France";68;"France";251;250;9;"OECD Europe";TRUE;TRUE;TRUE
+"89";281;74;74;"GAB";266;"GAB";"Gabão";"Gabon";"Gabón";"Gabon";"Gabon";"Gabon";74;"Gabon";266;266;6;"Western Africa";TRUE;FALSE;TRUE
+"90";285;75;75;"GMB";270;"GMB";"Gâmbia";"Gambia";"Gambia";"Gambia";"Gambia, The";"";75;"Gambia";270;270;6;"Western Africa";TRUE;FALSE;TRUE
+"91";289;81;81;"GHA";288;"GHA";"Gana";"Ghana";"Ghana";"Ghana";"Ghana";"Ghana";81;"Ghana";288;288;6;"Western Africa";TRUE;FALSE;TRUE
+"92";291;73;73;"GEO";268;"GEO";"Geórgia";"Georgia";"Georgia";"Georgia";"Georgia";"Georgia";73;"Georgia";268;268;11;"Former USSR";TRUE;FALSE;TRUE
+"93";292;271;999;"ROW";239;"SGS";"Geórgia do Sul e Sandwich do Sul, Ilhas";"South Georgia and the South Sandwich Islands";"Islas Georgias del Sur y Sandwich del Sur";"South Georgia and the South Sandwich Islands";"";"";999;"Global average";NA;239;4;"South America";FALSE;FALSE;FALSE
+"94";293;82;999;"ROW";292;"GIB";"Gibraltar";"Gibraltar";"Gibraltar";"Gibraltar";"Gibraltar";"Gibraltar";999;"Global average";292;292;9;"OECD Europe";FALSE;FALSE;FALSE
+"95";297;86;86;"GRD";308;"GRD";"Granada";"Grenada";"Granada";"Grenada";"Grenada";"";86;"Grenada";308;308;3;"Central America";TRUE;FALSE;TRUE
+"96";301;84;84;"GRC";300;"GRC";"Grécia";"Greece";"Grecia";"Greece";"Greece";"Greece";84;"Greece";300;300;9;"OECD Europe";TRUE;TRUE;TRUE
+"97";305;85;999;"ROW";304;"GRL";"Groenlândia";"Greenland";"Groenlandia";"Greenland";"Greenland";"";999;"Global average";304;304;9;"OECD Europe";FALSE;FALSE;FALSE
+"98";309;87;999;"ROW";312;"GLP";"Guadalupe";"Guadeloupe";"Guadalupe";"Guadeloupe";"Guadeloupe";"";87;"Guadeloupe";NA;312;3;"Central America";FALSE;FALSE;FALSE
+"99";313;88;999;"ROW";316;"GUM";"Guam";"Guam";"Guam";"Guam";"Guam";"";88;"Guam";316;316;16;"Oceania";FALSE;FALSE;FALSE
+"100";317;89;89;"GTM";320;"GTM";"Guatemala";"Guatemala";"Guatemala";"Guatemala";"Guatemala";"Guatemala";89;"Guatemala";320;320;3;"Central America";TRUE;FALSE;TRUE
+"101";321;999;999;"ROW";999;"GGY";"Guernsey";"Guernsey";"Guernsey";NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;TRUE
+"102";325;69;999;"ROW";254;"GUF";"Guiana Francesa";"French Guyana";"Guyana Francesa";"French Guiana";"French Guiana";"";69;"French Guiana";NA;254;4;"South America";FALSE;FALSE;FALSE
+"103";329;90;90;"GIN";324;"GIN";"Guiné";"Guinea";"Guinea";"Guinea";"Guinea";"";90;"Guinea";324;324;6;"Western Africa";TRUE;FALSE;TRUE
+"104";331;61;999;"ROW";226;"GNQ";"Guiné Equatorial";"Equatorial Guinea";"Guinea Ecuatorial";"Equatorial Guinea";"Equatorial Guinea";"";61;"Equatorial Guinea";226;226;6;"Western Africa";FALSE;FALSE;FALSE
+"105";334;175;175;"GNB";624;"GNB";"Guiné-Bissau";"Guinea-Bissau";"Guinea-Bissau";"Guinea-Bissau";"Guinea-Bissau";"";175;"Guinea-Bissau";624;624;6;"Western Africa";TRUE;FALSE;TRUE
+"106";337;91;91;"GUY";328;"GUY";"Guiana";"Guyana";"Guyana";"Guyana";"Guyana";"";91;"Guyana";328;328;4;"South America";TRUE;FALSE;TRUE
+"107";341;93;93;"HTI";332;"HTI";"Haiti";"Haiti";"Haiti";"Haiti";"Haiti";"Haiti";93;"Haiti";332;332;3;"Central America";TRUE;FALSE;TRUE
+"108";343;92;999;"ROW";334;"HMD";"Heard e ilhas mcdonald, Ilha";"
+Heard Island and McDonald Islands";"Islas Heard y McDonald";"Heard and McDonald Islands";"";"";999;"Global average";NA;334;16;"Oceania";FALSE;FALSE;FALSE
+"109";345;95;95;"HND";340;"HND";"Honduras";"Honduras";"Honduras";"Honduras";"Honduras";"Honduras";95;"Honduras";340;340;3;"Central America";TRUE;FALSE;TRUE
+"110";351;96;96;"HKG";344;"HKG";"Hong Kong";"Hong Kong";"Hong Kong";"China, Hong Kong SAR";"Hong Kong";"Hong Kong, China";351;"China";344;344;14;"East Asia";TRUE;FALSE;TRUE
+"111";355;97;97;"HUN";348;"HUN";"Hungria";"Hungary";"Hungría";"Hungary";"Hungary";"Hungary";97;"Hungary";348;348;10;"Eastern Europe";TRUE;TRUE;TRUE
+"112";357;249;249;"YEM";887;"YEM";"Iêmen";"Yemen";"Yemen";"Yemen";"Yemen";"Yemen";249;"Yemen";887;887;12;"Middle East";TRUE;FALSE;TRUE
+"113";358;999;999;"ROW";720;"YMD";"Iêmen Democrático";"Democratic Yemen";"Yemen Democrático";NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;TRUE
+"114";359;999;999;"ROW";833;"IMN";"Ilha de Man";"Isle of Man";"Isla de Man";NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;TRUE
+"115";361;100;100;"IND";356;"IND";"Índia";"India";"India";"India";"India";"India";100;"India";699;356;13;"South Asia";TRUE;FALSE;TRUE
+"116";365;101;101;"IDN";360;"IDN";"Indonésia";"Indonesia";"Indonesia";"Indonesia";"Indonesia";"Indonesia";101;"Indonesia";360;360;15;"South East Asia";TRUE;FALSE;TRUE
+"117";367;229;229;"GBR";826;"GBR";"Inglaterra";"England";"Inglaterra";"United Kingdom";"United Kingdom";"United Kingdom";229;"United Kingdom";826;826;9;"OECD Europe";TRUE;FALSE;TRUE
+"118";369;103;103;"IRQ";368;"IRQ";"Iraque";"Iraq";"Irak";"Iraq";"Iraq";"Iraq";103;"Iraq";368;368;12;"Middle East";TRUE;FALSE;TRUE
+"119";372;102;102;"IRN";364;"IRN";"Irã";"Iran";"Irán";"Iran (Islamic Republic of)";"Iran";"Islamic Republic of Iran";102;"Iran, Islamic Republic of";364;364;12;"Middle East";TRUE;FALSE;TRUE
+"120";375;104;104;"IRL";372;"IRL";"Irlanda";"Ireland";"Irlanda";"Ireland";"Ireland";"Ireland";104;"Ireland";372;372;9;"OECD Europe";TRUE;TRUE;TRUE
+"121";379;99;99;"ISL";352;"ISL";"Islândia";"Iceland";"Islandia";"Iceland";"Iceland";"Iceland";99;"Iceland";352;352;9;"OECD Europe";TRUE;FALSE;TRUE
+"122";383;105;105;"ISR";376;"ISR";"Israel";"Israel";"Israel";"Israel";"Israel";"Israel";105;"Israel";376;376;12;"Middle East";TRUE;FALSE;TRUE
+"123";386;106;106;"ITA";380;"ITA";"Itália";"Italy";"Italia";"Italy";"Italy";"Italy";106;"Italy";381;380;9;"OECD Europe";TRUE;TRUE;TRUE
+"124";388;186;186;"SCG";891;"SCG";"Iugoslávia";"Yugoslavia";"Yugoslavia";"Serbia and Montenegro";"Former Serbia and Montenegro";"";186;"Serbia and Montenegro";891;891;9;"OECD Europe";TRUE;FALSE;TRUE
+"125";391;109;109;"JAM";388;"JAM";"Jamaica";"Jamaica";"Jamaica";"Jamaica";"Jamaica";"Jamaica";109;"Jamaica";388;388;3;"Central America";TRUE;FALSE;TRUE
+"126";393;999;999;"ROW";999;"ROW";"Jersey";"Jersey";"Jersey";"RoW";"";"";999;"Global average";NA;NA;NA;"";TRUE;FALSE;TRUE
+"127";396;231;231;"USA";840;"USA";"Johnston, Ilhas";"Johnston (Island)";"Johnston (Isla)";"United States of America";"United States";"United States";231;"United States of America";842;840;2;"USA";TRUE;FALSE;TRUE
+"128";399;110;110;"JPN";392;"JPN";"Japão";"Japan";"Japón";"Japan";"Japan";"Japan";110;"Japan";392;392;17;"Japan";TRUE;FALSE;TRUE
+"129";403;112;112;"JOR";400;"JOR";"Jordânia";"Jordan";"Jordania";"Jordan";"Jordan";"Jordan";112;"Jordan";400;400;12;"Middle East";TRUE;FALSE;TRUE
+"130";411;83;83;"KIR";296;"KIR";"Kiribati";"Kiribati";"Kiribati";"Kiribati";"Kiribati";"";83;"Kiribati";296;296;16;"Oceania";TRUE;FALSE;TRUE
+"131";420;120;120;"LAO";418;"LAO";"Laos";"Laos";"Laos";"Lao People's Democratic Republic";"Laos";"";120;"Lao People's Democratic Republic";418;418;15;"South East Asia";TRUE;FALSE;TRUE
+"132";423;131;131;"MYS";458;"MYS";"Lebuan, Ilhas";"Lebuan";"Lebuan";"Malaysia";"Malaysia";"Malaysia";131;"Malaysia";458;458;15;"South East Asia";TRUE;FALSE;TRUE
+"133";426;122;122;"LSO";426;"LSO";"Lesoto";"Lesotho";"Lesotho";"Lesotho";"Lesotho";"";122;"Lesotho";NA;426;8;"Southern Africa";TRUE;FALSE;TRUE
+"134";427;119;119;"LVA";428;"LVA";"Letônia";"Latvia";"Letonia";"Latvia";"Latvia";"Latvia";119;"Latvia";428;428;11;"Former USSR";TRUE;TRUE;TRUE
+"135";431;121;121;"LBN";422;"LBN";"Líbano";"Lebanon";"Líbano";"Lebanon";"Lebanon";"Lebanon";121;"Lebanon";422;422;12;"Middle East";TRUE;FALSE;TRUE
+"136";434;123;123;"LBR";430;"LBR";"Libéria";"Liberia";"Liberia";"Liberia";"Liberia";"";123;"Liberia";430;430;6;"Western Africa";TRUE;FALSE;TRUE
+"137";438;124;124;"LBY";434;"LBY";"Líbia";"Libya";"Libia";"Libya";"Libya";"Libya";124;"Libyan Arab Jamahiriya";434;434;5;"Northern Africa";TRUE;FALSE;TRUE
+"138";440;125;999;"ROW";438;"LIE";"Liechtenstein";"Liechtenstein";"Liechtenstein";"Liechtenstein";"";"";999;"Global average";NA;438;9;"OECD Europe";FALSE;FALSE;FALSE
+"139";442;126;126;"LTU";440;"LTU";"Lituânia";"Lithuania";"Lituania";"Lithuania";"Lithuania";"Lithuania";126;"Lithuania";440;440;11;"Former USSR";TRUE;TRUE;TRUE
+"140";445;256;256;"LUX";442;"LUX";"Luxemburgo";"Luxembourg";"Luxemburgo";"Luxembourg";"Luxembourg";"Luxembourg";256;"Luxembourg";NA;442;9;"OECD Europe";TRUE;TRUE;TRUE
+"141";447;128;128;"MAC";446;"MAC";"Macau";"Macao";"Macao";"China, Macao SAR";"Macau";"";351;"China";446;446;14;"East Asia";TRUE;FALSE;TRUE
+"142";449;154;154;"MKD";807;"MKD";"Macedônia";"Macedonia";"Macedonia";"North Macedonia";"Macedonia";"Former Yugoslav Republic of Macedonia";154;"The former Yugoslav Republic of Macedonia";807;807;10;"Eastern Europe";TRUE;FALSE;TRUE
+"143";450;129;129;"MDG";450;"MDG";"Madagascar";"Madagascar";"Madagascar";"Madagascar";"Madagascar";"";129;"Madagascar";450;450;7;"Eastern Africa";TRUE;FALSE;TRUE
+"144";452;174;174;"PRT";620;"PRT";"Madeira, Ilha da";"Madeira";"Madeira";"Portugal";"Portugal";"Portugal";174;"Portugal";620;620;9;"OECD Europe";TRUE;TRUE;TRUE
+"145";455;131;131;"MYS";458;"MYS";"Malásia";"Malaysia";"Malasia";"Malaysia";"Malaysia";"Malaysia";131;"Malaysia";458;458;15;"South East Asia";TRUE;FALSE;TRUE
+"146";458;130;130;"MWI";454;"MWI";"Malavi";"Malawi";"Malawi";"Malawi";"Malawi";"";130;"Malawi";454;454;8;"Southern Africa";TRUE;FALSE;TRUE
+"147";461;132;132;"MDV";462;"MDV";"Maldivas";"Maldives";"Maldivas";"Maldives";"Maldives";"";132;"Maldives";462;462;13;"South Asia";TRUE;FALSE;TRUE
+"148";464;133;133;"MLI";466;"MLI";"Mali";"Mali";"Mali";"Mali";"Mali";"";133;"Mali";466;466;6;"Western Africa";TRUE;FALSE;TRUE
+"149";467;134;134;"MLT";470;"MLT";"Malta";"Malta";"Malta";"Malta";"Malta";"Malta";134;"Malta";470;470;9;"OECD Europe";TRUE;TRUE;TRUE
+"150";472;163;999;"ROW";580;"MNP";"Marianas do Norte, Ilhas";"Northern Marianas";"Marianas Septentrionales, Islas";"Northern Mariana Islands";"";"";999;"Global average";580;580;16;"Oceania";FALSE;FALSE;FALSE
+"151";474;143;143;"MAR";504;"MAR";"Marrocos";"Morocco";"Marruecos";"Morocco";"Morocco";"Morocco";143;"Morocco";504;504;5;"Northern Africa";TRUE;FALSE;TRUE
+"152";476;127;999;"ROW";584;"MHL";"Marshall, Ilhas";"Marshall Islands";"Islas Marshall";"Marshall Islands";"";"";127;"Marshall Islands";584;584;16;"Oceania";FALSE;FALSE;FALSE
+"153";477;135;999;"ROW";474;"MTQ";"Martinica";"Martinique";"Martinica";"Martinique";"Martinique";"";135;"Martinique";NA;474;3;"Central America";FALSE;FALSE;FALSE
+"154";485;137;137;"MUS";480;"MUS";"Maurício";"Mauritius";"Mauricio";"Mauritius";"Mauritius";"Mauritius";137;"Mauritius";480;480;7;"Eastern Africa";TRUE;FALSE;TRUE
+"155";488;136;136;"MRT";478;"MRT";"Mauritânia";"Mauritania";"Mauritania";"Mauritania";"Mauritania";"";136;"Mauritania";478;478;6;"Western Africa";TRUE;FALSE;TRUE
+"156";489;999;999;"ROW";999;"ROW";"Mayotte";"Mayotte";"Mayotte";"RoW";"";"";999;"Global average";NA;NA;NA;"";TRUE;FALSE;TRUE
+"157";490;232;999;"ROW";581;"UMI";"Midway, Ilhas";"Midway, Islands";"Midways, Islas";"US Minor Is.";"";"";999;"Global average";NA;581;2;"USA";FALSE;FALSE;FALSE
+"158";493;138;138;"MEX";484;"MEX";"México";"Mexico";"México";"Mexico";"Mexico";"Mexico";138;"Mexico";484;484;3;"Central America";TRUE;FALSE;TRUE
+"159";494;146;146;"MDA";498;"MDA";"Moldávia";"Moldova";"Moldova, República de";"Republic of Moldova";"Moldova";"Republic of Moldova";146;"Moldova";498;498;11;"Former USSR";TRUE;FALSE;TRUE
+"160";495;140;999;"ROW";492;"MCO";"Mônaco";"Monaco";"Mónaco";"Monaco";"";"";999;"Global average";NA;492;9;"OECD Europe";FALSE;FALSE;FALSE
+"161";497;141;141;"MNG";496;"MNG";"Mongólia";"Mongolia";"Mongolia";"Mongolia";"Mongolia";"Mongolia";141;"Mongolia";496;496;14;"East Asia";TRUE;FALSE;TRUE
+"162";498;273;273;"MNE";499;"MNE";"Montenegro";"Montenegro";"Montenegro";"Montenegro";"Montenegro";"Montenegro";186;"Serbia and Montenegro";499;499;9;"OECD Europe";TRUE;FALSE;TRUE
+"163";499;145;999;"ROW";583;"FSM";"Micronésia";"Micronesia";"Micronesia";"Micronesia (Federated States of)";"";"";145;"Micronesia, Federated States of";583;583;16;"Oceania";FALSE;FALSE;FALSE
+"164";501;142;999;"ROW";500;"MSR";"Montserrat";"Montserrat";"Montserrat";"Montserrat";"Montserrat";"";142;"Montserrat";500;500;3;"Central America";FALSE;FALSE;FALSE
+"165";505;144;144;"MOZ";508;"MOZ";"Moçambique";"Mozambique";"Mozambique";"Mozambique";"Mozambique";"Mozambique";144;"Mozambique";508;508;8;"Southern Africa";TRUE;FALSE;TRUE
+"166";507;147;147;"NAM";516;"NAM";"Namíbia";"Namibia";"Namibia";"Namibia";"Namibia";"Namibia";147;"Namibia";NA;516;8;"Southern Africa";TRUE;FALSE;TRUE
+"167";508;148;999;"ROW";520;"NRU";"Nauru";"Nauru";"Nauru";"Nauru";"Nauru";"";148;"Nauru";520;520;16;"Oceania";FALSE;FALSE;FALSE
+"168";511;42;999;"ROW";162;"CXR";"Christmas (Navidad), Ilha";"Christmas Island";"Navidad (Christmas), Isla";"Christmas Island";"";"";999;"Global average";162;162;16;"Oceania";FALSE;FALSE;FALSE
+"169";517;149;149;"NPL";524;"NPL";"Nepal";"Nepal";"Nepal";"Nepal";"Nepal";"Nepal";149;"Nepal";524;524;13;"South Asia";TRUE;FALSE;TRUE
+"170";521;157;157;"NIC";558;"NIC";"Nicarágua";"Nicaragua";"Nicaragua";"Nicaragua";"Nicaragua";"Nicaragua";157;"Nicaragua";558;558;3;"Central America";TRUE;FALSE;TRUE
+"171";525;158;158;"NER";562;"NER";"Níger";"Niger";"Níger";"Niger";"Niger";"Niger";158;"Niger";562;562;6;"Western Africa";TRUE;FALSE;TRUE
+"172";528;159;159;"NGA";566;"NGA";"Nigéria";"Nigeria";"Nigeria";"Nigeria";"Nigeria";"Nigeria";159;"Nigeria";566;566;6;"Western Africa";TRUE;FALSE;TRUE
+"173";531;160;999;"ROW";570;"NIU";"Niue";"Niue";"Niue";"Niue";"Niue";"";160;"Niue";570;570;16;"Oceania";FALSE;FALSE;FALSE
+"174";535;161;999;"ROW";574;"NFK";"Norfolk, Ilha";"Norfolk Island";"Norfolk, Islas";"Norfolk Island";"";"";999;"Global average";574;574;16;"Oceania";FALSE;FALSE;FALSE
+"175";538;162;162;"NOR";578;"NOR";"Noruega";"Norway";"Noruega";"Norway";"Norway";"Norway";162;"Norway";579;578;9;"OECD Europe";TRUE;FALSE;TRUE
+"176";542;153;153;"NCL";540;"NCL";"Nova Caledônia";"New Caledonia";"Nueva Caledonia";"New Caledonia";"New Caledonia";"";153;"New Caledonia";540;540;16;"Oceania";TRUE;FALSE;TRUE
+"177";545;168;168;"PNG";598;"PNG";"Papua Nova Guiné";"Papua New Guinea";"Papua Nueva Guinea";"Papua New Guinea";"Papua New Guinea";"";168;"Papua New Guinea";598;598;16;"Oceania";TRUE;FALSE;TRUE
+"178";548;156;156;"NZL";554;"NZL";"Nova Zelândia";"New Zealand";"Nueva Zelanda";"New Zealand";"New Zealand";"New Zealand";156;"New Zealand";554;554;16;"Oceania";TRUE;FALSE;TRUE
+"179";551;155;155;"VUT";548;"VUT";"Vanuatu";"Vanuatu";"Vanuatu";"Vanuatu";"Vanuatu";"";155;"Vanuatu";548;548;16;"Oceania";TRUE;FALSE;TRUE
+"180";556;221;221;"OMN";512;"OMN";"Omã";"Oman";"Omán";"Oman";"Oman";"Oman";221;"Oman";512;512;12;"Middle East";TRUE;FALSE;TRUE
+"181";563;232;999;"ROW";581;"UMI";"Pacífico, Ilhas do (Administração dos EUA)";"Pacific, Islands of (U.S. Administration)";"Pacífico, las Islas (EE.UU administración)";"US Minor Is.";"";"";999;"Global average";NA;581;2;"USA";FALSE;FALSE;FALSE
+"182";566;232;999;"ROW";581;"UMI";"Pacífico, Ilhas do (EUA)";"Pacific Islands (USA)";"Pacífico, Islas del (Estados Unidos)";"US Minor Is.";"";"";999;"Global average";NA;581;2;"USA";FALSE;FALSE;FALSE
+"183";569;232;999;"ROW";581;"UMI";"Pacífico, Ilhas do (Território Fideicomisso EUA)";"Pacifics, Islands of (U.S. trust territory)";"Pacífico, las islas (EE.UU. TERRITORIO EN FIDEICOMISO";"US Minor Is.";"";"";999;"Global average";NA;581;2;"USA";FALSE;FALSE;FALSE
+"184";573;150;150;"NLD";528;"NLD";"Países Baixos (Holanda)";"Netherlands";"Países Bajos";"Netherlands";"Netherlands";"Netherlands";150;"Netherlands";528;528;9;"OECD Europe";TRUE;TRUE;TRUE
+"185";575;180;999;"ROW";585;"PLW";"Palau";"Palau";"Palau";"Palau";"";"";999;"Global average";585;585;16;"Oceania";FALSE;FALSE;FALSE
+"186";576;165;165;"PAK";586;"PAK";"Paquistão";"Pakistan";"Pakistán";"Pakistan";"Pakistan";"Pakistan";165;"Pakistan";586;586;13;"South Asia";TRUE;FALSE;TRUE
+"187";578;299;999;"ROW";275;"PSE";"Palestina";"Palestine";"Palestina";"Palestine";"Palestinian Territories";"";299;"Occupied Palestinian Territory";275;275;12;"Middle East";FALSE;FALSE;FALSE
+"188";580;166;166;"PAN";591;"PAN";"Panamá";"Panama";"Panamá";"Panama";"Panama";"Panama";166;"Panama";591;591;3;"Central America";TRUE;FALSE;TRUE
+"189";583;168;168;"PNG";598;"PNG";"Papua, Território de";"Papua territory";"Territorio de Papua";"Papua New Guinea";"Papua New Guinea";"";168;"Papua New Guinea";598;598;16;"Oceania";TRUE;FALSE;TRUE
+"190";586;169;169;"PRY";600;"PRY";"Paraguai";"Paraguay";"Paraguay";"Paraguay";"Paraguay";"Paraguay";169;"Paraguay";600;600;4;"South America";TRUE;FALSE;TRUE
+"191";589;170;170;"PER";604;"PER";"Peru";"Peru";"Perú";"Peru";"Peru";"Peru";170;"Peru";604;604;4;"South America";TRUE;FALSE;TRUE
+"192";593;172;999;"ROW";612;"PCN";"Pitcairn";"Pitcairn";"Pitcairn";"Pitcairn Islands";"";"";999;"Global average";612;612;16;"Oceania";FALSE;FALSE;FALSE
+"193";599;70;70;"PYF";258;"PYF";"Polinésia Francesa";"French Polynesia";"Polinesia Francesa";"French Polynesia";"French Polynesia";"";70;"French Polynesia";258;258;16;"Oceania";TRUE;FALSE;TRUE
+"194";603;173;173;"POL";616;"POL";"Polônia";"Poland";"Polonia";"Poland";"Poland";"Poland";173;"Poland";616;616;10;"Eastern Europe";TRUE;TRUE;TRUE
+"195";607;174;174;"PRT";620;"PRT";"Portugal";"Portugal";"Portugal";"Portugal";"Portugal";"Portugal";174;"Portugal";620;620;9;"OECD Europe";TRUE;TRUE;TRUE
+"196";611;177;177;"PRI";630;"PRI";"Porto Rico";"Puerto Rico";"Puerto Rico";"Puerto Rico";"Puerto Rico";"";177;"Puerto Rico";NA;630;3;"Central America";TRUE;FALSE;TRUE
+"197";623;114;114;"KEN";404;"KEN";"Quênia";"Kenya";"Kenya";"Kenya";"Kenya";"Kenya";114;"Kenya";404;404;7;"Eastern Africa";TRUE;FALSE;TRUE
+"198";625;113;113;"KGZ";417;"KGZ";"Quirguistão";"Kyrgyzstan";"Kirguistán";"Kyrgyzstan";"Kyrgyzstan";"Kyrgyzstan";113;"Kyrgyzstan";417;417;11;"Former USSR";TRUE;FALSE;TRUE
+"199";628;229;229;"GBR";826;"GBR";"Reino Unido";"United Kingdom";"Reino Unido";"United Kingdom";"United Kingdom";"United Kingdom";229;"United Kingdom";826;826;9;"OECD Europe";TRUE;FALSE;TRUE
+"200";640;37;37;"CAF";140;"CAF";"República Centro-Africana";"Central African Republic";"República Centroafricana";"Central African Republic";"Central African Republic";"";37;"Central African Republic";140;140;6;"Western Africa";TRUE;FALSE;TRUE
+"201";647;56;56;"DOM";214;"DOM";"República Dominicana";"Dominican Republic";"República Dominicana";"Dominican Republic";"Dominican Republic";"Dominican Republic";56;"Dominican Republic";214;214;3;"Central America";TRUE;FALSE;TRUE
+"202";660;182;999;"ROW";638;"REU";"Reunião";"Reunion";"Reunión";"RÃ©union";"Reunion";"";182;"R?union";NA;638;7;"Eastern Africa";FALSE;FALSE;FALSE
+"203";665;181;181;"ZWE";716;"ZWE";"Zimbábue";"Zimbabwe";"Zimbabwe";"Zimbabwe";"Zimbabwe";"Zimbabwe";181;"Zimbabwe";716;716;8;"Southern Africa";TRUE;FALSE;TRUE
+"204";670;183;183;"ROU";642;"ROU";"Romênia";"Romania";"Rumania";"Romania";"Romania";"Romania";183;"Romania";642;642;10;"Eastern Europe";TRUE;TRUE;TRUE
+"205";675;184;184;"RWA";646;"RWA";"Ruanda";"Rwanda";"Ruanda";"Rwanda";"Rwanda";"";184;"Rwanda";646;646;7;"Eastern Africa";TRUE;FALSE;TRUE
+"206";676;185;185;"RUS";643;"RUS";"Rússia";"Russia";"Rusia";"Russian Federation";"Russia";"Russia";185;"Russian Federation";643;643;11;"Former USSR";TRUE;FALSE;TRUE
+"207";677;25;25;"SLB";90;"SLB";"Salomão, Ilhas";"Solomon Islands";"Salomón, Islas";"Solomon Islands";"Solomon Islands";"";25;"Solomon Islands";90;90;16;"Oceania";TRUE;FALSE;TRUE
+"208";678;188;188;"KNA";659;"KNA";"Saint Kitts e Nevis";"St. Kitts and Nevis";"St. Kitts y Nevis";"Saint Kitts and Nevis";"Saint Kitts and Nevis";"";188;"Saint Kitts and Nevis";659;659;3;"Central America";TRUE;FALSE;TRUE
+"209";685;205;999;"ROW";732;"ESH";"Saara Ocidental";"Western Sahara";"Sahara Occidental";"Western Sahara";"Western Sahara";"";205;"Western Sahara";NA;732;5;"Northern Africa";FALSE;FALSE;FALSE
+"210";687;60;60;"SLV";222;"SLV";"El Salvador";"El Salvador";"El Salvador";"El Salvador";"El Salvador";"El Salvador";60;"El Salvador";222;222;3;"Central America";TRUE;FALSE;TRUE
+"211";690;244;244;"WSM";882;"WSM";"Samoa";"Samoa";"Samoa";"Samoa";"Samoa";"";244;"Samoa";882;882;16;"Oceania";TRUE;FALSE;TRUE
+"212";691;5;999;"ROW";16;"ASM";"Samoa Americana";"Americana Samoa";"Samoa Americana";"American Samoa";"American Samoa";"";5;"American Samoa";16;16;16;"Oceania";FALSE;FALSE;FALSE
+"213";693;999;999;"ROW";652;"BLM";"São Bartolomeu";"Saint Barthelemy";"San Bartolomé";NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;TRUE
+"214";695;188;188;"KNA";659;"KNA";"São Cristóvão e Névis";"Saint Christopher and Nevis";"Saint Kitts y Nevis";"Saint Kitts and Nevis";"Saint Kitts and Nevis";"";188;"Saint Kitts and Nevis";659;659;3;"Central America";TRUE;FALSE;TRUE
+"215";697;192;999;"ROW";674;"SMR";"San Marino";"San Marino";"San Marino";"San Marino";"";"";999;"Global average";674;674;9;"OECD Europe";FALSE;FALSE;FALSE
+"216";698;999;999;"ROW";999;"ROW";"São Martinho, Ilha de (parte francesa)";"São Martinho, Ilha de (parte francesa)";"São Martinho, Ilha de (parte francesa)";"RoW";"";"";999;"Global average";NA;NA;NA;"";TRUE;FALSE;TRUE
+"217";699;999;999;"ROW";534;"SXM";"Sint Maarten";"Sint Maarten";"Sint Maarten";NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;TRUE
+"218";700;190;999;"ROW";666;"SPM";"São Pedro e Miquelon";"Saint Pierre and Miquelon";"Saint Pierre y Miquelon";"Saint Pierre and Miquelon";"Saint Pierre and Miquelon";"";190;"Saint Pierre and Miquelon";666;666;2;"USA";FALSE;FALSE;FALSE
+"219";705;191;191;"VCT";670;"VCT";"São Vicente e Granadinas";"Saint Vicent and the Granadines";"San Vicente y las Granadinas";"Saint Vincent and the Grenadines";"Saint Vincent/Grenadines";"";191;"Saint Vincent and Grenadines";670;670;3;"Central America";TRUE;FALSE;TRUE
+"220";710;187;999;"ROW";654;"SHN";"Santa Helena";"Saint Helena";"Santa Helena, Ascención y Tristán de Acuña";"Saint Helena, Ascension and Tristan da Cunha";"Saint Helena";"";999;"Global average";654;654;6;"Western Africa";FALSE;FALSE;FALSE
+"221";715;189;189;"LCA";662;"LCA";"Santa Lúcia";"Saint Lucia";"Santa Lucia";"Saint Lucia";"Saint Lucia";"";189;"Saint Lucia";662;662;3;"Central America";TRUE;FALSE;TRUE
+"222";720;193;193;"STP";678;"STP";"São Tomé e Príncipe";"São Tome and Principe";"Santo Tomé y Príncipe";"Sao Tome and Principe";"Sao Tome and Principe";"";193;"Sao Tome and Principe";678;678;6;"Western Africa";TRUE;FALSE;TRUE
+"223";728;195;195;"SEN";686;"SEN";"Senegal";"Senegal";"Senegal";"Senegal";"Senegal";"Senegal";195;"Senegal";686;686;6;"Western Africa";TRUE;FALSE;TRUE
+"224";731;196;999;"ROW";690;"SYC";"Seicheles";"Seychelles";"Seychelles";"Seychelles";"Seychelles";"";196;"Seychelles";690;690;7;"Eastern Africa";FALSE;FALSE;FALSE
+"225";735;197;197;"SLE";694;"SLE";"Serra Leoa";"Sierra Leone";"Sierra Leona";"Sierra Leone";"Sierra Leone";"";197;"Sierra Leone";694;694;6;"Western Africa";TRUE;FALSE;TRUE
+"226";737;272;272;"SRB";688;"SRB";"Sérvia";"Serbia";"Serbia";"Serbia";"Serbia";"Serbia";186;"Serbia and Montenegro";688;688;9;"OECD Europe";TRUE;FALSE;TRUE
+"227";741;200;200;"SGP";702;"SGP";"Cingapura";"Singapore";"Singapur";"Singapore";"Singapore";"Singapore";200;"Singapore";702;702;15;"South East Asia";TRUE;FALSE;TRUE
+"228";744;212;212;"SYR";760;"SYR";"Síria";"Syria";"Siria";"Syrian Arab Republic";"Syria";"Syrian Arab Republic";212;"Syrian Arab Republic";760;760;12;"Middle East";TRUE;FALSE;TRUE
+"229";748;201;201;"SOM";706;"SOM";"Somália";"Somalia";"Somalia";"Somalia";"Somalia";"";201;"Somalia";706;706;7;"Eastern Africa";TRUE;FALSE;TRUE
+"230";750;38;38;"LKA";144;"LKA";"Sri Lanka";"Sri Lanka";"Sri Lanka";"Sri Lanka";"Sri Lanka";"Sri Lanka";38;"Sri Lanka";144;144;13;"South Asia";TRUE;FALSE;TRUE
+"231";754;209;209;"SWZ";748;"SWZ";"Suazilândia";"Swaziland";"Swazilandia";"Eswatini";"Swaziland";"";209;"Swaziland";NA;748;8;"Southern Africa";TRUE;FALSE;TRUE
+"232";755;260;999;"ROW";744;"SJM";"Svalbard e Jan Mayen";"Svalbard and Jan Mayen";"Svalbard y Jan Mayen";"Svalbard and Jan Mayen Islands";"";"";999;"Global average";NA;744;9;"OECD Europe";FALSE;FALSE;FALSE
+"233";756;202;202;"ZAF";710;"ZAF";"África do Sul";"South Africa";"Sudáfrica";"South Africa";"South Africa";"South Africa";202;"South Africa";711;710;8;"Southern Africa";TRUE;FALSE;TRUE
+"234";759;276;276;"SDN";736;"SDN";"Sudão";"Sudan";"Sudán";"Sudan";"";"";206;"Sudan";736;729;7;"Eastern Africa";TRUE;FALSE;TRUE
+"235";760;277;277;"SSD";728;"SSD";"Sudão do Sul";"South Sudan";"Sudán del Sur";"South Sudan";"";"South Sudan";206;"Sudan";728;728;7;"Eastern Africa";TRUE;FALSE;TRUE
+"236";764;210;210;"SWE";752;"SWE";"Suécia";"Sweden";"Suecia";"Sweden";"Sweden";"Sweden";210;"Sweden";752;752;9;"OECD Europe";TRUE;TRUE;TRUE
+"237";767;211;211;"CHE";756;"CHE";"Suíça";"Switzerland";"Suiza";"Switzerland";"Switzerland";"Switzerland";211;"Switzerland";757;756;9;"OECD Europe";TRUE;FALSE;TRUE
+"238";770;207;207;"SUR";740;"SUR";"Suriname";"Suriname";"Suriname";"Suriname";"Suriname";"Suriname";207;"Suriname";740;740;4;"South America";TRUE;FALSE;TRUE
+"239";772;208;208;"TJK";762;"TJK";"Tadjiquistão";"Tajikistan";"Tayikistán";"Tajikistan";"Tajikistan";"Tajikistan";208;"Tajikistan";762;762;11;"Former USSR";TRUE;FALSE;TRUE
+"240";776;216;216;"THA";764;"THA";"Tailândia";"Thailand";"Tailandia";"Thailand";"Thailand";"Thailand";216;"Thailand";764;764;15;"South East Asia";TRUE;FALSE;TRUE
+"241";780;215;215;"TZA";834;"TZA";"Tanzânia";"Tanzania";"Tanzanía";"United Republic of Tanzania";"Tanzania";"United Republic of Tanzania";215;"Tanzania, United Republic of";834;834;8;"Southern Africa";TRUE;FALSE;TRUE
+"242";781;71;999;"ROW";999;"ATF";"Terras Austrais Francesas";"French Southern Lands";"Tierras Australes Francesas";"French Southern and Antarctic Territories";"";"";999;"Global average";260;260;16;"Oceania";FALSE;FALSE;FALSE
+"243";782;24;999;"ROW";86;"IOT";"Território Britânico do Oceano Índico";"British Indian Ocean Territory";"Territorio Británico del Océano Indico";"British Indian Ocean Territory";"";"";999;"Global average";86;86;13;"South Asia";FALSE;FALSE;FALSE
+"244";783;72;72;"DJI";262;"DJI";"Djibuti";"Djibouti";"Djibouti";"Djibouti";"Djibouti";"";72;"Djibouti";262;262;7;"Eastern Africa";TRUE;FALSE;TRUE
+"245";785;999;999;"ROW";999;"ROW";"Território da Alta Comissão do Pacífico Ocidental";"Territory of the High Commissioner of the Western Pacif";"Territorio del Alto Comisionado del Pacífico Occidental";"RoW";"";"";999;"Global average";NA;NA;NA;"";TRUE;FALSE;TRUE
+"246";786;229;229;"GBR";826;"GBR";"Território Antártico Britânico";"British Antarctic Territory";"Territorio Antártico Británico";"United Kingdom";"United Kingdom";"United Kingdom";229;"United Kingdom";826;826;9;"OECD Europe";TRUE;FALSE;TRUE
+"247";788;39;39;"TCD";148;"TCD";"Chade";"Chad";"Chad";"Chad";"Chad";"";39;"Chad";148;148;6;"Western Africa";TRUE;FALSE;TRUE
+"248";790;51;51;"CSK";200;"CSK";"Tchecoslováquia";"Czechoslovakia";"Checoslovaquia";"Czechoslovakia";"Former Czechoslovakia";"";167;"Czech Republic";200;200;9;"OECD Europe";TRUE;FALSE;TRUE
+"249";791;167;167;"CZE";203;"CZE";"Tcheca, República";"Czech Republic";"República Checa";"Czech Republic";"Czech Republic";"Czech Republic";167;"Czech Republic";203;203;10;"Eastern Europe";TRUE;TRUE;TRUE
+"250";795;176;176;"TLS";626;"TLS";"Timor Leste";"East Timor";"Timor Leste";"Timor-Leste";"Timor-Leste (East Timor)";"";176;"Timor-Leste";626;626;15;"South East Asia";TRUE;FALSE;TRUE
+"251";800;217;217;"TGO";768;"TGO";"Togo";"Togo";"Togo";"Togo";"Togo";"Togo";217;"Togo";768;768;6;"Western Africa";TRUE;FALSE;TRUE
+"252";805;218;999;"ROW";772;"TKL";"Toquelau";"Tokelau";"Tokelau";"Tokelau";"";"";218;"Tokelau";772;772;16;"Oceania";FALSE;FALSE;FALSE
+"253";810;219;999;"ROW";776;"TON";"Tonga";"Tonga";"Tonga";"Tonga";"Tonga";"";219;"Tonga";776;776;16;"Oceania";FALSE;FALSE;FALSE
+"254";815;220;220;"TTO";780;"TTO";"Trinidad e Tobago";"Trinidad and Tobago";"Trinidad y Tobago";"Trinidad and Tobago";"Trinidad and Tobago";"Trinidad and Tobago";220;"Trinidad and Tobago";780;780;3;"Central America";TRUE;FALSE;TRUE
+"255";820;222;222;"TUN";788;"TUN";"Tunísia";"Tunisia";"Túnez";"Tunisia";"Tunisia";"Tunisia";222;"Tunisia";788;788;5;"Northern Africa";TRUE;FALSE;TRUE
+"256";823;224;999;"ROW";796;"TCA";"Turcas e Caicos, Ilhas";"Turks and Caicos, Islands";"Turcas y Caicos, Islas";"Turks and Caicos Islands";"Turks and Caicos Islands";"";999;"Global average";796;796;3;"Central America";FALSE;FALSE;FALSE
+"257";824;213;213;"TKM";795;"TKM";"Turcomenistão";"Turkmenistan";"Turkmenistán";"Turkmenistan";"Turkmenistan";"Turkmenistan";213;"Turkmenistan";795;795;11;"Former USSR";TRUE;FALSE;TRUE
+"258";827;223;223;"TUR";792;"TUR";"Turquia";"Turkey";"Turquía";"Turkey";"Turkey";"Turkey";223;"Turkey";792;792;12;"Middle East";TRUE;FALSE;TRUE
+"259";828;227;999;"ROW";798;"TUV";"Tuvalu";"Tuvalu";"Tuvalu";"Tuvalu";"";"";227;"Tuvalu";798;798;16;"Oceania";FALSE;FALSE;FALSE
+"260";831;230;230;"UKR";804;"UKR";"Ucrânia";"Ukraine";"Ucrania";"Ukraine";"Ukraine";"Ukraine";230;"Ukraine";804;804;11;"Former USSR";TRUE;FALSE;TRUE
+"261";833;226;226;"UGA";800;"UGA";"Uganda";"Uganda";"Uganda";"Uganda";"Uganda";"";226;"Uganda";800;800;7;"Eastern Africa";TRUE;FALSE;TRUE
+"262";840;999;999;"ROW";999;"ROW";"União das Repúblicas Socialistas Soviéticas";"Union of Soviet Socialist Republics";"Unión de Repúblicas Socialistas Soviéticas";"RoW";"";"";999;"Global average";NA;NA;NA;"";TRUE;FALSE;TRUE
+"263";845;234;234;"URY";858;"URY";"Uruguai";"Uruguay";"Uruguay";"Uruguay";"Uruguay";"Uruguay";234;"Uruguay";858;858;4;"South America";TRUE;FALSE;TRUE
+"264";847;235;235;"UZB";860;"UZB";"Uzbequistão";"Uzbekistan";"Uzbekistán";"Uzbekistan";"Uzbekistan";"Uzbekistan";235;"Uzbekistan";860;860;11;"Former USSR";TRUE;FALSE;TRUE
+"265";848;94;999;"ROW";336;"VAT";"Vaticano";"Vatican City";"Santa Sede (Vaticano)";"Holy See";"";"";999;"Global average";NA;336;9;"OECD Europe";FALSE;FALSE;FALSE
+"266";850;236;236;"VEN";862;"VEN";"Venezuela";"Venezuela";"Venezuela";"Venezuela (Bolivarian Republic of)";"Venezuela";"Venezuela";236;"Venezuela, Bolivarian Republic of";862;862;4;"South America";TRUE;FALSE;TRUE
+"267";858;237;237;"VNM";704;"VNM";"Vietnã";"Vietnam";"Viet Nam";"Viet Nam";"Vietnam";"Viet Nam";237;"Viet Nam";704;704;15;"South East Asia";TRUE;FALSE;TRUE
+"268";863;239;999;"ROW";92;"VGB";"Virgens, Ilhas (Britânicas)";"Virgin Islands (UK)";"Vírgenes Británicas, Islas";"British Virgin Islands";"Virgin Islands, British";"";999;"Global average";92;92;3;"Central America";FALSE;FALSE;FALSE
+"269";866;240;999;"ROW";850;"VIR";"Virgens, Ilhas (Americanas)";"Virgin Islands (USA)";"Vírgenes de los Estados Unidos, Islas";"United States Virgin Islands";"Virgin Islands,  U.S.";"";999;"Global average";NA;850;3;"Central America";FALSE;FALSE;FALSE
+"270";870;66;66;"FJI";242;"FJI";"Fiji";"Fiji";"Fiji";"Fiji";"Fiji";"";66;"Fiji";242;242;16;"Oceania";TRUE;FALSE;TRUE
+"271";873;231;231;"USA";840;"USA";"Wake, Ilha";"Wake Island";"Isla Wake";"United States of America";"United States";"United States";231;"United States of America";842;840;2;"USA";TRUE;FALSE;TRUE
+"272";875;243;999;"ROW";876;"WLF";"Wallis e Futuna, Ilhas";"Wallis and Futuna";"Wallis y Futuna";"Wallis and Futuna Islands";"";"";243;"Wallis and Futuna Islands";876;876;16;"Oceania";FALSE;FALSE;FALSE
+"273";888;250;250;"COD";180;"COD";"Congo, República Democrática";"Democratic Republic of the Congo";"República Democrática del Congo";"Democratic Republic of the Congo";"Congo (Kinshasa)";"Democratic Republic of the Congo";250;"Congo, Democratic Republic of";180;180;6;"Western Africa";TRUE;FALSE;TRUE
+"274";890;251;251;"ZMB";894;"ZMB";"Zâmbia";"Zambia";"Zambia";"Zambia";"Zambia";"Zambia";251;"Zambia";894;894;8;"Southern Africa";TRUE;FALSE;TRUE
+"275";895;999;999;"ROW";592;"PCZ";"Zona do Canal do Panamá";"Panama Canal Zone";"Zona del Canal de Panamá";NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;TRUE
+"276";990;999;999;"ROW";999;"ROW";"Provisão de Navios e Aeronaves";"Planes and ships provisions";"Disposiciones para buques y aviones";"RoW";"";"";999;"Global average";NA;NA;NA;"";TRUE;FALSE;TRUE
+"277";994;999;999;"ROW";999;"ROW";"A Designar";"To define";"A designar";"RoW";"";"";999;"Global average";NA;NA;NA;"";TRUE;FALSE;TRUE
+"278";995;999;999;"ROW";999;"ROW";"Bancos Centrais";"Central Banks";"Bancos Centrales";"RoW";"";"";999;"Global average";NA;NA;NA;"";TRUE;FALSE;TRUE
+"279";997;999;999;"ROW";999;"ROW";"Organizações Internacionais";"International Organizations";"Organizaciones Internacionales";"RoW";"";"";999;"Global average";NA;NA;NA;"";TRUE;FALSE;TRUE
+"280";998;999;999;"ROW";999;"ROW";"Sem informação";"Sem informação";"Sem informação";"RoW";"";"";999;"Global average";NA;NA;NA;"";TRUE;FALSE;TRUE
+"281";999;999;999;"ROW";999;"ROW";"Não Declarados";"Not declared";"No declarados";"RoW";"";"";999;"Global average";NA;NA;NA;"";TRUE;FALSE;TRUE
+"282";NA;15;15;"BLX";NA;"BLX";NA;NA;NA;"Belgium-Luxembourg";"";"";255;"Belgium";NA;58;9;"OECD Europe";TRUE;TRUE;TRUE
+"283";NA;34;999;"ROW";NA;"CTE";NA;NA;NA;"Canton and Enderbury Islands";"";"";999;"Global average";NA;128;16;"Oceania";FALSE;FALSE;FALSE
+"284";NA;111;999;"ROW";NA;"JTN";NA;NA;NA;"Johnston Island";"";"";999;"Global average";NA;396;16;"Oceania";FALSE;FALSE;FALSE
+"285";NA;139;999;"ROW";NA;"MID";NA;NA;NA;"Midway Island";"";"";999;"Global average";NA;488;16;"Oceania";FALSE;FALSE;FALSE
+"286";NA;152;999;"ROW";NA;"NTZ";NA;NA;NA;"Neutral Zone";"";"";999;"Global average";NA;536;12;"Middle East";FALSE;FALSE;FALSE
+"287";NA;164;999;"ROW";NA;"PCI";NA;NA;NA;"Pacific Islands Trust Territory";"";"";999;"Global average";NA;582;15;"South East Asia";FALSE;FALSE;FALSE
+"288";NA;228;228;"SUN";NA;"SUN";NA;NA;NA;"USSR";"Former U.S.S.R.";"";185;"Russian Federation";810;810;11;"Former USSR";TRUE;FALSE;TRUE
+"289";NA;242;999;"ROW";NA;"WAK";NA;NA;NA;"Wake Island";"Wake Island";"";999;"Global average";NA;872;16;"Oceania";FALSE;FALSE;FALSE
+"290";NA;248;248;"YUG";NA;"YUG";NA;NA;NA;"Yugoslav SFR";"Former Yugoslavia";"";186;"Serbia and Montenegro";891;890;10;"Eastern Europe";TRUE;FALSE;TRUE
+"291";NA;252;999;"ROW";NA;"UXY";NA;NA;NA;"Unspecified";"";"";999;"Global average";NA;896;NA;"";FALSE;FALSE;FALSE
+"292";NA;254;999;"ROW";NA;"OXY";NA;NA;NA;"Others (adjustment)";"";"";999;"Global average";NA;NA;NA;"";FALSE;FALSE;FALSE
+"293";NA;270;999;"ROW";NA;"MYT";NA;NA;NA;"Mayotte";"";"";999;"Global average";NA;175;7;"Eastern Africa";FALSE;FALSE;FALSE
+"294";NA;281;999;"ROW";NA;"MAF";NA;NA;NA;"Saint-Martin (French Part)";"";"";999;"Global average";NA;NA;3;"Central America";FALSE;FALSE;FALSE
