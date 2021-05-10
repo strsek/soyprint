@@ -9,7 +9,7 @@ library(gdxrrw)
 #### set GAMS directory according to location where GAMS is installed on your PC ###
 # igdx("C:/GAMS/34")
 
-write = TRUE
+write = FALSE
 
 # load data
 SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.rds")
@@ -65,11 +65,11 @@ transport_cost <- cost_truck %>% left_join(cost_train, by = c("a", "b")) %>% lef
 # restricted sample only containing only MUs with excess supply (a) and demand (b)
 #transport_cost_pos <- filter(transport_cost, a %in% excess_supply_pos$a, b %in% excess_demand_pos$a)
 
-# sheet only municipality codes
+# sheet with only municipality codes
 MUN <- dplyr::select(SOY_MUN, co_mun:nm_mun)
 
 # write to file ------------------------------
-if (write == TRUE){
+if (write){
   write.xlsx(MUN, file = "GAMS/MUN_codes.xlsx", col.names = F, row.names = F, sheetName = "MUN_codes")
   write.xlsx(demand, file = "GAMS/demand.xlsx", row.names = F, sheetName = "demand")
   write.xlsx(supply, file = "GAMS/supply.xlsx", row.names = F, sheetName = "supply")

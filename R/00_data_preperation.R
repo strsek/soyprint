@@ -310,9 +310,6 @@ GEO_MUN_SOY <- st_transform(GEO_MUN_SOY, 5880)
 # retrieve x/y coordinates of each MU
 MUN_xy <- st_point_on_surface(GEO_MUN_SOY) # or st_centroid(GEO_MUN_SOY)
 
-# add point coordinates to the data frame (optional)
-#GEO_MUN_SOY <- mutate(GEO_MUN_SOY, point_xy = xy$geometry)
-
 # compute euclidean distance for points within MUs
 MUN_dist <- st_distance(MUN_xy)
 dimnames(MUN_dist) <- list(GEO_MUN_SOY$co_mun, GEO_MUN_SOY$co_mun)
@@ -324,11 +321,44 @@ dimnames(MUN_adj) <- list(GEO_MUN_SOY$co_mun, GEO_MUN_SOY$co_mun)
 MUN_dist[MUN_adj == TRUE] <- 0
 
 
+# municipality capitals ---------------------------------------------------
+
+# load data
+MUN_localities <- st_read("input_data/geo/IBGE_localities/BR_Localidades_2010_v1.shx", stringsAsFactors = FALSE)
+
+# data contains several types of localities (cities, villages...) -> extract only capitals 
+MUN_capitals <- MUN_localities %>% filter(CD_NIVEL == 1) %>% dplyr::select(c(CD_GEOCODM, NM_MUNICIP, LONG, LAT)) %>% rename("co_mun" = "CD_GEOCODM", "nm_mun" = "NM_MUNICIP") %>% mutate(co_mun = as.numeric(co_mun))
+
+# check which MUs are missing
+SOY_MUN[,1:4][which(!SOY_MUN$co_mun %in% MUN_capitals$co_mun, arr.ind = T),]
+
+# add 7 missing MUs manually
+Mojuidoscampos  <- c(1504752, "MOJUÍ DOS CAMPOS", -54.640278, -2.684722)
+PescariaBrava   <- c(4212650, "PESCARIA BRAVA", -48.883333, -28.383333) 
+BalnearioRincao <- c(4220000, "BALNEÁRIO RINCÃO", -49.236111, -28.834444)
+LagoaMirim      <- c(4300001, "LAGOA MIRIM", -52.899807, -32.697881)
+LagoadosPatos   <- c(4300002, "LAGOA DOS PATOS",  -51.365753, -30.995042)
+Paraisodasaguas <- c(5006275, "PARAÍSO DAS ÁGUAS", -52.968333, -19.052222)
+PintoBandeira   <- c(4314548, "PINTO BANDEIRA", -51.450278, -29.097778) 
+
+MUN_capitals_missing <- data.frame(rbind(Mojuidoscampos, PescariaBrava, BalnearioRincao, LagoaMirim, LagoadosPatos, Paraisodasaguas, PintoBandeira))
+names(MUN_capitals_missing) <- names(MUN_capitals)[1:4]
+MUN_capitals_missing[,c(1,3:4)] <- apply(MUN_capitals_missing[,c(1,3:4)], 2, function(x) as.numeric(as.character(x)))
+# transform to sf object and project crs of main table
+MUN_capitals_missing <- st_as_sf(MUN_capitals_missing, coords = c("LONG","LAT"), remove = FALSE, crs = 4326)
+MUN_capitals_missing <- st_transform(MUN_capitals_missing, st_crs(MUN_capitals))
+# append to MUN_capitals
+MUN_capitals <- rbind(MUN_capitals, MUN_capitals_missing)
+MUN_capitals <- MUN_capitals[order(MUN_capitals$co_mun),]
+# correct names
+MUN_capitals <- left_join(MUN_capitals[,c(1,3:5)], SOY_MUN[,1:2], by = "co_mun") %>% relocate(nm_mun, .after = co_mun)
+# project to EPSG 5880
+MUN_capitals <- st_transform(MUN_capitals, crs = st_crs(GEO_MUN_SOY))
 
 
 # export data ---------------------------------------------------------------------------------------------------------------------------
 
-if (write == TRUE){
+if (write){
   
   # tables
   saveRDS(SOY_MUN, file = "intermediate_data/SOY_MUN_00.rds")
@@ -340,6 +370,9 @@ if (write == TRUE){
   st_write(GEO_MUN_SOY, "intermediate_data/GEO_MUN_SOY.gpkg", driver = "GPKG", overwrite=TRUE, delete_dsn=TRUE) # 
   saveRDS(GEO_MUN_SOY, file = "intermediate_data/GEO_MUN_SOY_00.rds")
 
+  # capitals
+  saveRDS(MUN_capitals, file = "intermediate_data/MUN_capitals.rds")
+  
   # distance matrix
   saveRDS(MUN_dist, file = "intermediate_data/MUN_dist.rds")
 }

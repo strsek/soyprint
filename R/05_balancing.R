@@ -59,7 +59,7 @@ SOY_MUN_fin <- bind_cols(SOY_MUN[,1:4], SOY_MUN_fin)
 
 
 # export data -------------------------------------------------------------------
-if(write == TRUE) {
+if(write){
   saveRDS(SOY_MUN_fin, file = "intermediate_data/SOY_MUN_fin.RDS")
   saveRDS(CBS_SOY, file = "intermediate_data/CBS_SOY.RDS")
   write.csv2(CBS_SOY, file = "intermediate_data/CBS_SOY.csv")

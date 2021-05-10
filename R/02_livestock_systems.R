@@ -287,7 +287,7 @@ LSTOCK_MUN <- dplyr::select(SOY_MUN, c(co_mun:nm_mun, cattle:quail))
 
 ############# write results ####################
 
-if (write == TRUE){
+if (write){
   # save data
   saveRDS(SOY_MUN, file = "intermediate_data/SOY_MUN_02.rds")
   # write.csv2(SOY_MUN, file = "intermediate_data/SOY_MUN.csv")
@@ -296,5 +296,4 @@ if (write == TRUE){
   # export polygons with all attributes (uncomment if needed)
   saveRDS(GEO_MUN_SOY, file = "intermediate_data/GEO_MUN_SOY_02.rds")
   # st_write(GEO_MUN_SOY, "intermediate_data/GEO_MUN_SOY.gpkg", driver = "GPKG", overwrite=TRUE, layer_options = "ENCODING=ISO-8859-1", delete_dsn=TRUE)
-  
 }

@@ -6,7 +6,7 @@ library(tidyr)
 library(janitor)
 library(openxlsx)
 
-write <- FALSE
+write <- TRUE
 
 # load data ------------------------------------------------------------------------------------
 
@@ -127,7 +127,7 @@ IMP_SOY <- IMP_NAT_SOY %>% group_by(product) %>% summarise(import = sum(import, 
 
 # export data --------------------------------------
 
-if (write == TRUE){
+if (write){
   
   # export data for Martin
    saveRDS(EXP_MUN_SOY, file = "intermediate_data/EXP_MUN_SOY.rds")

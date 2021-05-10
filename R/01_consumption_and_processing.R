@@ -87,7 +87,7 @@ newcols <- SOY_MUN %>% dplyr::select(c(co_mun, proc_bean:stock_bean))
 GEO_MUN_SOY <- GEO_MUN_SOY %>% left_join(newcols, by = "co_mun")
 
 # write to file
-if (write == TRUE){
+if (write){
   saveRDS(SOY_MUN, file = "intermediate_data/SOY_MUN_01.rds")
   saveRDS(GEO_MUN_SOY, file = "intermediate_data/GEO_MUN_SOY_01.rds")
   # st_write(GEO_MUN_SOY, "intermediate_data/GEO_MUN_SOY.gpkg", driver = "GPKG", overwrite=TRUE, delete_dsn=TRUE)
