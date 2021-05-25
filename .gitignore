@@ -1,13 +1,10 @@
-*.Rhistory
-*.Rproj.user
-intermediate_data/*
+.Rhistory
+/intermediate_data*
+.Rproj*
 GEO_MUN_2013_IBGE_merged.gpkg
 MUN_dist_long.csv
 transport_cost.csv
-transport_cost.gdx
-*.log
 *.log*
 *.lst
 *.lxi
-transport_sol.gdx
-transport_sol_simple.gdx
+*.gdx
