@@ -10,7 +10,7 @@ library(tidyr)
 library(sf)
 
 # should results be written to file ? (TRUE/FALSE)
-write = TRUE
+write = FALSE
 
 
 # load raw data -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -307,18 +307,18 @@ GEO_MUN_SOY <- GEO_MUN_SOY %>% dplyr::select(-nm_mun.y) %>% rename("nm_mun" = "n
 # project to the Brazil polyconic projection of SIRGAS 2000 (EPSG:5880)
 GEO_MUN_SOY <- st_transform(GEO_MUN_SOY, 5880)
 
-# retrieve x/y coordinates of each MU
-MUN_xy <- st_point_on_surface(GEO_MUN_SOY) # or st_centroid(GEO_MUN_SOY)
+# retrieve coordinates of a central point within each MU 
+MUN_center <- st_point_on_surface(GEO_MUN_SOY) # or st_centroid(GEO_MUN_SOY)
 
 # compute euclidean distance for points within MUs
-MUN_dist <- st_distance(MUN_xy)
-dimnames(MUN_dist) <- list(GEO_MUN_SOY$co_mun, GEO_MUN_SOY$co_mun)
+MUN_center_dist <- st_distance(MUN_center)
+dimnames(MUN_center_dist) <- list(GEO_MUN_SOY$co_mun, GEO_MUN_SOY$co_mun)
 
 # check which polygons are adjacent
-MUN_adj <- st_touches(GEO_MUN_SOY, byid = FALSE, sparse = FALSE)
-dimnames(MUN_adj) <- list(GEO_MUN_SOY$co_mun, GEO_MUN_SOY$co_mun)
+# MUN_adj <- st_touches(GEO_MUN_SOY, byid = FALSE, sparse = FALSE)
+# dimnames(MUN_adj) <- list(GEO_MUN_SOY$co_mun, GEO_MUN_SOY$co_mun)
 # set distance of adjacent polygons to zero
-MUN_dist[MUN_adj == TRUE] <- 0
+# MUN_dist[MUN_adj == TRUE] <- 0
 
 
 # municipality capitals ---------------------------------------------------
@@ -332,7 +332,8 @@ MUN_capitals <- MUN_localities %>% filter(CD_NIVEL == 1) %>% dplyr::select(c(CD_
 # check which MUs are missing
 SOY_MUN[,1:4][which(!SOY_MUN$co_mun %in% MUN_capitals$co_mun, arr.ind = T),]
 
-# add 7 missing MUs manually
+# add 7 missing MUs manually (coordinates taken from google maps)
+# Note: LAGOA MIRIM and LAGOA DOS PATOS cover only the area of lakes, without any inhabitants and a capital
 Mojuidoscampos  <- c(1504752, "MOJUÍ DOS CAMPOS", -54.640278, -2.684722)
 PescariaBrava   <- c(4212650, "PESCARIA BRAVA", -48.883333, -28.383333) 
 BalnearioRincao <- c(4220000, "BALNEÁRIO RINCÃO", -49.236111, -28.834444)
@@ -351,9 +352,17 @@ MUN_capitals_missing <- st_transform(MUN_capitals_missing, st_crs(MUN_capitals))
 MUN_capitals <- rbind(MUN_capitals, MUN_capitals_missing)
 MUN_capitals <- MUN_capitals[order(MUN_capitals$co_mun),]
 # correct names
-MUN_capitals <- left_join(MUN_capitals[,c(1,3:5)], SOY_MUN[,1:2], by = "co_mun") %>% relocate(nm_mun, .after = co_mun)
+MUN_capitals <- left_join(MUN_capitals[,c(1,3:5)], SOY_MUN[,1:2], by = "co_mun") %>% 
+  relocate(nm_mun, .after = co_mun) %>% 
+  arrange(co_mun)
 # project to EPSG 5880
 MUN_capitals <- st_transform(MUN_capitals, crs = st_crs(GEO_MUN_SOY))
+
+
+# compute euclidean distance for MU capitals
+MUN_capital_dist <- st_distance(MUN_capitals)
+dimnames(MUN_capital_dist) <- list(MUN_capitals$co_mun, MUN_capitals$co_mun)
+
 
 
 # export data ---------------------------------------------------------------------------------------------------------------------------
@@ -372,7 +381,10 @@ if (write){
 
   # capitals
   saveRDS(MUN_capitals, file = "intermediate_data/MUN_capitals.rds")
+  st_write(MUN_capitals, "intermediate_data/MUN_capitals.gpkg", driver = "GPKG", overwrite=TRUE, delete_dsn=TRUE)
   
-  # distance matrix
-  saveRDS(MUN_dist, file = "intermediate_data/MUN_dist.rds")
+  # distance matrices
+  saveRDS(MUN_center_dist, file = "intermediate_data/MUN_center_dist.rds")
+  saveRDS(MUN_capital_dist, file = "intermediate_data/MUN_capital_dist.rds")
+  
 }

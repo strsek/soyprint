@@ -7,6 +7,7 @@ write = TRUE
 
 # load data -----------------------------------------------------------------------------------
 SOY_MUN <- readRDS("intermediate_data/SOY_MUN_03.rds")
+GEO_MUN_SOY <- readRDS("intermediate_data/GEO_MUN_SOY_03.rds")
 CBS_SOY <- readRDS("intermediate_data/CBS_SOY.rds")
 EXP_MUN_SOY <- readRDS("intermediate_data/EXP_MUN_SOY.rds")
 IMP_MUN_SOY <- readRDS("intermediate_data/IMP_MUN_SOY.rds")
@@ -39,7 +40,7 @@ SOY_agg$ratio <- SOY_agg$FAO/SOY_agg$MUN
 # rescale MU level data
 SOY_MUN_fin <- as.data.frame(t(t(SOY_MUN_fin)*SOY_agg$ratio))
 
-# check for balance
+# check for balance, adding columns for total supply and demand of each product
 SOY_agg$MUN_fin <- colSums(SOY_MUN_fin)
 SOY_agg$check <- SOY_agg$MUN_fin == SOY_agg$FAO
 
@@ -54,13 +55,32 @@ sum(SOY_MUN_fin$total_supply_bean) == sum(SOY_MUN_fin$total_use_bean)
 sum(SOY_MUN_fin$total_supply_oil) == sum(SOY_MUN_fin$total_use_oil)
 sum(SOY_MUN_fin$total_supply_cake) == sum(SOY_MUN_fin$total_use_cake)
 
+
+# add columns for excess supply and demand of each product
+SOY_MUN_fin <- mutate(SOY_MUN_fin, 
+                  excess_supply_bean = ifelse(total_supply_bean - total_use_bean > 0, total_supply_bean - total_use_bean, 0), 
+                  excess_supply_oil =  ifelse(total_supply_oil -  total_use_oil > 0,  total_supply_oil -  total_use_oil, 0),
+                  excess_supply_cake = ifelse(total_supply_cake - total_use_cake > 0, total_supply_cake - total_use_cake, 0),
+                  excess_use_bean = ifelse(total_use_bean - total_supply_bean > 0, total_use_bean - total_supply_bean, 0), 
+                  excess_use_oil =  ifelse(total_use_oil -  total_supply_oil > 0,  total_use_oil -  total_supply_oil, 0),
+                  excess_use_cake = ifelse(total_use_cake - total_supply_cake > 0, total_use_cake - total_supply_cake, 0))
+
+# add columns for domestic use of each product
+SOY_MUN_fin <- mutate(SOY_MUN_fin, 
+                      domestic_use_bean =  total_use_bean - exp_bean,
+                      domestic_use_oil  =  total_use_oil -  exp_oil ,
+                      domestic_use_cake =  total_use_cake - exp_cake)
+
 # add MU identifiers back again
 SOY_MUN_fin <- bind_cols(SOY_MUN[,1:4], SOY_MUN_fin)
 
+# merge with GEO file
+GEO_MUN_SOY_fin <- right_join(GEO_MUN_SOY, select(SOY_MUN_fin, c(co_mun, total_supply_bean:excess_use_cake)), by = "co_mun")
 
 # export data -------------------------------------------------------------------
 if(write){
-  saveRDS(SOY_MUN_fin, file = "intermediate_data/SOY_MUN_fin.RDS")
-  saveRDS(CBS_SOY, file = "intermediate_data/CBS_SOY.RDS")
-  write.csv2(CBS_SOY, file = "intermediate_data/CBS_SOY.csv")
+  saveRDS(SOY_MUN_fin, file = "intermediate_data/SOY_MUN_fin.rds")
+  saveRDS(GEO_MUN_SOY_fin, file = "intermediate_data/GEO_MUN_SOY_fin.rds")
+  saveRDS(CBS_SOY, file = "intermediate_data/CBS_SOY.rds")
+  write.csv2(CBS_SOY, file = "intermediate_data/CBS_SOY.rds")
 }

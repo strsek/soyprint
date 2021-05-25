@@ -19,7 +19,7 @@ SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.rds")
 # plot data ------------------------
 
 plot_funct <- function(variable, title, unit, ...){
-  thesubset <- GEO_MUN_SOY[SOY_MUN[,paste0(variable)]>0,]
+  thesubset <- GEO_MUN_SOY[pull(SOY_MUN, variable)>0,]
   thedata <- st_drop_geometry(thesubset)
   theplot <- ggplot(thesubset, aes(fill = pull(thedata, variable)), size = 0.01) +
                 labs(title = title)+
