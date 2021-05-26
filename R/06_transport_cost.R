@@ -8,7 +8,7 @@ library(fasterize)
 library(gdistance)
 
 # should results be written to file?
-write = FALSE
+write = TRUE
 
 # load data -------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ MUN_capitals <- readRDS("intermediate_data/MUN_capitals.rds")
 # inspect data
 #mapview(list(road, rail, river, GEO_MUN_SOY))
 #mapview(list(road, road_structural))
-mapview(dnit2010)
+#mapview(dnit2010)
 
 
 # rasterize road network -----------------------------------------------------------
@@ -90,7 +90,7 @@ ext <- as.character(st_bbox(GEO_MUN_SOY))
 gdal_utils('rasterize', src, "intermediate_data/ibge2014_rasterized.tif", options = c("-tr", "5000", "5000", "-a", "speed", "-te", ext, "-a_nodata", "NA", "-at"))
 # load in rasterized file
 ibge2014_rast <- raster("intermediate_data/ibge2014_rasterized.tif")
-mapview(ibge2014_rast, maxpixels = 833860)
+#mapview(ibge2014_rast, maxpixels = 833860)
 
 # create cost raster -------------------------------------------------------------------------------------------
 
@@ -138,25 +138,28 @@ transition <- transition(x = road_speed2014, transitionFunction = function(x) me
 # geoCorrect (see gDistance documentation)
 transition_corr <- geoCorrection(transition, type = "c")
 # compute matrix of least-cost distances between MU capitals
-cost_mat <- costDistance(transition_corr, st_coordinates(MUN_capitals)[1:10,])
+road_cost_mat <- costDistance(transition_corr, st_coordinates(MUN_capitals)[1:10,])
 
 # check an exemplary pair of MUs
-AtoB <- shortestPath(transition_corr, as_Spatial(MUN_capitals[1,]), as_Spatial(MUN_capitals[1337,]), output = "SpatialLines")
+A <- MUN_capitals[1,]
+B <-MUN_capitals[1337,]
+AtoB <- shortestPath(transition_corr, as_Spatial(A), as_Spatial(B), output = "SpatialLines")
 #road_cost_crop  <- crop(road_cost2010, AtoB) 
 #plot(road_cost_crop)
-#plot(road_cost2010)
+#plot(road_speed2014)
 #plot(AtoB, add = TRUE)
 plot(as_Spatial(MUN_capitals[c(1,1337),]), add = TRUE)
-cost_mat_AtoB <- costDistance(transition_corr, as_Spatial(MUN_capitals[1:2,]))
+cost_mat_AtoB <- costDistance(transition_corr, as_Spatial(MUN_capitals[1:1337,]))
 
 m1 <- mapview(road_speed2014, maxpixels =  799850) #, st_as_sf(AtoB)
 m2 <- mapview(AtoB, color = 'cyan') 
+m3 <- mapview(list(A,B), zcol = "nm_mun", col.regions = list("yellow", "green"))
 
-m1+m2
+m1+m2+m3
 
 
 # export results
 
 if(write){
-  saveRDS(cost_mat, file = "intermediate_data/network_cost.RDS")
+  saveRDS(road_cost_mat, file = "intermediate_data/road_cost_mat.RDS")
 }

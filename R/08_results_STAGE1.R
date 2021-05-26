@@ -8,15 +8,14 @@ library(abind)
 library(Matrix.utils)
 
 
-write = FALSE
+write = TRUE
 
-flows_GAMS <- readRDS("intermediate_data/transport_flows.rds")
-flows_R <- readRDS("intermediate_data/transport_flows_R.rds")
+flows_GAMS <- readRDS("intermediate_data/flows_GAMS.rds")
+flows_R <- readRDS("intermediate_data/flows_R.rds")
 GEO_MUN_SOY <- readRDS("intermediate_data/GEO_MUN_SOY_fin.rds")
 SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.rds")
 EXP_MUN_SOY <- readRDS("intermediate_data/EXP_MUN_SOY.rds")
-
-write = TRUE
+IMP_MUN_SOY <- readRDS("intermediate_data/IMP_MUN_SOY.rds")
 
 co_mun <- SOY_MUN$co_mun
 product <- c("bean", "oil", "cake")
@@ -35,7 +34,7 @@ flow_long <- left_join(mapping_templ, flows_R, by = c("co_orig", "co_dest", "pro
 
 # put data into a list of separate wide-format matrices for each product
 flow_wide <- sapply(product, function(x){
-  filter(flow_long, product == x) %>% select(!product) %>% pivot_wider(names_from = co_dest, values_from = value) %>% column_to_rownames("co_orig") %>% as("Matrix")
+  filter(flow_long, product == x) %>% dplyr::select(!product) %>% pivot_wider(names_from = co_dest, values_from = value) %>% column_to_rownames("co_orig") %>% as("Matrix")
   }, USE.NAMES = TRUE, simplify = FALSE)
 
 # add back self-supply to the diagonals
@@ -52,7 +51,7 @@ lapply(product, function(x){
 # 
 flow_long_full <- abind(lapply(product, function(x){
   summ <- summary(flow_wide_full[[x]])
-  df <- data.frame(co_orig = co_mun[summ$i], co_dest = co_mun[summ$j], product = product, value = summ$x)}), along = 1)
+  df <- data.frame(co_orig = co_mun[summ$i], co_dest = co_mun[summ$j], product = x, value = summ$x)}), along = 1)
 
 #flow_long_full <- abind(lapply(product, function(x){as.data.frame(as.matrix(flow_wide_full[[x]])) %>% pivot_longer(everything(), names_to = "co_dest", values_to = "vlaue")}), along = 1)	
 
@@ -68,11 +67,11 @@ exp_templ <- data.frame(
   co_dest = rep(destin, times = length(co_mun) * length(product)),
   product = rep(product, each = length(destin) * length(co_mun)))
 
-exp_long  <- left_join(exp_templ, select(EXP_MUN_SOY, c(co_mun, product, to_name, export)), by = c("co_orig" = "co_mun", "co_dest" = "to_name", "product" = "product")) %>% replace_na(list(export = 0))
+exp_long  <- left_join(exp_templ, dplyr::select(EXP_MUN_SOY, c(co_mun, product, to_name, export)), by = c("co_orig" = "co_mun", "co_dest" = "to_name", "product" = "product")) %>% replace_na(list(export = 0))
 
 # put data into a list of separate wide-format matrices for each product
 exp_wide <- sapply(product, function(x){
-  filter(exp_long, product == x) %>% select(!product) %>% pivot_wider(names_from = co_dest, values_from = export) %>% column_to_rownames("co_orig") %>% as("Matrix")
+  filter(exp_long, product == x) %>% dplyr::select(!product) %>% pivot_wider(names_from = co_dest, values_from = export) %>% column_to_rownames("co_orig") %>% as("Matrix")
 }, USE.NAMES = TRUE, simplify = FALSE)
 
 

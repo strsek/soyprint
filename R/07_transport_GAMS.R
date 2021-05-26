@@ -82,8 +82,8 @@ if (write){
 }
 
 
+# after GAMS optimization: read and process results -------------------------------------------------------
 
-# read and process results -------------------------------------------------------
 transport_sol <- rgdx("GAMS/transport_sol.gdx", requestList = list(name = "xsoytransport") )
 flows <- as.data.frame(transport_sol$val)
 colnames(flows) <- c(paste0(transport_sol$domains,"_num"), "value")
@@ -108,11 +108,14 @@ transport_sol_simple_cost <- rgdx("GAMS/transport_sol_simple.gdx", requestList =
 transport_sol_simple_cost <- transport_sol_simple_cost$val
 
 # compare solution from simple model in GAMS and R
-all.equal(arrange(flows_simple, by=value), arrange(flows_R, by = value))
-flows_comp <- full_join(flows_R, flows_simple, by = c("co_orig", "co_dest", "product"))
-flows_comp <- mutate(flows_comp, diff = value.x - value.y)
-flows_comp[is.na(flows_comp)] <- 0
-colSums(select(flows_comp, value.x, value.y))
+# all.equal(arrange(flows_simple, by=value), arrange(flows_R, by = value))
+# flows_comp <- full_join(flows_R, flows_simple, by = c("co_orig", "co_dest", "product"))
+# flows_comp <- mutate(flows_comp, diff = value.x - value.y)
+# flows_comp[is.na(flows_comp)] <- 0
+# colSums(select(flows_comp, value.x, value.y))
 
 # export
-saveRDS(flows, file = "intermediate_data/transport_flows.rds")
+if (write) {
+saveRDS(flows, file = "intermediate_data/flows_GAMS.rds")
+saveRDS(flows_simple, file = "intermediate_data/flows_GAMS_simple.rds")
+}

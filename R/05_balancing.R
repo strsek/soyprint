@@ -75,7 +75,7 @@ SOY_MUN_fin <- mutate(SOY_MUN_fin,
 SOY_MUN_fin <- bind_cols(SOY_MUN[,1:4], SOY_MUN_fin)
 
 # merge with GEO file
-GEO_MUN_SOY_fin <- right_join(GEO_MUN_SOY, select(SOY_MUN_fin, c(co_mun, total_supply_bean:excess_use_cake)), by = "co_mun")
+GEO_MUN_SOY_fin <- right_join(GEO_MUN_SOY, dplyr::select(SOY_MUN_fin, c(co_mun, total_supply_bean:excess_use_cake)), by = "co_mun")
 
 # export data -------------------------------------------------------------------
 if(write){

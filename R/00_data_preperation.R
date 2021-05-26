@@ -10,7 +10,7 @@ library(tidyr)
 library(sf)
 
 # should results be written to file ? (TRUE/FALSE)
-write = FALSE
+write = TRUE
 
 
 # load raw data -----------------------------------------------------------------------------------------------------------------------------------------------

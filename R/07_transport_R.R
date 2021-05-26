@@ -44,6 +44,6 @@ flows_R <- abind(MUN_transport,along = 1, force.array = FALSE)
 
 
 if (write){
-  saveRDS(flows_R, file = "intermediate_data/transport_flows_R.rds")
+  saveRDS(flows_R, file = "intermediate_data/flows_R.rds")
 }
 
