@@ -1,4 +1,4 @@
-### subnational supply chain to exports results STAGE 1 ###
+### sub-national supply chain to exports results STAGE 1 ###
 
 library(dplyr)
 library(data.table)
@@ -48,7 +48,7 @@ lapply(product, function(x){
   all.equal(rowSums(flow_wide_full[[x]]), pull(SOY_MUN, paste0("total_supply_",x), name = "co_mun")) &
   all.equal(colSums(flow_wide_full[[x]]), pull(SOY_MUN, paste0("total_use_",x), name = "co_mun"))})
 
-# 
+# bring back into long format
 flow_long_full <- abind(lapply(product, function(x){
   summ <- summary(flow_wide_full[[x]])
   df <- data.frame(co_orig = co_mun[summ$i], co_dest = co_mun[summ$j], product = x, value = summ$x)}), along = 1)
@@ -61,6 +61,8 @@ flow_long_full <- abind(lapply(product, function(x){
 EXP_MUN_SOY <- mutate(EXP_MUN_SOY, product = ifelse(product == "soybean", "bean", ifelse(product == "soy_oil", "oil", "cake")))
   
 destin <- unique(EXP_MUN_SOY$to_name)
+destin <- c("BRA", destin)
+destin <- sort(destin)
 
 exp_templ <- data.frame(
   co_orig = rep(co_mun, each = length(destin), times = length(product)),
@@ -69,6 +71,13 @@ exp_templ <- data.frame(
 
 exp_long  <- left_join(exp_templ, dplyr::select(EXP_MUN_SOY, c(co_mun, product, to_name, export)), by = c("co_orig" = "co_mun", "co_dest" = "to_name", "product" = "product")) %>% replace_na(list(export = 0))
 
+# add domestic consumption as "exports to Brazil"
+#all.equal(exp_long$co_orig[exp_long$co_dest == "BRA" & exp_long$product == "bean"], SOY_MUN$co_mun) 
+exp_long$export[exp_long$co_dest == "BRA" & exp_long$product == "bean"] <- SOY_MUN$domestic_use_bean
+exp_long$export[exp_long$co_dest == "BRA" & exp_long$product == "oil"] <-  SOY_MUN$domestic_use_oil
+exp_long$export[exp_long$co_dest == "BRA" & exp_long$product == "cake"] <- SOY_MUN$domestic_use_cake
+
+
 # put data into a list of separate wide-format matrices for each product
 exp_wide <- sapply(product, function(x){
   filter(exp_long, product == x) %>% dplyr::select(!product) %>% pivot_wider(names_from = co_dest, values_from = export) %>% column_to_rownames("co_orig") %>% as("Matrix")
@@ -76,19 +85,20 @@ exp_wide <- sapply(product, function(x){
 
 
 # map MU sources to export destinations by multiplying the MU flow matrix in relative terms with the export matrix for each product
+# create a sub-national flow "input coefficient matrix" by dividing each column by the column sum (= total use)
 flow_wide_rel <- lapply(flow_wide_full, function(x){ rel <- t(t(x)/colSums(x)); rel[is.na(rel)] <- 0; return(rel)})
-
+# map sources to exports by multiplying the flow coefficient matrix with the export matrix 
 source_to_export <- sapply(product, function(x){flow_wide_rel[[x]] %*% exp_wide[[x]]}, USE.NAMES = TRUE, simplify = FALSE)
- 
+
+# check if results match total exports
+sapply(exp_wide, sum, na.rm = T)
+sapply(source_to_export, sum, na.rm = T) 
 
 # finally, take into account that some of the MU level supply is imported by multiplying rows by "domestic supply share" of each MU
 source_to_export <- sapply(product, function(x){
   dom_share <- (pull(SOY_MUN, paste0("prod_",x))/pull(SOY_MUN, paste0("total_supply_",x)))
   dom_share[is.na(dom_share)] <- 0
   source_to_export[[x]] * dom_share}, USE.NAMES = TRUE, simplify = FALSE)
-
-sapply(exp_wide, sum, na.rm = T)
-sapply(source_to_export, sum, na.rm = T)
 
 # bring back into long format
 source_to_export_df <- lapply(product, function(x) {
@@ -101,8 +111,12 @@ source_to_export_df <- lapply(product, function(x) {
   df <- mutate(df, item_code = x, .before = from_code)
 }) 
 
+
 source_to_export_fin <- bind_rows(source_to_export_df)
 
+#### TODO: check discrepancies
+sapply(source_to_export, sum, na.rm = T) 
+sum(SOY_MUN$prod_bean); sum(SOY_MUN$prod_oil); sum(SOY_MUN$prod_cake)
 
 # export results
 if (write){

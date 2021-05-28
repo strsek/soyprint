@@ -2,6 +2,7 @@
 
 library(dplyr)
 library(tidyr)
+library(ggplot2)
 
 write == TRUE
 
@@ -64,13 +65,14 @@ comp_mun <- trase_mun %>% full_join(results_mun_agg, by = c("co_mun" = "from_cod
 comp_mun <- comp_mun %>% left_join(dplyr::select(SOY_MUN, c(co_mun, co_state)), by = "co_mun") %>% relocate(co_state, .before = nm_state)
 
 # add country group from FABIO
-comp_mun <- comp_mun %>% left_join(dplyr::select(regions, c(ISO_BTD, region)), by = c("to_code" = "ISO_BTD")) %>%
+regions_btd <- filter(regions, ISO_BTD != "ROW") %>% distinct(CO_BTD, ISO_BTD, region)
+comp_mun <- comp_mun %>% left_join(dplyr::select(regions_btd, c(ISO_BTD, region)), by = c("to_code" = "ISO_BTD")) %>%
   rename(to_region = region) %>% relocate(to_region, .after = to_code) %>%
   # separate China
   mutate(to_region = ifelse(to_code == "CHN", "China", to_region)) %>%
   mutate(to_region = ifelse(to_code == "ROW", "ROW", to_region))
 
-# drop landuse (optional)
+# drop land-use (optional)
 comp_mun <- dplyr::select(comp_mun, -landuse)
 
 
@@ -89,15 +91,30 @@ comp_state <- comp_mun %>% group_by(co_state, to_code, to_region) %>%
 ggplot(comp_state, aes(x=trase, y = own, color = ))+
   geom_point()
 
+ggplot(comp_mun, aes(x=trase, y = own, color = "blue"))+
+  geom_point()
+ # geom_line
+ # +.5% line
+
+# compare production with trase flows 
+# check outliers
 
 # aggregate by region
 comp_state_by_region <- comp_mun %>% group_by(co_state, to_region) %>% 
   summarise(trase = sum(trase, na.rm = TRUE), own = sum(own, na.rm = T), .groups = "drop")
 
 # total exports by destination region
-exp_by_dest <- comp_mun %>% group_by(to_region) %>% 
+exp_by_dest <- comp_mun %>% group_by(to_code) %>% 
   summarise(trase = sum(trase, na.rm = TRUE), own = sum(own, na.rm = T), .groups = "drop")
 
+exp_by_dest_region <- comp_mun %>% group_by(to_region) %>% 
+  summarise(trase = sum(trase, na.rm = TRUE), own = sum(own, na.rm = T), .groups = "drop")
+
+exp_total <- colSums(filter(exp_by_dest, to_code != "BRA")[,2:3])
+exp_total["diff"] <- exp_total[2] - exp_total[1]
+
+flow_total <- colSums(exp_by_dest[,2:3])
+flow_total["diff"] <- exp_total[2] - exp_total[1]
 
 if (write){
   write.csv2(comp_mun, "intermediate_data/comp_mun.csv")
