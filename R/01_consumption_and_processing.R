@@ -22,10 +22,13 @@ proc_days <- CBS_SOY["bean", "processing"]/sum(SOY_MUN$proc_cap, na.rm = TRUE)
 ref_days <- CBS_SOY["oil", "production"]/sum(SOY_MUN$ref_cap, na.rm = TRUE)
 
 # conversion factor from soybean to cake and oil
-cake_conv <- CBS_SOY["cake", "production"]/CBS_SOY["bean", "processing"]
-oil_conv <- CBS_SOY["oil", "production"]/CBS_SOY["bean", "processing"]
+(cake_conv <- CBS_SOY["cake", "production"]/CBS_SOY["bean", "processing"])
+(oil_conv <- CBS_SOY["oil", "production"]/CBS_SOY["bean", "processing"])
 # note: values are relatively consistent with Smalling et. al (2008)[75% and 20%] and Dei (2011)[79% / 19%]
-
+# processing losses:
+(proc_loss <- 1-cake_conv-oil_conv)
+# equivalence factor (for comparison with TRASE)
+(equi_fact <- 1/(cake_conv+oil_conv))
 
 ## derive reference values for MU consumption estimation
 
@@ -56,6 +59,8 @@ SOY_MUN$prod_oil <- SOY_MUN$proc_bean*oil_conv
 SOY_MUN$prod_cake <- SOY_MUN$proc_bean*cake_conv
 sum(SOY_MUN$prod_oil, na.rm = T) == CBS_SOY["oil","production"]
 sum(SOY_MUN$prod_cake, na.rm = T) == CBS_SOY["cake","production"]
+# also add processing losses as difference between input and output
+# SOY_MUN$loss_bean <- SOY_MUN$proc_bean*(1-oil_conv-cake_conv)
 
 
 ## MU consumption items

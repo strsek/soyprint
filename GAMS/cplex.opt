@@ -1,4 +1,5 @@
 lpmethod 0
-names no
 threads 1
 memoryemphasis 1
+baralg 0
+names no

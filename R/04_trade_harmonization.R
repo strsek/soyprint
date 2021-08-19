@@ -125,6 +125,7 @@ EXP_SOY <- EXP_NAT_SOY %>% group_by(product) %>% summarise(export = sum(export, 
 IMP_SOY <- IMP_NAT_SOY %>% group_by(product) %>% summarise(import = sum(import, na.rm = T), import_dol = sum(import_dol, na.rm = T), import_btd = sum(import_btd, na.rm = T))
 
 
+
 # export data --------------------------------------
 
 if (write){

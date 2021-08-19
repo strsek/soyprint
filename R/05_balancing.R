@@ -77,10 +77,22 @@ SOY_MUN_fin <- bind_cols(SOY_MUN[,1:4], SOY_MUN_fin)
 # merge with GEO file
 GEO_MUN_SOY_fin <- right_join(GEO_MUN_SOY, dplyr::select(SOY_MUN_fin, c(co_mun, total_supply_bean:excess_use_cake)), by = "co_mun")
 
+
+# re-scale MU exports/imports files to match CBS values as well
+# EXP_MUN_SOY <- mutate(EXP_MUN_SOY, 
+#                      export     = ifelse(product == "soybean", export*SOY_agg["exp_bean","ratio"],      ifelse(product == "soy_oil", export*SOY_agg["exp_oil","ratio"],     export*SOY_agg["exp_cake","ratio"] )),
+#                      export_dol = ifelse(product == "soybean", export_dol*SOY_agg["exp_bean","ratio"],  ifelse(product == "soy_oil", export_dol*SOY_agg["exp_oil","ratio"], export_dol*SOY_agg["exp_cake","ratio"] )))
+# 
+# IMP_MUN_SOY <- mutate(IMP_MUN_SOY, 
+#                      import     = ifelse(product == "soybean", import*SOY_agg["imp_bean","ratio"],      ifelse(product == "soy_oil", import*SOY_agg["imp_oil","ratio"],     import*SOY_agg["imp_cake","ratio"] )),
+#                      import_dol = ifelse(product == "soybean", import_dol*SOY_agg["imp_bean","ratio"],  ifelse(product == "soy_oil", import_dol*SOY_agg["imp_oil","ratio"], import_dol*SOY_agg["imp_cake","ratio"] )))
+
 # export data -------------------------------------------------------------------
 if(write){
   saveRDS(SOY_MUN_fin, file = "intermediate_data/SOY_MUN_fin.rds")
   saveRDS(GEO_MUN_SOY_fin, file = "intermediate_data/GEO_MUN_SOY_fin.rds")
   saveRDS(CBS_SOY, file = "intermediate_data/CBS_SOY.rds")
   write.csv2(CBS_SOY, file = "intermediate_data/CBS_SOY.rds")
+  saveRDS(EXP_MUN_SOY, file = "intermediate_data/EXP_MUN_SOY_cbs.rds")
+  saveRDS(IMP_MUN_SOY, file = "intermediate_data/IMP_MUN_SOY_cbs.rds")
 }
