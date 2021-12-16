@@ -18,13 +18,14 @@ SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.rds")
 
 # plot data ------------------------
 
-plot_funct <- function(variable, title, unit, ...){
+plot_funct <- function(variable, title = NA, unit = NA, ...){
   thesubset <- GEO_MUN_SOY[pull(SOY_MUN, variable)>0,]
   thedata <- st_drop_geometry(thesubset)
   theplot <- ggplot(thesubset, aes(fill = pull(thedata, variable)), size = 0.01) +
-                labs(title = title)+
+                labs(title = ifelse(!is.na(title), title, variable))+
                 geom_sf(color = "transparent")+            
-                scale_fill_viridis(direction = -1, na.value = "transparent", name = paste(unit)) + 
+               # scale_fill_viridis(direction = -1, na.value = "transparent", name = paste(unit)) + 
+                scale_fill_gradient(direction = -1, low = "white", high = "darkgreen", na.value = "transparent", name = paste(unit)) + 
                 geom_sf(data = GEO_states, fill = "transparent", color = "grey", size = 0.1)+
                 theme_void()+ # or minimal
                 theme(plot.title = element_text(hjust = 0.5), plot.margin = margin(0.5, 1, 0.5, 1, "cm"))

@@ -320,6 +320,10 @@ dimnames(MUN_center_dist) <- list(GEO_MUN_SOY$co_mun, GEO_MUN_SOY$co_mun)
 # set distance of adjacent polygons to zero
 # MUN_dist[MUN_adj == TRUE] <- 0
 
+# merge all MUs to obtain a polygon of the whole country (for download of MapBiomas data on GEE)
+GEO_BRA <- summarise(GEO_MUN_SOY)
+GEO_BRA_EXT <- st_as_sfc(st_bbox(GEO_MUN_SOY))
+
 
 # municipality capitals ---------------------------------------------------
 
@@ -379,6 +383,10 @@ if (write){
   st_write(GEO_MUN_SOY, "intermediate_data/GEO_MUN_SOY.gpkg", driver = "GPKG", overwrite=TRUE, delete_dsn=TRUE) # 
   saveRDS(GEO_MUN_SOY, file = "intermediate_data/GEO_MUN_SOY_00.rds")
 
+  # Brazil Polygon
+  st_write(GEO_BRA, "intermediate_data/GEO_BRA.shp", append=FALSE) # 
+  st_write(GEO_BRA_EXT, "intermediate_data/GEO_BRA_EXT.shp", append=FALSE) # 
+  
   # capitals
   saveRDS(MUN_capitals, file = "intermediate_data/MUN_capitals.rds")
   st_write(MUN_capitals, "intermediate_data/MUN_capitals.gpkg", driver = "GPKG", overwrite=TRUE, delete_dsn=TRUE)

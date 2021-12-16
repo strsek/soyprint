@@ -14,6 +14,9 @@ write = TRUE
 #flows_euclid <- readRDS("intermediate_data/flows_R.rds")
 #flows_road <- readRDS("intermediate_data/flows_road.rds")
 flows <- readRDS("intermediate_data/flows_list.rds")
+X_a_b_tot_mf <- readRDS("intermediate_data/X_a_b_tot.rds")
+X_a_b_tot_nn <- readRDS("intermediate_data/X_a_b_tot_nn.rds")
+flows <- c(flows, "intermod_mf" = list(X_a_b_tot_mf), "intermod_nn" = list(X_a_b_tot_nn))
 
 #GEO_MUN_SOY <- readRDS("intermediate_data/GEO_MUN_SOY_fin.rds")
 SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.rds")
@@ -163,10 +166,6 @@ source_2_export <- lapply(flows, function(x){
 #stopCluster(clust)
 
 
-#### TODO: check discrepancies: 
-# soybean production should match, for oil and cake it should match with production weighted by total domestic soybean share
-#sapply(source_to_export, sum, na.rm = T) 
-#sum(SOY_MUN$prod_bean)-sum(SOY_MUN$prod_oil)-sum(SOY_MUN$prod_cake); sum(SOY_MUN$prod_oil)*(sum(SOY_MUN$prod_bean)/sum(SOY_MUN$total_supply_bean)); sum(SOY_MUN$prod_cake)*(sum(SOY_MUN$prod_bean)/sum(SOY_MUN$total_supply_bean))
 
 # export results
 if (write){

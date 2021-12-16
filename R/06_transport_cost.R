@@ -12,6 +12,7 @@ library(tidyr)
 library(tibble)
 library(xlsx)
 library(abind)
+library(janitor)
 
 # should results be written to file?
 write = FALSE
@@ -39,13 +40,14 @@ cargo_rail <- xlsx::read.xlsx("input_data/RailCargo_2006-21_ANTT.xls", sheetName
 # ANTAQ ports and cargo data
 ports <- st_read("input_data/geo/ANTAQ/IP.shp", stringsAsFactors = FALSE, options = "ENCODING=WINDOWS-1252")
 cargo_water <- read.csv2("input_data/geo/ANTAQ/2013Carga.txt", encoding="UTF-8", stringsAsFactors=FALSE)
+cargo_water_cont <- read.csv2("input_data/geo/ANTAQ/2013Carga_Conteinerizada.txt", encoding="UTF-8", stringsAsFactors=FALSE)
 
 # MU capitals
 MUN_capitals <- readRDS("intermediate_data/MUN_capitals.rds")
 
 
 
-# create cost rasters for all modes -------------------------------------------------------------------------------------------
+# create distance rasters for all modes -------------------------------------------------------------------------------------------
 
 
 #### road ------------------------------------------------------------------------------
@@ -92,69 +94,71 @@ osm2014$state <- as.numeric(substr(as.character(osm_mun),1,2))
 osm2014 <- osm2014 %>% mutate(maxspeed = ifelse(maxspeed == 0, NA, maxspeed))
 osm_att <- st_drop_geometry(osm2014)
 
-## fill missing maxspeed values: 2 options
-
-# 1. use most frequent value of same road type in MU/state/country
-
-# get most frequent speed value per road type and state
-maxspeed_BRA   <- osm_att %>% group_by(fclass) %>% summarise(maxspeed_BRA = modal(maxspeed, ties = "highest", na.rm = T), .groups = "drop")
-maxspeed_state <- osm_att %>% filter(!is.na(state)) %>% group_by(fclass, state) %>% summarise(maxspeed_state = modal(maxspeed, ties = "highest", na.rm = T), .groups = "drop")
-maxspeed_mun   <- osm_att %>% filter(!is.na(mun)) %>% group_by(fclass, mun) %>% summarise(maxspeed_mun = modal(maxspeed, ties = "highest", na.rm = T), .groups = "drop")
-maxspeed_mun_ref   <- osm_att %>% filter(!is.na(mun)) %>% group_by(fclass, mun, ref) %>% summarise(maxspeed_mun_ref = modal(maxspeed, ties = "highest", na.rm = T), .groups = "drop")
-
-# fill missing maxspeed values
-osm2014 <- left_join(osm2014, maxspeed_mun_ref, by = c("fclass", "mun", "ref"))
-osm2014 <- left_join(osm2014, maxspeed_mun, by = c("fclass", "mun"))
-osm2014 <- left_join(osm2014, maxspeed_state, by = c("fclass", "state"))
-osm2014 <- left_join(osm2014, maxspeed_BRA, by = c("fclass"))
-osm2014 <- mutate(osm2014, maxspeed_mf_fin = coalesce(maxspeed, maxspeed_mun_ref, maxspeed_mun, maxspeed_state, maxspeed_BRA))
-
-# 2. use value of closest road of same road type
-# osm_byclass <- sapply(unique(osm2014$fclass), function(x){filter(osm2014, !is.na(maxspeed) & fclass == x)}, simplify = F, USE.NAMES = T)
-# nn <- lapply(osm_byclass, function(x){st_nearest_feature(osm2014, x)})
-# nn_maxspeed <- sapply(names(nn), function(x){maxspeed <- osm_byclass[[x]]$maxspeed[nn[[x]]]
-# df = data.frame(fclass = x, osm_id = osm2014$osm_id, maxspeed_nn = maxspeed)
-#                 return(df)}, simplify = F, USE.NAMES = T) %>% bind_rows()
-# 
-# osm2014 <- left_join(osm2014, nn_maxspeed, by = c("osm_id", "fclass"))
-# osm2014 <- mutate(osm2014, maxspeed_nn_fin = coalesce(maxspeed, maxspeed_nn))
-# 
-# # transform maxspeed into a weighted conductance value 
-# # this will weight the distance to traverse a pixel by the deviation of the maxspeed from 80km/h, which is assumed to be the average maxspeed on long distance routes
-# osm2014 <- mutate(osm2014, conduct_mf = maxspeed_mf_fin/80, conduct_mf_sqrt = sqrt(maxspeed_mf_fin/80), conduct_nn = maxspeed_nn_fin/80, conduct_nn_sqrt = sqrt(maxspeed_nn_fin/80))
-
-## rasterize  OSM data
-
-# write to file
-osm2014mf <- arrange(osm2014, maxspeed_mf_fin)
-st_write(osm2014mf, dsn = "intermediate_data/osm2014mf.gpkg", driver = "GPKG", delete_dsn = TRUE)
-
-# osm2014nn <- arrange(osm2014, maxspeed_nn_fin)
-# st_write(osm2014nn, dsn = "intermediate_data/osm2014nn.gpkg", driver = "GPKG", delete_dsn = TRUE)
+## ## fill missing maxspeed values: 2 options
+## 
+## NOTE: computationally intensive, uncomment if needed 
+## 
+## # 1. use most frequent value of same road type in MU/state/country
+## 
+## # get most frequent speed value per road type and state
+## maxspeed_BRA   <- osm_att %>% group_by(fclass) %>% summarise(maxspeed_BRA = modal(maxspeed, ties = "highest", na.rm = T), .groups = "drop")
+## maxspeed_state <- osm_att %>% filter(!is.na(state)) %>% group_by(fclass, state) %>% summarise(maxspeed_state = modal(maxspeed, ties = "highest", na.rm = T), .groups = "drop")
+## maxspeed_mun   <- osm_att %>% filter(!is.na(mun)) %>% group_by(fclass, mun) %>% summarise(maxspeed_mun = modal(maxspeed, ties = "highest", na.rm = T), .groups = "drop")
+## maxspeed_mun_ref   <- osm_att %>% filter(!is.na(mun)) %>% group_by(fclass, mun, ref) %>% summarise(maxspeed_mun_ref = modal(maxspeed, ties = "highest", na.rm = T), .groups = "drop")
+## 
+## # fill missing maxspeed values
+## osm2014 <- left_join(osm2014, maxspeed_mun_ref, by = c("fclass", "mun", "ref"))
+## osm2014 <- left_join(osm2014, maxspeed_mun, by = c("fclass", "mun"))
+## osm2014 <- left_join(osm2014, maxspeed_state, by = c("fclass", "state"))
+## osm2014 <- left_join(osm2014, maxspeed_BRA, by = c("fclass"))
+## osm2014 <- mutate(osm2014, maxspeed_mf_fin = coalesce(maxspeed, maxspeed_mun_ref, maxspeed_mun, maxspeed_state, maxspeed_BRA))
+## 
+## # 2. use value of closest road of same road type
+## osm_byclass <- sapply(unique(osm2014$fclass), function(x){filter(osm2014, !is.na(maxspeed) & fclass == x)}, simplify = F, USE.NAMES = T)
+## nn <- lapply(osm_byclass, function(x){st_nearest_feature(osm2014, x)})
+## nn_maxspeed <- sapply(names(nn), function(x){maxspeed <- osm_byclass[[x]]$maxspeed[nn[[x]]]
+## df = data.frame(fclass = x, osm_id = osm2014$osm_id, maxspeed_nn = maxspeed)
+##                return(df)}, simplify = F, USE.NAMES = T) %>% bind_rows()
+## 
+## osm2014 <- left_join(osm2014, nn_maxspeed, by = c("osm_id", "fclass"))
+## osm2014 <- mutate(osm2014, maxspeed_nn_fin = coalesce(maxspeed, maxspeed_nn))
+## 
+## # transform maxspeed into a weighted conductance value 
+## # this will weight the distance to traverse a pixel by the deviation of the maxspeed from 80km/h, which is assumed to be the average maxspeed on long distance routes
+## osm2014 <- mutate(osm2014, conduct_mf = maxspeed_mf_fin/80, conduct_mf_sqrt = sqrt(maxspeed_mf_fin/80), conduct_nn = maxspeed_nn_fin/80, conduct_nn_sqrt = sqrt(maxspeed_nn_fin/80))
+## 
+## ## rasterize  OSM data
+## 
+## # write to file
+## osm2014mf <- arrange(osm2014, maxspeed_mf_fin)
+## st_write(osm2014mf, dsn = "intermediate_data/osm2014mf.gpkg", driver = "GPKG", delete_dsn = TRUE)
+## 
+## osm2014nn <- arrange(osm2014, maxspeed_nn_fin)
+## st_write(osm2014nn, dsn = "intermediate_data/osm2014nn.gpkg", driver = "GPKG", delete_dsn = TRUE)
 # 
 # osm2014conduct <- arrange(osm2014, conduct_mf_sqrt)
 # st_write(osm2014conduct, dsn = "intermediate_data/osm2014conduct.gpkg", driver = "GPKG", delete_dsn = TRUE)
 
 
-# define file source and target extent for rasterization
-ext <- as.character(st_bbox(GEO_MUN_SOY))
-# rasterize from file to file with resolution of 5000m
-# "most frequent (mf) maxspeed version"
-src <- "intermediate_data/osm2014mf.gpkg"
-gdal_utils('rasterize', src, "intermediate_data/osm2014mf_rasterized.tif", options = c("-tr", "5000", "5000", "-a", "maxspeed_mf_fin", "-te", ext, "-a_nodata", "NA", "-at"))
-# "nearest neighbor (nn) maxspeed version"
-src <- "intermediate_data/osm2014nn.gpkg"
-gdal_utils('rasterize', src, "intermediate_data/osm2014nn_rasterized.tif", options = c("-tr", "5000", "5000", "-a", "maxspeed_nn_fin", "-te", ext, "-a_nodata", "NA", "-at"))
-# "mf conductance version"
-src <- "intermediate_data/osm2014conduct.gpkg"
-gdal_utils('rasterize', src, "intermediate_data/osm2014conduct_rasterized.tif", options = c("-tr", "5000", "5000", "-a", "conduct_mf_sqrt", "-te", ext, "-a_nodata", "NA", "-at"))
+## # define file source and target extent for rasterization
+## ext <- as.character(st_bbox(GEO_MUN_SOY))
+## # rasterize from file to file with resolution of 5000m
+## # "most frequent (mf) maxspeed version"
+## src <- "intermediate_data/osm2014mf.gpkg"
+## gdal_utils('rasterize', src, "intermediate_data/osm2014mf_rasterized.tif", options = c("-tr", "5000", "5000", "-a", "maxspeed_mf_fin", "-te", ext, "-a_nodata", "NA", "-at"))
+## # "nearest neighbor (nn) maxspeed version"
+## src <- "intermediate_data/osm2014nn.gpkg"
+## gdal_utils('rasterize', src, "intermediate_data/osm2014nn_rasterized.tif", options = c("-tr", "5000", "5000", "-a", "maxspeed_nn_fin", "-te", ext, "-a_nodata", "NA", "-at"))
+## # "mf conductance version"
+## src <- "intermediate_data/osm2014conduct.gpkg"
+## gdal_utils('rasterize', src, "intermediate_data/osm2014conduct_rasterized.tif", options = c("-tr", "5000", "5000", "-a", "conduct_mf_sqrt", "-te", ext, "-a_nodata", "NA", "-at"))
 
 # load in rasterized file and set NA values to no network value
 osm2014mf_rast <- raster("intermediate_data/osm2014mf_rasterized.tif")
 osm2014mf_rast[is.na(osm2014mf_rast) & Brazil_rast == 1] <- 10 # 
 
-# osm2014nn_rast <- raster("intermediate_data/osm2014nn_rasterized.tif")
-# osm2014nn_rast[is.na(osm2014nn_rast) & Brazil_rast == 1] <- 10 # 
+osm2014nn_rast <- raster("intermediate_data/osm2014nn_rasterized.tif")
+osm2014nn_rast[is.na(osm2014nn_rast) & Brazil_rast == 1] <- 10 # 
 
 # osm2014conduct_rast <- raster("intermediate_data/osm2014conduct_rasterized.tif")
 # osm2014conduct_rast[is.na(osm2014conduct_rast) & Brazil_rast == 1] <- sqrt(10/80) # 
@@ -169,9 +173,6 @@ osm2014mf_rast[is.na(osm2014mf_rast) & Brazil_rast == 1] <- 10 #
 
 
 #### rail --------------------------------------------------------------------------------
-
-# NOTE: railway stations used for soy transport were geocoded manually in QGIS
-#--- stations$id <- as.character(stations$id)
 
 # cargo: extract soy movements
 cargo_rail <- filter(cargo_rail, Mercadoria.ANTT %in% c("Soja", "Farelo de Soja", "Óleo Vegetal"))
@@ -224,12 +225,26 @@ raster::extract(rail_rast, stations_dest)
 
 #### water ---------------------------------------------------------------------------------------------
 
+# join main cargo table with info on containerized cargo
+cargo_water <- left_join(cargo_water, cargo_water_cont, by =c("X.U.FEFF.IDCarga"))
+
+# for containerized cargo, the true commodity code is contained in "CDMercadoriaConteinerizada"  
+# --> add column with harmonized commodity code
+cargo_water <- cargo_water %>% mutate(co_product = ifelse(Carga.Geral.Acondicionamento == "Conteinerizada", CDMercadoriaConteinerizada, CDMercadoria), .before = CDMercadoria)
+# add volume column containing gross weight (VLPesoCargaBruta) for bulk cargo and net weight for container cargo (VLPesoCargaConteinerizada)
+cargo_water <- cargo_water %>% mutate(weight = ifelse(Carga.Geral.Acondicionamento == "Conteinerizada", VLPesoCargaConteinerizada, VLPesoCargaBruta))
+# NOTE: results show that interior soy transports do not use containers (they seem to be only used for export shipments)
+
 # cargo: extract only interior soy movements
-cargo_water <- filter(cargo_water, CDMercadoria %in% c(1201,1507,2304)) %>%
+cargo_water <- filter(cargo_water, co_product %in% c(1201,1507,2304)) %>%
   filter(Tipo.Navegação %in% c("Interior")) %>% #"Cabotagem" #NOTE: cabotage (only small volumes) is not included for now
   filter(substr(Origem,1,2) == "BR") %>% # removing movements that originate or arrive outside of Brazil
   filter(substr(Destino,1,2) == "BR")
 
+# remove duplicates
+# NOTE: not 100% sure if these really are duplicates or the exact same volume transported repeatedly between same ports
+cargo_water_dup <- get_dupes(cargo_water, c(Origem, Destino, co_product, weight))
+cargo_water <-  distinct(cargo_water, Origem, Destino, co_product, weight ,.keep_all = TRUE)
 
 #ports:  add full MU code
 co_mun <- st_drop_geometry(GEO_MUN_SOY)$co_mun
@@ -255,10 +270,9 @@ ports <- rbind(ports, ports_add)
 ports_orig <- filter(ports, cdi_tuaria %in% cargo_water$Origem)
 ports_dest <- filter(ports, cdi_tuaria %in% cargo_water$Destino)
 
-
 # add product names to transport volumes
-cargo_water <- cargo_water %>% mutate(product = ifelse(CDMercadoria == "1201", "bean", ifelse(CDMercadoria == "1507", "oil", "cake"))) %>%
-  relocate(product, .after = CDMercadoria)
+cargo_water <- cargo_water %>% mutate(product = ifelse(co_product == "1201", "bean", ifelse(co_product == "1507", "oil", "cake"))) %>%
+  relocate(product, .after = co_product)
 
 # rasterize waterways
 water$value <- 1
@@ -292,36 +306,37 @@ raster::extract(water_rast, ports_dest)
 # create transition matrix based on cost raster
 #transition <- transition(x = road_cost2010, transitionFunction = function(x) 1/mean(x), directions=8)
 transition_osm_mf <- transition(x = osm2014mf_rast, transitionFunction = function(x){mean(sqrt(x/80))}, directions=8)
-#transition_osm_nn <- transition(x = osm2014nn_rast, transitionFunction = function(x){mean(x)}, directions=8)
+transition_osm_nn <- transition(x = osm2014nn_rast, transitionFunction = function(x){mean(sqrt(x/80))}, directions=8)
 #transition_conduct <- transition(x = osm2014conduct_rast, transitionFunction = function(x){mean(x)}, directions=8)
 #--> equivalent!
 
 # geoCorrect (see gDistance documentation)
 transition_corr_osm_mf <- geoCorrection(transition_osm_mf, type = "c")
-#transition_corr_osm_nn <- geoCorrection(transition_osm_nn, type = "c")
+transition_corr_osm_nn <- geoCorrection(transition_osm_nn, type = "c")
 #transition_corr_conduct <- geoCorrection(transition_conduct, type = "c")
 
+transition_corr <- transition_corr_osm_nn
 
 # compute matrix of least-cost distances
 ncores <- detectCores() - 1
 clust <- makeCluster(ncores)
 #clusterExport(cl = clust, c("transition_conduct","transition_corr_osm_mf", "transition_corr_osm_nn", "MUN_capitals"))
-clusterExport(cl = clust, c("transition_corr_osm_mf", "MUN_capitals"))
+clusterExport(cl = clust, c("transition_corr", "MUN_capitals", "stations_orig", "ports_orig", "stations_dest", "ports_dest"))
 
 # between MU capitals
-road_dist_MUN <- costDistance(transition_corr_osm_mf, st_coordinates(MUN_capitals))
+road_dist_MUN <- costDistance(transition_corr, st_coordinates(MUN_capitals))
 
 # from MU capitals to origin stations
-road_dist_MUN_stat <- costDistance(transition_corr_osm_mf, st_coordinates(MUN_capitals), st_coordinates(stations_orig) )
+road_dist_MUN_stat <- costDistance(transition_corr, st_coordinates(MUN_capitals), st_coordinates(stations_orig) )
 
 # from MU capitals to origin ports
-road_dist_MUN_port <- costDistance(transition_corr_osm_mf, st_coordinates(MUN_capitals), st_coordinates(ports_orig) )
+road_dist_MUN_port <- costDistance(transition_corr, st_coordinates(MUN_capitals), st_coordinates(ports_orig) )
 
 # from MU capitals to destination stations
-road_dist_stat_MUN <- costDistance(transition_corr_osm_mf, st_coordinates(stations_dest), st_coordinates(MUN_capitals) )
+road_dist_stat_MUN <- costDistance(transition_corr, st_coordinates(stations_dest), st_coordinates(MUN_capitals) )
 
 # from MU capitals to destination ports
-road_dist_port_MUN <- costDistance(transition_corr_osm_mf, st_coordinates(ports_dest), st_coordinates(MUN_capitals) )
+road_dist_port_MUN <- costDistance(transition_corr, st_coordinates(ports_dest), st_coordinates(MUN_capitals) )
 
 # change type to normal matrix
 road_dist_MUN <- as.matrix(road_dist_MUN)
@@ -458,18 +473,20 @@ modal_volumes <- data.frame(road = rep(NA,3), rail = cargo_rail_total$TU, water 
 prod <- c(sum(SOY_MUN$prod_bean), sum(SOY_MUN$prod_cake), sum(SOY_MUN$prod_oil))
 modal_volumes$road <- prod-rowSums(modal_volumes, na.rm = TRUE)
 modal_split <- modal_volumes/prod
+# check shares of soy in total rail/water (interior) transport
 
-# export results
+
+
+# write results ------------------------------------------------------------------------
 
 if(write){
   
   save(ports_dest, ports_orig, ports, file = "intermediate_data/ports.Rdata")
   save(stations_dest, stations_orig, stations, file = "intermediate_data/stations.Rdata")
   save(cargo_water_long, cargo_rail_long, file = "intermediate_data/cargo_long.Rdata")
+
+  save(road_dist_MUN, road_dist_MUN_stat, road_dist_MUN_port, road_dist_stat_MUN, road_dist_port_MUN, file = "intermediate_data/road_dist_nn.RDS")
   
-  #saveRDS(MUN_road_dist, file = "intermediate_data/MUN_road_dist.RDS")
-  #saveRDS(MUN_road_dist_osm_mf, file = "intermediate_data/MUN_road_dist_osm_mf.RDS")
-  #saveRDS(MUN_road_dist_osm_nn, file = "intermediate_data/MUN_road_dist_osm_nn.RDS")
   saveRDS(road_dist_MUN, file = "intermediate_data/road_dist_MUN.RDS")
   saveRDS(road_dist_MUN_stat, file = "intermediate_data/road_dist_MUN_stat.RDS")
   saveRDS(road_dist_MUN_port, file = "intermediate_data/road_dist_MUN_port.RDS")
@@ -477,6 +494,9 @@ if(write){
   saveRDS(road_dist_port_MUN, file = "intermediate_data/road_dist_port_MUN.RDS")
   saveRDS(water_dist, file = "intermediate_data/water_dist.RDS")
   saveRDS(rail_dist, file = "intermediate_data/rail_dist.RDS")
+  
+  save(road_cost_MUN, road_cost_MUN_stat, road_cost_MUN_port, road_cost_stat_MUN, road_cost_port_MUN, file = "intermediate_data/road_cost_nn.RDS")
+  
   
   saveRDS(road_cost_MUN, file = "intermediate_data/road_cost_MUN.RDS")
   saveRDS(road_cost_MUN_stat, file = "intermediate_data/road_cost_MUN_stat.RDS")

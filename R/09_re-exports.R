@@ -5,39 +5,41 @@ library(Matrix)
 library(dplyr)
 library(tidyr)
 library(tibble)
+source("input_data/FABIO/01_tidy_functions.R")
 
-write = TRUE
+write = FALSE
+
+# load data ---------------------------------------------------------------
 
 SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.rds")
 
-# BTD ---------------------------------------------------------------------
+# BTD 
 
-btd <- readRDS("input_data/FABIO/btd_bal.rds")
-cbs <- readRDS("input_data/FABIO/cbs_full.rds")
+soy_items <- c("bean" = 2555, "oil" = 2571, "cake" = 2590)
+btd_soy <- readRDS("input_data/FABIO/FABIO_exp/v1/btd_bal.rds") %>% 
+  filter(item_code %in% soy_items, year == 2013)
+#btd_soy <- readRDS("input_data/FABIO/FABIO_exp/btd_bal_soy.rds")
+cbs <- readRDS("input_data/FABIO/FABIO_exp/v1/cbs_full.rds") # CBS from same FABIO version!
+cbs_soy <- filter(cbs, item_code %in% soy_items & year == 2013) 
 
-items <- unique(cbs$item_code)
+items <- read.csv("input_data/FABIO/FABIO_exp/items.csv")# unique(cbs$item_code)
 regions <- readRDS("intermediate_data/regions.rds")
 regions_btd <- distinct(regions, CO_BTD, ISO_BTD) %>% arrange(CO_BTD)
-soy_items <- c("bean" = 2555, "oil" = 2571, "cake" = 2590)
 areas <- sort(unique(cbs$area_code))
 
 ## sub-national trade
 
 # imports and exports
-exp <- readRDS("intermediate_data/EXP_MUN_SOY.rds")
-imp <- readRDS("intermediate_data/IMP_MUN_SOY.rds")
+exp <- readRDS("intermediate_data/EXP_MUN_SOY_cbs.rds")
+imp <- readRDS("intermediate_data/IMP_MUN_SOY_cbs.rds")
 
 # intra-municipal trade
 flows <- readRDS("intermediate_data/transport_flows_R.rds")
 
-source("input_data/FABIO/01_tidy_functions.R")
 
+# prepare reallocation of re-exports --------------------------------------
 
-# Prepare reallocation of re-exports --------------------------------------
-
-### extend bilateral soy trade data with sub-national trade beteen Brazilian MUs
-
-btd_soy <- filter(btd, item_code %in% c(2555, 2571, 2590))
+## extend bilateral soy trade data with sub-national trade between Brazilian MUs
 
 # bring MU exports in same format as btd
 btd_MUN_exp <- exp %>% dplyr::select(co_mun, item_code, to_code, export) %>%
@@ -59,7 +61,7 @@ btd_soy_extended <- btd_soy %>% filter(from_code != 21 & to_code !=21) %>% dplyr
   bind_rows(btd_MUN_exp, btd_MUN_imp,btd_MUN_intra)
   
 
-# Create a structure to map importers to exporters per item (+ targets)
+# Create a structure to map importers to exporters per item (+ targets) 
 
 # extend FABIO btd regions by disaggregating Brazil into its municipalities
 regions_extended <- regions_btd %>% filter(ISO_BTD != "BRA") %>% bind_rows(setNames(SOY_MUN[,1:2], names(regions_btd)))
@@ -80,37 +82,27 @@ mapping <- lapply(soy_items, function(x){
   map <- left_join(mapping_templ, btd_item, by = c("from_code", "to_code")) %>% replace_na(list(value = 0))})
 
 # restructure into matrices per item
+#mapping_reex <- lapply(mapping, function(x){
+#  pivot_wider(x, names_from = to_code, values_from = value) %>% column_to_rownames("from_code") %>% as("Matrix")})
+
 mapping_reex <- lapply(mapping, function(x){
-  pivot_wider(x, names_from = to_code, values_from = value) %>% column_to_rownames("from_code") %>% as("Matrix")})
+   with(x, sparseMatrix(i=dense_rank(from_code), j = dense_rank(to_code), x=value, dimnames=list(regions_code, regions_code)))})
 
-# mapping_reex2 <- lapply(mapping, function(x){
-#   with(x, sparseMatrix(i=dense_rank(from_code), j = dense_rank(to_code), x=value, dimnames=list(regions_code, regions_code)))})
-
-# mapping_reex3 <- sapply(soy_items, function(x){
+# mapping_reex <- sapply(soy_items, function(x){
 #   btd_item <- filter(btd_soy_extended, item_code == x) %>% dplyr::select(!item_code)
 #   with(btd_item, sparseMatrix(i=match(from_code, regions_code), j = match(from_code, regions_code), x=value, dimnames=list(regions_code, regions_code)))})
 
+rm(mapping, mapping_templ)
+
 ## extend CBS with sub-national data
-cbs_soy <- cbs %>% filter(item_code %in% soy_items & year == 2013)
+
+# add domestic and total use to cbs
 cbs_soy[, dom_use := na_sum(feed, food, losses, other, processing, seed, stock_addition, balancing, unspecified)]
 cbs_soy[, total_use := na_sum(dom_use, exports)]
 
 # reshape SOY_MUN so that soy products go into separate rows
-#SOY_MUN_bean <- SOY_MUN %>% dplyr::select(c(co_mun:nm_mun, ends_with("bean"))) %>% rename_with(~ sub("_bean$", "", .x), everything()) %>% mutate(item_code = 2555, .after = nm_mun)
-#SOY_MUN_oil <-  SOY_MUN %>% dplyr::select(c(co_mun:nm_mun, ends_with("oil")))  %>% rename_with(~ sub("_oil$", "", .x),  everything()) %>% mutate(item_code = 2571, .after = nm_mun)
-#SOY_MUN_cake <- SOY_MUN %>% dplyr::select(c(co_mun:nm_mun, ends_with("cake"))) %>% rename_with(~ sub("_cake$", "", .x), everything()) %>% mutate(item_code = 2590, .after = nm_mun)
-#SOY_MUN_long <- bind_rows(SOY_MUN_bean, SOY_MUN_oil, SOY_MUN_cake) %>% rename(area_code = co_mun,
-#                                                                              area = nm_mun,
-#                                                                              production = prod, 
-#                                                                              imports = imp, 
-#                                                                              exports = exp, 
-#                                                                              processing = proc,
-#                                                                              stock_addition = stock, 
-#                                                                              dom_use = domestic_use)
-
-
 SOY_MUN_long <- SOY_MUN %>% 
-  pivot_longer(cols = prod_bean:domestic_use_cake, names_to = c(".value", "product"), names_pattern = "(.+)_(.+$)") %>%
+  pivot_longer(cols = ends_with(c("_bean", "_oil", "_cake")), names_to = c(".value", "product"), names_pattern = "(.+)_(.+$)") %>% #cols = prod_bean:domestic_use_cake
   mutate_all(~replace(., is.na(.), 0)) %>% 
   mutate(item_code = ifelse(product=="bean", 2555, ifelse(product == "oil", 2571,2590)), .before = product) %>%
   rename(area_code = co_mun,
@@ -122,18 +114,21 @@ SOY_MUN_long <- SOY_MUN %>%
          stock_addition = stock, 
          dom_use = domestic_use)
 
+# excess supply and use across MUs needs to ba added as part of exports/imports
+SOY_MUN_long <- mutate(SOY_MUN_long, imports = imports + excess_use, exports = exports + excess_supply, total_use = total_use + excess_supply, total_supply = total_supply + excess_use)
+
 
 # extend CBS with long SOY_MUN table
 cbs_soy_extended <- cbs_soy %>% dplyr::select(!c(item, year, stock_withdrawal)) %>% filter(area_code != 21) %>%
-  bind_rows(dplyr::select(SOY_MUN_long, !c(co_state:nm_state, product, starts_with("excess")))) %>%
+  bind_rows(dplyr::select(SOY_MUN_long, intersect(names(cbs_soy), names(SOY_MUN_long)) )) %>% #!c(co_state:nm_state, product, starts_with("excess"))
   mutate_all(~replace(., is.na(.), 0))
 
+# set negative domestic use to zero
+# TODO: this is just a temporary fix
+cbs_soy_extended$dom_use[cbs_soy_extended$dom_use < 0] <- 0
 
 
-## re-allocate re-exports
-
-#reex <- list()
-#for(j in soy_items) {
+# re-allocate re-exports ---------------------------------------------------------------------------
 
 reex <- lapply(soy_items, function(x){    
 data <- merge(data.table(area_code = regions_code),
@@ -155,18 +150,16 @@ mat <- solve(mat, sparse = TRUE) # make sure to use sparse = TRUE so that the ma
 
 # remove re-exports
 mat <- mat * data$dom_share # multiplying L with share of domestic production in total use
-mat <- t(t(mat) * data$dom_use) # again, along columns
+mat <- t(t(mat) * data$dom_use) # and along columns with absolute domestic use
 colnames(mat) <- rownames(mat)
-#dimnames(mat) <- list(regions_code[regions_code != 21], regions_code[regions_code != 21])
 
 return(mat)
-#reex[[names(soy_items)[soy_items == j]]] <- mat
 })
 
 ### TO CHECK: negative values in trade matrix?
 # --> due to input coefficients >>1 (trade mismatches!)
 
-# reshape to long format
+# reshape back to long format
 
 # system.time(
 # btd_final1 <- lapply(soy_items, function(x){
@@ -226,10 +219,34 @@ btd_final5 <- lapply(soy_items, function(x) {
 # 
 # all.equal(b3,b5)
 
-btd_final <- bind_rows(btd_final5)
+btd_soy_final <- rbindlist(btd_final5) # bind_rows(btd_final5)
+
+# set negative values to zero
+# TODO: just a temporary fix!
+btd_soy_final$value[btd_soy_final$value <0] <- 0
+
+# add commodity code and year
+btd_soy_final <- mutate(btd_soy_final, year = 2013, .before = item_code) %>%
+  mutate(comm_code = items$comm_code[match(btd_soy_final$item_code, items$item_code)])
+
+# append btd_soy_final to btd_final (replacing existing soy values)
+btd_final <- readRDS("input_data/FABIO/FABIO_exp/v1/btd_final.rds") 
+btd_final <- btd_final[btd_final$year == 2013]
+btd_final <- btd_final[!(btd_final$item_code %in% soy_items)]
+
+# bind btd_soy_final to btd_ginal
+btd_final <- bind_rows(btd_final, btd_soy_final)
+
+# append cbs_soy extended to cbs_full (replacing existing soy values)
+cbs <- cbs[cbs$year == 2013]
+cbs <- cbs[!(cbs$item_code %in% soy_items)]
+cbs_soy_extended <- mutate(cbs_soy_extended, item = items$item[match(cbs_soy_extended$item_code, items$item_code)],  year = 2013, .after = item_code) 
+cbs_full <- bind_rows(cbs, select(cbs_soy_extended, !c(dom_use, total_use)))
 
 
 # Store the balanced table -----------------------------------------------
 if (write){
-saveRDS(btd_final, "intermediate_data/btd_final.rds")
+  saveRDS(reex, "intermediate_data/FABIO/reex.rds")
+  saveRDS(btd_final, "intermediate_data/FABIO/btd_final.rds")
+  saveRDS(cbs_full, "intermediate_data/FABIO/cbs_full.rds")
 }

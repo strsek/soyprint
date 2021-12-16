@@ -1,4 +1,8 @@
+.Rproj.user
 .Rhistory
+.RData
+.RData
+.Ruserdata
 /intermediate_data*
 .Rproj*
 GEO_MUN_2013_IBGE_merged.gpkg
@@ -11,3 +15,8 @@ gis_osm_roads_free_1*
 *.lst
 *.lxi
 *.gdx
+/temp
+/lib
+/input_data/FABIO/FABIO_exp/pure
+/input_data/FABIO/FABIO_exp/v0
+/results*

@@ -96,11 +96,11 @@
 "95";297;86;86;"GRD";308;"GRD";"Granada";"Grenada";"Granada";"Grenada";"Grenada";"";86;"Grenada";308;308;3;"Central America";TRUE;FALSE;TRUE
 "96";301;84;84;"GRC";300;"GRC";"Grécia";"Greece";"Grecia";"Greece";"Greece";"Greece";84;"Greece";300;300;9;"OECD Europe";TRUE;TRUE;TRUE
 "97";305;85;999;"ROW";304;"GRL";"Groenlândia";"Greenland";"Groenlandia";"Greenland";"Greenland";"";999;"Global average";304;304;9;"OECD Europe";FALSE;FALSE;FALSE
-"98";309;87;999;"ROW";312;"GLP";"Guadalupe";"Guadeloupe";"Guadalupe";"Guadeloupe";"Guadeloupe";"";87;"Guadeloupe";NA;312;3;"Central America";FALSE;FALSE;FALSE
+"98";309;87;68;"FRA";312;"GLP";"Guadalupe";"Guadeloupe";"Guadalupe";"Guadeloupe";"Guadeloupe";"";87;"Guadeloupe";NA;312;3;"Central America";FALSE;FALSE;FALSE
 "99";313;88;999;"ROW";316;"GUM";"Guam";"Guam";"Guam";"Guam";"Guam";"";88;"Guam";316;316;16;"Oceania";FALSE;FALSE;FALSE
 "100";317;89;89;"GTM";320;"GTM";"Guatemala";"Guatemala";"Guatemala";"Guatemala";"Guatemala";"Guatemala";89;"Guatemala";320;320;3;"Central America";TRUE;FALSE;TRUE
 "101";321;999;999;"ROW";999;"GGY";"Guernsey";"Guernsey";"Guernsey";NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;TRUE
-"102";325;69;999;"ROW";254;"GUF";"Guiana Francesa";"French Guyana";"Guyana Francesa";"French Guiana";"French Guiana";"";69;"French Guiana";NA;254;4;"South America";FALSE;FALSE;FALSE
+"102";325;69;68;"FRA";254;"GUF";"Guiana Francesa";"French Guyana";"Guyana Francesa";"French Guiana";"French Guiana";"";69;"French Guiana";NA;254;4;"South America";FALSE;FALSE;FALSE
 "103";329;90;90;"GIN";324;"GIN";"Guiné";"Guinea";"Guinea";"Guinea";"Guinea";"";90;"Guinea";324;324;6;"Western Africa";TRUE;FALSE;TRUE
 "104";331;61;999;"ROW";226;"GNQ";"Guiné Equatorial";"Equatorial Guinea";"Guinea Ecuatorial";"Equatorial Guinea";"Equatorial Guinea";"";61;"Equatorial Guinea";226;226;6;"Western Africa";FALSE;FALSE;FALSE
 "105";334;175;175;"GNB";624;"GNB";"Guiné-Bissau";"Guinea-Bissau";"Guinea-Bissau";"Guinea-Bissau";"Guinea-Bissau";"";175;"Guinea-Bissau";624;624;6;"Western Africa";TRUE;FALSE;TRUE
@@ -152,7 +152,7 @@ Heard Island and McDonald Islands";"Islas Heard y McDonald";"Heard and McDonald 
 "150";472;163;999;"ROW";580;"MNP";"Marianas do Norte, Ilhas";"Northern Marianas";"Marianas Septentrionales, Islas";"Northern Mariana Islands";"";"";999;"Global average";580;580;16;"Oceania";FALSE;FALSE;FALSE
 "151";474;143;143;"MAR";504;"MAR";"Marrocos";"Morocco";"Marruecos";"Morocco";"Morocco";"Morocco";143;"Morocco";504;504;5;"Northern Africa";TRUE;FALSE;TRUE
 "152";476;127;999;"ROW";584;"MHL";"Marshall, Ilhas";"Marshall Islands";"Islas Marshall";"Marshall Islands";"";"";127;"Marshall Islands";584;584;16;"Oceania";FALSE;FALSE;FALSE
-"153";477;135;999;"ROW";474;"MTQ";"Martinica";"Martinique";"Martinica";"Martinique";"Martinique";"";135;"Martinique";NA;474;3;"Central America";FALSE;FALSE;FALSE
+"153";477;135;68;"FRA";474;"MTQ";"Martinica";"Martinique";"Martinica";"Martinique";"Martinique";"";135;"Martinique";NA;474;3;"Central America";FALSE;FALSE;FALSE
 "154";485;137;137;"MUS";480;"MUS";"Maurício";"Mauritius";"Mauricio";"Mauritius";"Mauritius";"Mauritius";137;"Mauritius";480;480;7;"Eastern Africa";TRUE;FALSE;TRUE
 "155";488;136;136;"MRT";478;"MRT";"Mauritânia";"Mauritania";"Mauritania";"Mauritania";"Mauritania";"";136;"Mauritania";478;478;6;"Western Africa";TRUE;FALSE;TRUE
 "156";489;999;999;"ROW";999;"ROW";"Mayotte";"Mayotte";"Mayotte";"RoW";"";"";999;"Global average";NA;NA;NA;"";TRUE;FALSE;TRUE
@@ -201,7 +201,7 @@ Heard Island and McDonald Islands";"Islas Heard y McDonald";"Heard and McDonald 
 "199";628;229;229;"GBR";826;"GBR";"Reino Unido";"United Kingdom";"Reino Unido";"United Kingdom";"United Kingdom";"United Kingdom";229;"United Kingdom";826;826;9;"OECD Europe";TRUE;FALSE;TRUE
 "200";640;37;37;"CAF";140;"CAF";"República Centro-Africana";"Central African Republic";"República Centroafricana";"Central African Republic";"Central African Republic";"";37;"Central African Republic";140;140;6;"Western Africa";TRUE;FALSE;TRUE
 "201";647;56;56;"DOM";214;"DOM";"República Dominicana";"Dominican Republic";"República Dominicana";"Dominican Republic";"Dominican Republic";"Dominican Republic";56;"Dominican Republic";214;214;3;"Central America";TRUE;FALSE;TRUE
-"202";660;182;999;"ROW";638;"REU";"Reunião";"Reunion";"Reunión";"RÃ©union";"Reunion";"";182;"R?union";NA;638;7;"Eastern Africa";FALSE;FALSE;FALSE
+"202";660;182;68;"FRA";638;"REU";"Reunião";"Reunion";"Reunión";"RÃ©union";"Reunion";"";182;"R?union";NA;638;7;"Eastern Africa";FALSE;FALSE;FALSE
 "203";665;181;181;"ZWE";716;"ZWE";"Zimbábue";"Zimbabwe";"Zimbabwe";"Zimbabwe";"Zimbabwe";"Zimbabwe";181;"Zimbabwe";716;716;8;"Southern Africa";TRUE;FALSE;TRUE
 "204";670;183;183;"ROU";642;"ROU";"Romênia";"Romania";"Rumania";"Romania";"Romania";"Romania";183;"Romania";642;642;10;"Eastern Europe";TRUE;TRUE;TRUE
 "205";675;184;184;"RWA";646;"RWA";"Ruanda";"Rwanda";"Ruanda";"Rwanda";"Rwanda";"";184;"Rwanda";646;646;7;"Eastern Africa";TRUE;FALSE;TRUE

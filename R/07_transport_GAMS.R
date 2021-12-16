@@ -22,13 +22,14 @@ write = FALSE
 
 # load data
 SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.rds")
-road_dist_MUN <- readRDS(file = "intermediate_data/road_dist_MUN.RDS")
-road_dist_MUN_stat <- readRDS(file = "intermediate_data/road_dist_MUN_stat.RDS")
-road_dist_MUN_port <- readRDS(file = "intermediate_data/road_dist_MUN_port.RDS")
-road_dist_stat_MUN <- readRDS(file = "intermediate_data/road_dist_stat_MUN.RDS")
-road_dist_port_MUN <- readRDS(file = "intermediate_data/road_dist_port_MUN.RDS")
-water_dist <- readRDS(file = "intermediate_data/water_dist.RDS")
-rail_dist  <- readRDS(file = "intermediate_data/rail_dist.RDS")
+#road_cost_MUN <- readRDS(file = "intermediate_data/road_cost_MUN.RDS")
+#road_cost_MUN_stat <- readRDS(file = "intermediate_data/road_cost_MUN_stat.RDS")
+#road_cost_MUN_port <- readRDS(file = "intermediate_data/road_cost_MUN_port.RDS")
+#road_cost_stat_MUN <- readRDS(file = "intermediate_data/road_cost_stat_MUN.RDS")
+#road_cost_port_MUN <- readRDS(file = "intermediate_data/road_cost_port_MUN.RDS")
+load("intermediate_data/road_cost_nn.RDS")
+water_cost <- readRDS(file = "intermediate_data/water_cost.RDS")
+rail_cost  <- readRDS(file = "intermediate_data/rail_cost.RDS")
 load("intermediate_data/stations.Rdata")
 load("intermediate_data/ports.Rdata")
 load("intermediate_data/cargo_long.Rdata")
@@ -137,29 +138,32 @@ if (isWindows) gms <- gsub("/","\\",gms,fixed=TRUE)
 ingdx <- paste0(getwd(),"/GAMS/GAMS_data.gdx")
 if (isWindows) ingdx <- gsub("/","\\",ingdx,fixed=TRUE)
 
+outgdx <- paste0(getwd(),"/GAMS/GAMS_sol.gdx")
+if (isWindows) outgdx <- gsub("/","\\",outgdx,fixed=TRUE)
+
 # run model
-gams(paste0(gms, " --INPUT=", ingdx))
+gams(paste0(gms, " --INPUT=", ingdx, " --OUTPUT=", outgdx))
 
 
 
 
 # after GAMS optimization: read and process results -------------------------------------------------------
 
-#sol <- rgdx("GAMS/sol.gdx", requestList = list(name = "xtotalcost") )
+#sol <- rgdx("GAMS/GAMS_sol.gdx", requestList = list(name = "xtotalcost") )
 
-X_a_b <- readgdx("GAMS/sol.gdx", "X_a_b")
-X_a_r1 <- readgdx("GAMS/sol.gdx", "X_a_r1")
-X_a_w1 <- readgdx("GAMS/sol.gdx", "X_a_w1")
-X_r1_r2 <- readgdx("GAMS/sol.gdx", "X_r1_r2")
-X_w1_w2 <- readgdx("GAMS/sol.gdx", "X_w1_w2")
-X_r2_b <- readgdx("GAMS/sol.gdx", "X_r2_b")
-X_w2_b <- readgdx("GAMS/sol.gdx", "X_w2_b")
-totalcost <- rgdx("GAMS/sol.gdx", requestList = list(name = "xtotalcost"))$val
+X_a_b <- readgdx("GAMS/GAMS_sol.gdx", "X_a_b")
+X_a_r1 <- readgdx("GAMS/GAMS_sol.gdx", "X_a_r1")
+X_a_w1 <- readgdx("GAMS/GAMS_sol.gdx", "X_a_w1")
+X_r1_r2 <- readgdx("GAMS/GAMS_sol.gdx", "X_r1_r2")
+X_w1_w2 <- readgdx("GAMS/GAMS_sol.gdx", "X_w1_w2")
+X_r2_b <- readgdx("GAMS/GAMS_sol.gdx", "X_r2_b")
+X_w2_b <- readgdx("GAMS/GAMS_sol.gdx", "X_w2_b")
+totalcost <- rgdx("GAMS/GAMS_sol.gdx", requestList = list(name = "xtotalcost"))$val
 
 ## compile rail flows from source MU to target MU
  
 # get flows into wide format matrices per product
-X_a_b_wide <- sapply(product, function(x){
+X_a_b_wide <- sapply(products, function(x){
   filter(X_a_b, product == x) %>% dplyr::select(!product) %>%
     pivot_wider(names_from = b, values_from = value)  %>% 
     arrange(a) %>% column_to_rownames("a") %>% 
@@ -167,32 +171,32 @@ X_a_b_wide <- sapply(product, function(x){
     replace(is.na(.), 0) %>% as("matrix")
 }, USE.NAMES = TRUE, simplify = FALSE)
 
-X_a_r1_wide <- sapply(product, function(x){
+X_a_r1_wide <- sapply(products, function(x){
   filter(X_a_r1, product == x) %>% dplyr::select(!product) %>%
     pivot_wider(names_from = r1, values_from = value)  %>% 
     arrange(a) %>% column_to_rownames("a") %>% 
-    dplyr::select(as.character(sort(as.numeric(names(.))))) %>%
+    dplyr::select(sort(names(.))) %>%
     replace(is.na(.), 0) %>% as("matrix")
 }, USE.NAMES = TRUE, simplify = FALSE)
 
-X_r1_r2_wide <- sapply(product, function(x){
+X_r1_r2_wide <- sapply(products, function(x){
   filter(X_r1_r2, product == x) %>% dplyr::select(!product) %>% 
     pivot_wider(names_from = r2, values_from = value) %>% 
-    arrange(as.numeric(r1)) %>% column_to_rownames("r1") %>% 
-    dplyr::select(as.character(sort(as.numeric(names(.))))) %>%
+    arrange(r1) %>% column_to_rownames("r1") %>% 
+    dplyr::select(sort(names(.))) %>%
     replace(is.na(.), 0) %>% as("matrix")
 }, USE.NAMES = TRUE, simplify = FALSE)
 
-X_r2_b_wide <- sapply(product, function(x){
+X_r2_b_wide <- sapply(products, function(x){
   filter(X_r2_b, product == x) %>% dplyr::select(!product) %>% 
     pivot_wider(names_from = b, values_from = value) %>% 
-    arrange(as.numeric(r2)) %>% column_to_rownames("r2") %>% 
-    dplyr::select(as.character(sort(as.numeric(names(.))))) %>%
+    arrange(r2) %>% column_to_rownames("r2") %>% 
+    dplyr::select(sort(names(.))) %>%
     replace(is.na(.), 0) %>% as("matrix")
 }, USE.NAMES = TRUE, simplify = FALSE)
 
 
-X_a_w1_wide <- sapply(product, function(x){
+X_a_w1_wide <- sapply(products, function(x){
   filter(X_a_w1, product == x) %>% dplyr::select(!product) %>% 
     pivot_wider(names_from = w1, values_from = value) %>% 
     arrange(a) %>% column_to_rownames("a") %>% 
@@ -200,7 +204,7 @@ X_a_w1_wide <- sapply(product, function(x){
     replace(is.na(.), 0) %>% as("matrix")
 }, USE.NAMES = TRUE, simplify = FALSE)
 
-X_w1_w2_wide <- sapply(product, function(x){
+X_w1_w2_wide <- sapply(products, function(x){
   filter(X_w1_w2, product == x) %>% dplyr::select(!product) %>% 
     pivot_wider(names_from = w2, values_from = value) %>% 
     arrange(w1) %>% column_to_rownames("w1") %>% 
@@ -208,7 +212,7 @@ X_w1_w2_wide <- sapply(product, function(x){
     replace(is.na(.), 0) %>% as("matrix")
 }, USE.NAMES = TRUE, simplify = FALSE)
 
-X_w2_b_wide <- sapply(product, function(x){
+X_w2_b_wide <- sapply(products, function(x){
   filter(X_w2_b, product == x) %>% dplyr::select(!product) %>% 
     pivot_wider(names_from = b, values_from = value) %>% 
     arrange(w2) %>% column_to_rownames("w2") %>% 
@@ -220,30 +224,68 @@ X_w2_b_wide <- sapply(product, function(x){
 X_a_b_r_wide <- Map(function(x,y,z) t(t(x)/colSums(x)) %*% t(t(y)/colSums(y)) %*% z , X_a_r1_wide, X_r1_r2_wide, X_r2_b_wide)
 X_a_b_w_wide <- Map(function(x,y,z) t(t(x)/colSums(x)) %*% t(t(y)/colSums(y)) %*% z , X_a_w1_wide, X_w1_w2_wide, X_w2_b_wide)
 
+# back to long
+X_a_b_r <- do.call(rbind, lapply(products, function(x){
+  as.data.frame.table(X_a_b_r_wide[[x]], stringsAsFactors = FALSE) %>% 
+    rename(co_orig = Var1, co_dest = Var2, value_rail = Freq) %>% mutate(product = x, .after = co_dest)
+})) %>% filter(value_rail > 0) %>% mutate(across(co_orig:co_dest, as.numeric))
 
-# old model with overall modal split constraint and hypothetic transport cost fro rail and water
-transport_sol <- rgdx("GAMS/transport_sol.gdx", requestList = list(name = "xsoytransport") )
-flows <- as.data.frame(transport_sol$val)
-colnames(flows) <- c(paste0(transport_sol$domains,"_num"), "value")
-uels <- transport_sol$uels[[1]]
-flows$co_orig <- as.numeric(uels[flows$a_num])
-flows$co_dest <- as.numeric(uels[flows$b_num])
-flows$mode <- uels[flows$mode_num]
-flows$product <- uels[flows$product_num]
-flows <- flows[,c(6:9,5)]
+X_a_b_w <- do.call(rbind, lapply(products, function(x){
+  as.data.frame.table(X_a_b_w_wide[[x]], stringsAsFactors = FALSE) %>% 
+    rename(co_orig = Var1, co_dest = Var2, value_water = Freq) %>% mutate(product = x, .after = co_dest)
+})) %>% filter(value_water > 0) %>% mutate(across(co_orig:co_dest, as.numeric))
 
-# simple version without modal split
-transport_sol_simple <- rgdx("GAMS/transport_sol_simple.gdx", requestList = list(name = "xsoytransport") )
-flows_simple <- as.data.frame(transport_sol_simple$val)
-colnames(flows_simple) <- c(paste0(transport_sol_simple$domains,"_num"), "value")
-uels <- transport_sol_simple$uels[[1]]
-flows_simple$co_orig <- as.numeric(uels[flows_simple$a_num])
-flows_simple$co_dest <- as.numeric(uels[flows_simple$b_num])
-flows_simple$product <- uels[flows_simple$product_num]
-flows_simple <- flows_simple[,c(5:7,4)]
-#total cost
-transport_sol_simple_cost <- rgdx("GAMS/transport_sol_simple.gdx", requestList = list(name = "xtotalcost") )
-transport_sol_simple_cost <- transport_sol_simple_cost$val
+X_a_b_all <- rename(X_a_b, co_orig = a, co_dest = b, value_road = value) %>% mutate(co_orig = as.numeric(co_orig), co_dest = as.numeric(co_dest)) %>%
+  full_join(X_a_b_r, by = c("co_orig", "co_dest", "product")) %>% full_join(X_a_b_w, by = c("co_orig", "co_dest", "product")) %>%
+  replace(is.na(.), 0) %>%
+  mutate(value_total = value_road + value_rail + value_water)
+
+X_a_b_tot <- dplyr::select(X_a_b_all, -(value_road:value_water)) %>% rename(value = value_total)
+
+## wide-format aggregation
+## # add to road flows to obtain total MU-MU flows
+## X_a_b_tot_wide <- Map(function(x,y,z){
+##   row <- sort(unique(c(rownames(x), rownames(y), rownames(z))))
+##   col <- sort(unique(c(colnames(x), colnames(y), colnames(z))))
+##   a <- matrix(0, length(row), length(col), dimnames = list(row, col) )
+##   a[rownames(x), colnames(x)] <- a[rownames(x), colnames(x)]+x
+##   a[rownames(y), colnames(y)] <- a[rownames(y), colnames(y)]+y
+##   a[rownames(z), colnames(z)] <- a[rownames(z), colnames(z)]+z
+##   return(a)}, 
+## X_a_b_wide, X_a_b_r_wide, X_a_b_w_wide)
+## 
+## # back into long format
+## X_a_b_tot <- do.call(rbind, lapply(products, function(x){
+##   as.data.frame.table(X_a_b_tot_wide[[x]], stringsAsFactors = FALSE) %>% 
+##   rename(co_orig = Var1, co_dest = Var2, value = Freq) %>% mutate(product = x, .after = co_dest)
+##   })) %>% filter(value > 0) %>% mutate(across(co_orig:co_dest, as.numeric))
+
+
+
+
+## # old model with overall modal split constraint and hypothetic transport cost for rail and water
+## transport_sol <- rgdx("GAMS/transport_sol.gdx", requestList = list(name = "xsoytransport") )
+## flows <- as.data.frame(transport_sol$val)
+## colnames(flows) <- c(paste0(transport_sol$domains,"_num"), "value")
+## uels <- transport_sol$uels[[1]]
+## flows$co_orig <- as.numeric(uels[flows$a_num])
+## flows$co_dest <- as.numeric(uels[flows$b_num])
+## flows$mode <- uels[flows$mode_num]
+## flows$product <- uels[flows$product_num]
+## flows <- flows[,c(6:9,5)]
+## 
+## # simple version without modal split
+## transport_sol_simple <- rgdx("GAMS/transport_sol_simple.gdx", requestList = list(name = "xsoytransport") )
+## flows_simple <- as.data.frame(transport_sol_simple$val)
+## colnames(flows_simple) <- c(paste0(transport_sol_simple$domains,"_num"), "value")
+## uels <- transport_sol_simple$uels[[1]]
+## flows_simple$co_orig <- as.numeric(uels[flows_simple$a_num])
+## flows_simple$co_dest <- as.numeric(uels[flows_simple$b_num])
+## flows_simple$product <- uels[flows_simple$product_num]
+## flows_simple <- flows_simple[,c(5:7,4)]
+## #total cost
+## transport_sol_simple_cost <- rgdx("GAMS/transport_sol_simple.gdx", requestList = list(name = "xtotalcost") )
+## transport_sol_simple_cost <- transport_sol_simple_cost$val
 
 # compare solution from simple model in GAMS and R
 # all.equal(arrange(flows_simple, by=value), arrange(flows_R, by = value))
@@ -254,6 +296,8 @@ transport_sol_simple_cost <- transport_sol_simple_cost$val
 
 # export
 if (write) {
-saveRDS(flows, file = "intermediate_data/flows_GAMS.rds")
-saveRDS(flows_simple, file = "intermediate_data/flows_GAMS_simple.rds")
+  #saveRDS(flows, file = "intermediate_data/flows_GAMS.rds")
+  #saveRDS(flows_simple, file = "intermediate_data/flows_GAMS_simple.rds")
+  saveRDS(X_a_b_tot, file = "intermediate_data/X_a_b_tot_nn.rds")
+ # saveRDS(X_a_b_tot, file = "intermediate_data/X_a_b_tot.rds")
 }
