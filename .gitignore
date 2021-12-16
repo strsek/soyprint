@@ -10,7 +10,7 @@ MUN_dist_long.csv
 transport_cost.csv
 gis_osm_roads_free_1*
 2013Carga.txt
-/GAMS*
+/GAMS/2*
 *.log*
 *.lst
 *.lxi
