@@ -397,10 +397,16 @@ cake_feed_mun <- readRDS("intermediate_data/cake_feed_t.rds")
 
 # aggregate feed groups according to livestock husbandry processes
 names(bean_feed_mun)
-feed_proc_mun <- c("Cattle husbandry", "Dairy cattle husbandry","Cattle husbandry", "Dairy cattle husbandry", "Cattle husbandry",
-           "Buffaloes husbandry", "Dairy buffaloes husbandry", "Buffaloes husbandry", "Dairy buffaloes husbandry",
-           "Poultry Birds farming", "Poultry Birds farming", "Poultry Birds farming",
-           "Pigs farming", "Pigs farming", "Pigs farming")
+feed_proc_mun <- c(
+  # Cattle:
+  "Cattle husbandry", "Dairy cattle husbandry","Cattle husbandry", "Dairy cattle husbandry", "Cattle husbandry",
+  # Buffaloes         
+  "Buffaloes husbandry", "Dairy buffaloes husbandry", "Buffaloes husbandry", "Dairy buffaloes husbandry",
+  # Poultry         
+  "Poultry Birds farming", "Poultry Birds farming", "Poultry Birds farming",
+  # Pigs         
+  "Pigs farming", "Pigs farming", "Pigs farming")
+
 names(feed_proc_mun) <- names(bean_feed_mun)
 bean_feed_mun <- as.data.table(t(rowsum(t(bean_feed_mun), group = feed_proc_mun, reorder = FALSE, na.rm = TRUE)),
                                keep.rownames="area_code")

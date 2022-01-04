@@ -1,4 +1,4 @@
-############ transport optimization within R, using the transport package ###################
+####### transport optimization within R, using the transport package #######
 
 library(transport)
 library(openxlsx)
@@ -13,11 +13,10 @@ write = TRUE
 # load data
 SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.RDS")
 MUN_capital_dist <- readRDS("intermediate_data/MUN_capital_dist.rds")
-MUN_road_dist <- readRDS("intermediate_data/MUN_road_dist.rds")
-MUN_road_dist_osm_mf <- readRDS("intermediate_data/MUN_road_dist_osm_mf.rds")
-MUN_road_dist_osm_nn <- readRDS("intermediate_data/MUN_road_dist_osm_nn.rds")
+#MUN_road_dist <- readRDS("intermediate_data/MUN_road_dist.rds")
+#MUN_road_dist_osm <- readRDS("intermediate_data/MUN_road_dist_osm.rds")
 
-dist <- list(euclid = MUN_capital_dist, IBGE = MUN_road_dist, OSM_mf = MUN_road_dist_osm_mf, OSM_nn = MUN_road_dist_osm_nn)
+dist <- list(euclid = MUN_capital_dist)#, IBGE = MUN_road_dist, OSM = MUN_road_dist_osm)
 
 flows <- lapply(dist, function(d){
   MUN_dist <- d
@@ -46,15 +45,14 @@ flows <- lapply(dist, function(d){
     }, 
     simplify = FALSE, USE.NAMES = TRUE)
   
-  #flows_euclid <- abind(MUN_transport,along = 1, force.array = FALSE)
   flows <- abind(MUN_transport, along = 1, force.array = FALSE)
   return(flows)
 })
 
 
 if (write){
-  saveRDS(flows_road, file = "intermediate_data/flows_road.rds")
-  saveRDS(flows, file = "intermediate_data/flows_list.rds")
+  saveRDS(flows, file = "intermediate_data/flows_R.rds")
   
 }
 
+rm(list = ls())

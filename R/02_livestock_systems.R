@@ -291,7 +291,7 @@ if (write){
   # save data
   saveRDS(SOY_MUN, file = "intermediate_data/SOY_MUN_02.rds")
   # write.csv2(SOY_MUN, file = "intermediate_data/SOY_MUN.csv")
-  saveRDS(LSTOCK_MUN, file = "Intermediate_data/LIVESTOCK_MUN_02.rds")
+  saveRDS(LSTOCK_MUN, file = "intermediate_data/LIVESTOCK_MUN_02.rds")
   
   # export polygons with all attributes (uncomment if needed)
   saveRDS(GEO_MUN_SOY, file = "intermediate_data/GEO_MUN_SOY_02.rds")

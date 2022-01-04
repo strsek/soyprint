@@ -1,13 +1,14 @@
 
 ###### Data preparation of Brazilian municipality-level data #########
 
-# this script prepares and combines all the datasets on municipality level to one coherent data set with unique MU identifiers
+# this script prepares and combines all the data sets on municipality level to one coherent data set with unique MU identifiers
 # it also matches the aggregate data to the municipality polygon shapefiles 
 
 library(dplyr)
 library(openxlsx)
 library(tidyr)
 library(sf)
+library(readr)
 
 # should results be written to file ? (TRUE/FALSE)
 write = TRUE
@@ -20,8 +21,10 @@ MUN <- read.xlsx("input_data/GEO_MUN_2013_IBGE_merged.xlsx")
 # export and import (COMEX)
 EXP_MUN <- read.csv2(file = "input_data/EXP_2013_MUN_COMEX.csv", header = TRUE, stringsAsFactors = FALSE)
 IMP_MUN <- read.csv2(file = "input_data/IMP_2013_MUN_COMEX.csv", header = TRUE, stringsAsFactors = FALSE)
-COMEX_MUN <- read.csv2(file = "input_data/UF_MUN_COMEX.csv", header = TRUE)
-PAIS <- read.csv2(file = "input_data/PAIS_COMEX.csv", header = TRUE)
+COMEX_MUN <- read.csv2(file = "input_data/UF_MUN_COMEX.csv", header = TRUE, fileEncoding = "ISO-8859-1", stringsAsFactors = FALSE)
+#COMEX_MUN <- read_csv2(file = "input_data/UF_MUN_COMEX.csv", col_names = TRUE, locale = locale(encoding = "ISO-8859-1"), trim_ws = TRUE, show_col_types = FALSE)
+PAIS <- read.csv2(file = "input_data/PAIS_COMEX.csv", header = TRUE, fileEncoding = "ISO-8859-1")
+#PAIS <- read_csv2(file = "input_data/PAIS_COMEX.csv", col_names = TRUE, locale = locale(encoding = "ISO-8859-1"), trim_ws = TRUE, show_col_types = FALSE)
 # production (IBGE)
 PROD_MUN <- read.csv(file = "input_data/Production_tabela1612_IBGE.csv", header = TRUE, skip = 2, encoding = "UTF-8", stringsAsFactors = FALSE)
 # processing facilities (ABIOVE)
@@ -47,18 +50,21 @@ names(EXP_MUN) <- c("year", "month", "HS4", "co_destin", "nm_state_comex", "co_m
 # filter soy products
 EXP_MUN_SOY <- filter(EXP_MUN, HS4 %in% c(1201, 1507, 2304))
 
-# change exports in kg to exports in tons
+# change unit of exports from kg to tons
 EXP_MUN_SOY <- EXP_MUN_SOY %>% mutate(export_kg = export_kg/1000) %>% rename(export = export_kg)
 
 # aggregate months to get annual data
-EXP_MUN_SOY <- EXP_MUN_SOY %>% group_by(HS4, co_destin, nm_state_comex, co_mun_comex) %>% summarise(export = sum(export, na.rm = TRUE), export_dol = sum(export_dol, na.rm = TRUE), .groups = "drop") %>% ungroup() 
+EXP_MUN_SOY <- EXP_MUN_SOY %>% group_by(HS4, co_destin, nm_state_comex, co_mun_comex) %>% 
+  summarise(export = sum(export, na.rm = TRUE), export_dol = sum(export_dol, na.rm = TRUE), .groups = "drop") %>% 
+  ungroup() 
 
 # add product names column and put it next to the product code
-EXP_MUN_SOY <- EXP_MUN_SOY %>% mutate(product = ifelse(HS4 == 1201,"soybean", ifelse(HS4 == 1507, "soy_oil", "soy_cake"))) %>% relocate(product, .after = HS4)
+EXP_MUN_SOY <- EXP_MUN_SOY %>% mutate(product = ifelse(HS4 == 1201,"soybean", ifelse(HS4 == 1507, "soy_oil", "soy_cake"))) %>% 
+  relocate(product, .after = HS4)
 
 # add municipality names from accompanying Comex file 
 colnames(COMEX_MUN) <- c("co_mun_comex", "nm_mun_comex", "nm_mun_min_comex", "nm_state_comex") # change column name to identify them more easily in next steps
-COMEX_MUN[,"nm_mun_comex"] <- toupper(COMEX_MUN[,"nm_mun_min_comex"])  #make sure the upper case names use the special characters (accents etc.) as well
+COMEX_MUN$nm_mun_comex <- toupper(COMEX_MUN$nm_mun_min_comex)  #make sure the upper case names use the special characters (accents etc.) as well
 #check <- full_join(MUN, COMEX_MUN, by=c("NM_MUN" = "NM_MUN_comex", "NM_STATE" = "SG_UF_comex"))
 EXP_MUN_SOY <- EXP_MUN_SOY %>% left_join(COMEX_MUN[,1:2], by="co_mun_comex") # add MU names to export sheet
 # put MU code, name and state in first columns  % (old idea: match with MU name from GEO polygons)

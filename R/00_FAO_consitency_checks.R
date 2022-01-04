@@ -17,7 +17,7 @@ rownames(CBS_SOY) <- c("domestic_supply","production", "export", "import" , "foo
 CBS_SOY <- CBS_SOY[,5:3]
 colnames(CBS_SOY) <- c("bean", "oil", "cake")
 CBS_SOY <- as.data.frame(t(CBS_SOY), stringsAsFactors = FALSE)
-CBS_SOY <- CBS_SOY %>% mutate_all(funs(as.numeric(as.character(.)))) #lapply(CBS_SOY, function(x) as.numeric(as.character(x)))
+CBS_SOY <- CBS_SOY %>% mutate(across(everything(), ~as.numeric(as.character(.x)))) # mutate_all(funs(as.numeric(as.character(.)))) #lapply(CBS_SOY, function(x) as.numeric(as.character(x)))
 CBS_SOY[is.na(CBS_SOY)] <- 0
 CBS_SOY<- mutate(CBS_SOY, stock_addition = -stock_withdrawal)
 
@@ -77,6 +77,6 @@ consistency$ref_cap[2] <- CBS_SOY["oil", "production"]
 
 # write data
 if (write == TRUE) {
-saveRDS(CBS_SOY, file = "intermediate_data/CBS_SOY.rds")
-saveRDS(consistency, file = "intermediate_data/FAO_consistency.rds")
+  saveRDS(CBS_SOY, file = "intermediate_data/CBS_SOY.rds")
+  saveRDS(consistency, file = "intermediate_data/FAO_consistency.rds")
 }

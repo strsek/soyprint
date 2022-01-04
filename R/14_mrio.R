@@ -75,14 +75,40 @@ regions <- regions[cbs==TRUE]
 items <- fread("input_data/FABIO/inst/items_full.csv")
 nrcom <- nrow(items)
 Y <- readRDS("intermediate_data/FABIO/mr_use_fd.rds")
+Y_orig <- readRDS("intermediate_data/FABIO/mr_use_fd.rds")
 
-# Rebalance row sums for each year
+# compute total use of each commodity by using country in mr_use and Z
+agg_country <- function(mat){
+  proc_countries <- as.numeric(sub("_.*", "", colnames(mat)))
+  proc_countries[proc_countries > 1000] <- 21
+  sum_mat <- as(sapply(unique(proc_countries),"==",proc_countries), "Matrix")*1
+  dimnames(sum_mat) <- list(proc_countries, unique(proc_countries))
+  mat_agg <- mat %*% sum_mat
+}
+mr_use_country <- lapply(mr_use, agg_country)
+Z_m_country <- lapply(Z_m, agg_country)
+
+# compute difference (i.e. lost inputs in Z)
+use_diff <- Map(function(x,y){x-y}, mr_use_country, Z_m_country)
+
+# add use_diff to Y balancing item of the respective using country
+Y <- Map(function(y, diff){
+  y[,paste0(colnames(diff),"_balancing")] <- 
+    y[,paste0(colnames(diff),"_balancing")] + diff
+  return(y)
+  }, Y, use_diff)
+
+
+# Rebalance remaining imbalances in row sums for each year
 ## CHANGED: to character indexing and optional balancing via original cbs supply by item
 for(i in seq_along(Z_m)){
 
   X <- rowSums(Z_m[[i]]) + rowSums(Y[[i]])
-  X_sup <- colSums(mr_sup_mass[[i]])
+  X_sup <- colSums(mr_sup_m[[i]])
+  #X_use <- rowSums(mr_use[[i]]) + rowSums(Y_orig[[i]]) # Y already contains added balancing! --> use sup and deduct 
   bal <- X_sup - X
+  #bal_use <- X_use - X
+  
 
  # # or option 1 (standard)
  # #for(j in which(X < 0)){
@@ -107,10 +133,18 @@ for(i in seq_along(Z_m)){
     Y[[i]][j, paste0(reg, "_balancing")] <-
       Y[[i]][j, paste0(reg, "_balancing")] + bal[j]
   }
+  
+  # check balance:
+  all.equal(rowSums(Z_m[[i]]) + rowSums(Y[[i]]), X_sup)
 
 }
 
-# TODO: why is balancing item adjusted with Z_m and not Z_v? --> rowSums are identical
+# NOTE: why is balancing item adjusted with Z_m and not Z_v? --> rowSums are identical
+
+# optional: round everything up to 8 digits
+# Z_m <- lapply(Z_m, round, digits = 8)
+# Z_v <- lapply(Z_v, round, digits = 8)
+# Y <- lapply(Y, round, digits = 8)
 
 # Derive total output X ---------------------------------------------
 
