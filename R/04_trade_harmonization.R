@@ -237,3 +237,4 @@ if (write){
 
 # clear environment
 rm(list = ls())
+gc()

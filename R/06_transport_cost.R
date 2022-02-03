@@ -610,4 +610,6 @@ if(write){
   #saveRDS(rail_cost, file = "intermediate_data/rail_cost.RDS")
 }
 
+# clear environment
 rm(list = ls())
+gc()

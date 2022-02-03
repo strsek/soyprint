@@ -13,9 +13,15 @@ write = FALSE
 #flows_GAMS <- readRDS("intermediate_data/flows_GAMS_simple.rds")
 #flows_euclid <- readRDS("intermediate_data/flows_R.rds")
 #flows_road <- readRDS("intermediate_data/flows_road.rds")
-flows <- readRDS("intermediate_data/flows_R.rds")
-X_a_b_tot <- readRDS("intermediate_data/X_a_b_tot.rds")
-flows <- c(flows, "intermod" = list(X_a_b_tot))
+flows_euclid <- readRDS("intermediate_data/flows_R.rds")
+bs_files <- list.files("./GAMS/bs_res", pattern="*.rds", full.names=F)
+flows_bs <- lapply(bs_files, function(file){
+  readRDS(paste0("./GAMS/bs_res/", file))
+})
+names(flows_bs) <- gsub(".rds","",bs_files)
+ 
+flows <- c(flows_euclid, flows_bs)
+rm(flows_bs)
 
 #GEO_MUN_SOY <- readRDS("intermediate_data/GEO_MUN_SOY_fin.rds")
 SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.rds")
@@ -50,7 +56,8 @@ exp_long  <- left_join(exp_templ, dplyr::select(EXP_MUN_SOY, c(co_mun, product, 
 # add domestic consumption as "exports to Brazil"
 #all.equal(exp_long$co_orig[exp_long$co_dest == "BRA" & exp_long$product == "bean"], SOY_MUN$co_mun) 
 # NOTE: for bean, remove processing use from domestic use as it is no final use in our soy supply chain
-exp_long$export[exp_long$co_dest == "BRA" & exp_long$product == "bean"] <- SOY_MUN$domestic_use_bean - SOY_MUN$proc_bean # (SOY_MUN$prod_oil + SOY_MUN$prod_cake)
+exp_long$export[exp_long$co_dest == "BRA" & exp_long$product == "bean"] <- 
+  SOY_MUN$domestic_use_bean - SOY_MUN$proc_bean # (SOY_MUN$prod_oil + SOY_MUN$prod_cake)
 exp_long$export[exp_long$co_dest == "BRA" & exp_long$product == "oil"]  <- SOY_MUN$domestic_use_oil
 exp_long$export[exp_long$co_dest == "BRA" & exp_long$product == "cake"] <- SOY_MUN$domestic_use_cake
 
@@ -80,19 +87,44 @@ rm(EXP_MUN_SOY, IMP_MUN_SOY, exp_templ, exp_long)
 #clusterEvalQ(clust, {library(dplyr); library(data.table); library(tibble); library(tidyr); library(abind);library(Matrix.utils)})
 #source_2_export <- parLapply(clust, flows, function(x){
 
-source_2_export <- lapply(flows, function(x){
+#source_2_export <- lapply(flows, function(x){
+
+system.time(
+source_2_export <- mclapply(flows, function(x){  
 
   # join template with transport values
-  flow_long <- left_join(mapping_templ, x, by = c("co_orig", "co_dest", "product")) %>% 
-    replace_na(list(value = 0))
+  #flow_long <- left_join(mapping_templ, x, by = c("co_orig", "co_dest", "product")) %>% 
+  #  replace_na(list(value = 0))
   
   # put data into a list of separate wide-format matrices for each product
-  flow_wide <- sapply(product, function(x){
-    filter(flow_long, product == x) %>% dplyr::select(!product) %>% 
-      pivot_wider(names_from = co_dest, values_from = value) %>% 
-      column_to_rownames("co_orig") %>% 
-      as("Matrix")
-    }, USE.NAMES = TRUE, simplify = FALSE)
+
+  #flow_wide <- sapply(product, function(x){
+  #  filter(flow_long, product == x) %>% dplyr::select(!product) %>%
+  #    pivot_wider(names_from = co_dest, values_from = value) %>% 
+  #    column_to_rownames("co_orig") %>% 
+  #    as("Matrix")
+  #  }, USE.NAMES = TRUE, simplify = FALSE)
+  
+  
+  #flow_wide <- sapply(product, function(x){
+  #  df <- filter(flow_long, product == x, value != 0) %>% dplyr::select(!product)
+  #  mat <- with(df, sparseMatrix(i = match(co_orig, co_mun), # dense_rank(co_orig), 
+  #                               j = match(co_dest, co_mun), # dense_rank(co_dest), 
+  #                               x = value, 
+  #                               dims = c(length(co_mun), length(co_mun)),
+  #                               dimnames = list(co_mun,co_mun))) # list(sort(unique(co_orig)), sort(unique(co_dest)))))
+  #}, USE.NAMES = TRUE, simplify = FALSE)
+  
+  ## WE dont't even need the long mapping! We can create full sparse matrix directly!
+  flow_wide <- sapply(product, function(prod){
+    df <- filter(x, product == prod, value != 0) %>% dplyr::select(!product)
+    mat <- with(df, sparseMatrix(i = match(co_orig, co_mun), # dense_rank(co_orig), 
+                                 j = match(co_dest, co_mun), # dense_rank(co_dest), 
+                                 x = value, 
+                                 dims = c(length(co_mun), length(co_mun)),
+                                 dimnames = list(co_mun,co_mun))) # list(sort(unique(co_orig)), sort(unique(co_dest)))))
+  }, USE.NAMES = TRUE, simplify = FALSE)
+
   
   # add back self-supply to the diagonals
   flow_wide_full <- sapply(product, function(x){
@@ -101,9 +133,9 @@ source_2_export <- lapply(flows, function(x){
     return(as(mat, "Matrix"))}, USE.NAMES = TRUE, simplify = FALSE)
   
   # check whether row and column sums add up to total supply and demand
-  lapply(product, function(prod){
-    cat("rowsums == total_supply?:", all.equal(rowSums(flow_wide_full[[prod]]), pull(SOY_MUN, paste0("total_supply_",prod), name = "co_mun")), "\n")
-    cat("colsums == total_use:?", all.equal(colSums(flow_wide_full[[prod]]), pull(SOY_MUN, paste0("total_use_",prod), name = "co_mun")), "\n")})
+  lapply(product, function(x){
+    all.equal(rowSums(flow_wide_full[[x]]), pull(SOY_MUN, paste0("total_supply_",x), name = "co_mun")) &
+    all.equal(colSums(flow_wide_full[[x]]), pull(SOY_MUN, paste0("total_use_",x), name = "co_mun"))})
   
   # bring back into long format
   flow_long_full <- abind(lapply(product, function(x){
@@ -118,12 +150,20 @@ source_2_export <- lapply(flows, function(x){
   # map MU sources to export destinations by multiplying the MU flow matrix in relative terms with the export matrix for each product
   
   # create a sub-national flow "input coefficient matrix" by dividing each column by the column sum (= total use)
+  # flow_wide_rel <- lapply(flow_wide_full, 
+  #                         function(x){ 
+  #                           rel <- t(t(x)/colSums(x)) 
+  #                           rel[is.na(rel)] <- 0 
+  #                           return(rel)})
+  
   flow_wide_rel <- lapply(flow_wide_full, 
                           function(x){ 
-                            rel <- t(t(x)/colSums(x)) 
-                            rel[is.na(rel)] <- 0 
+                            rel <- x 
+                            rel@x <- rel@x / rep.int(colSums(rel), diff(rel@p))
+                            #rel[is.na(rel)] <- 0 
                             return(rel)})
   
+
   # map sources to exports by multiplying the flow coefficient matrix with the export matrix 
   # this entails the implicit assumption that all uses of soy products in a MU (exports, processing, domestic consumption) have the same spatial source structure (proportionality assumption common in IO)
   source_to_export <- sapply(product, function(x){
@@ -140,9 +180,10 @@ source_2_export <- lapply(flows, function(x){
   # --> ~~NO!, because flow_wide_full for beans contains also flows destined for processing, while "exports to Brazil" have been cleared by that
   
   # check if results match total exports
-  sapply(flow_wide_full, sum, na.rm = T)
-  sapply(exp_wide, sum, na.rm = T)
-  sapply(source_to_export, sum, na.rm = T) 
+  #sapply(flow_wide_full, sum, na.rm = T)
+  #sapply(exp_wide, sum, na.rm = T)
+  #sapply(source_to_export, sum, na.rm = T)
+  Map(function(x,y){all.equal(sum(x),sum(y))}, source_to_export, exp_wide)
   
   # take into account that some of the MU level supply is imported by multiplying rows by "domestic supply share" of each MU
   dom_share <- sapply(product, function(x){
@@ -155,7 +196,7 @@ source_2_export <- lapply(flows, function(x){
     source_to_export[[x]] * dom_share[[x]]}, 
     USE.NAMES = TRUE, simplify = FALSE)
   
-  sapply(source_to_export, sum, na.rm = T) 
+  # sapply(source_to_export, sum, na.rm = T) 
   
   # finally, map oil and cake exports back to the origin of soybean production... 
   # ..by multiplying the bean flow coefficient matrix with the export matrices of oil and cake
@@ -184,16 +225,17 @@ source_2_export <- lapply(flows, function(x){
   source_to_export_fin <- bind_rows(source_to_export_df)
   
   return(source_to_export_fin)
-})
-#stopCluster(clust)
+  
+}, mc.cores = 12)
 
+#stopCluster(clust)
+)
 
 
 # export results
 if (write){
-  saveRDS(source_2_export, "intermediate_data/source_to_export_list_old.RDS")
+  #saveRDS(source_2_export, "intermediate_data/source_to_export_list.RDS")
+  saveRDS(source_2_export, "intermediate_data/source_to_export_list.RDS")
 }
 
-# clear environment
 rm(list = ls())
-gc()

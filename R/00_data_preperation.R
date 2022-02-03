@@ -37,6 +37,11 @@ LSTOCK_MUN <- read.csv2(file = "input_data/Livestock_2013_tabela3939_IBGE.csv", 
 MILKCOWS_MUN <- read.csv2(file = "input_data/MilkCows_2013_tabela94_IBGE.csv", header = TRUE, skip = 3, encoding = "UTF-8", stringsAsFactors = FALSE)
 # grain storage facilities (armazens) vector file from IBGE including capacity
 STORAGE_MUN <- st_read("input_data/geo/IBGE_logistic_network/armazens_2014.shp")
+# per-capita soy oil acquisition (IBGE POF)
+OIL_ACQ_STATE <- openxlsx::read.xlsx("input_data/POF_soy_oil_2017_IBGE.xlsx", sheet = 1)
+# biodiesel production facilities and regional material inputs (ANP)
+DIESEL_CAP_MUN <- read.xlsx("input_data/Biodiesel_capacity_2013_ANP.xlsx", sheet = "capacity", startRow = 2, colNames = T) 
+DIESEL_MAT_REG <- read.xlsx("input_data/Biodiesel_capacity_2013_ANP.xlsx", sheet = "materials", startRow = 2, colNames = T) 
 
 
 # prepare, harmonize and format data ----------------------------------------------------------------------------------------------------------------------
@@ -253,12 +258,54 @@ LSTOCK_MUN$nm_mun_raw <-  LSTOCK_MUN$nm_mun_raw %>% substr(1,nchar(LSTOCK_MUN$nm
 LSTOCK_MUN$check <- (LSTOCK_MUN$nm_mun_raw == LSTOCK_MUN$nm_mun) # as above, only a few spelling mismatches!
 LSTOCK_MUN <- LSTOCK_MUN %>% dplyr::select(-c(nm_mun_raw, check)) # remove columns no longer needed
 
-###### storage capacity ---------
+###### storage capacity (IBGE) ---------
 
 # check if MU codes of storage facilities are all contained in main MU sheet 
 all(unique(STORAGE_MUN$GEOCODIGO %in% MUN$co_mun))
 # sum capacities by MU
-STORAGE_MUN <- STORAGE_MUN %>% as.data.frame %>% group_by(MUNICIPIO, GEOCODIGO) %>% summarise("storage_cap" = sum(CAP_TON, na.rm = TRUE), .groups = "drop") %>% rename("co_mun" = "GEOCODIGO")
+STORAGE_MUN <- STORAGE_MUN %>% 
+  as.data.frame %>% 
+  group_by(MUNICIPIO, GEOCODIGO) %>% 
+  summarise("storage_cap" = sum(CAP_TON, na.rm = TRUE), .groups = "drop") %>% 
+  rename("co_mun" = "GEOCODIGO")
+
+
+###### annual soy oil acquisition for food purposes per capita in kg (IBGE) ---------------------
+
+# we assume homogeneity of consumption baskets within states and allocate the per-capita purchase quantity on state level to MUs
+OIL_ACQ_STATE <- rename(OIL_ACQ_STATE, oil_acq_pc = "Óleo.de.soja", nm_state = "subdivision") %>%
+  dplyr::select(c(nm_state, oil_acq_pc))
+
+
+###### biodiesel production capacity (ANP) ---------------------
+
+# check which MU names from ANP are not matching IBGE names
+DIESEL_CAP_MUN <- DIESEL_CAP_MUN %>% 
+  mutate(Município = toupper(Município)) %>%
+  rename(nm_mun = "Município", diesel_cap = "Capacidade.(m3/dia)", nm_state = "UF") %>%
+  dplyr::select(c(Empresa, nm_mun, nm_state, diesel_cap))
+DIESEL_CAP_MUN$nm_mun[which(!DIESEL_CAP_MUN$nm_mun %in% MUN$nm_mun)]
+# correct spelling
+DIESEL_CAP_MUN$nm_mun[which(!DIESEL_CAP_MUN$nm_mun %in% MUN$nm_mun)] <- 
+  c("BARRA DO BUGRES", "COLÍDER")
+# add mu codes and extract region code (first digit of MU code)
+DIESEL_CAP_MUN <- DIESEL_CAP_MUN %>% 
+  left_join(MUN[,1:4], by = c("nm_mun", "nm_state")) %>% # match also by state in case of duplicate mu names
+  mutate(co_reg = substr(as.character(co_mun),1,1)) %>%
+  relocate(co_mun:co_reg, .after = nm_mun)
+# aggregate by municipality
+DIESEL_CAP_MUN <- DIESEL_CAP_MUN %>%
+  group_by(across(nm_mun:nm_state)) %>%
+  summarise(diesel_cap = sum(diesel_cap), .groups = "drop")
+
+# add correct number macroregions (see https://biblioteca.ibge.gov.br/visualizacao/livros/liv101652.pdf, p.23)
+regions <- data.frame(co_reg = 1:5, nm_reg = c("Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste"))
+names(DIESEL_MAT_REG) <- regions$co_reg[match(names(DIESEL_MAT_REG), regions$nm_reg)]
+soy_share <- c(DIESEL_MAT_REG[1,names(DIESEL_MAT_REG)[2:6]])
+# add state soy input share to capacity
+DIESEL_CAP_MUN <- mutate(DIESEL_CAP_MUN, soy_share = as.numeric(soy_share[co_reg]))
+# compute production capacity using only soy inputs
+DIESEL_CAP_MUN <- mutate(DIESEL_CAP_MUN, diesel_cap_soy = diesel_cap * soy_share)
 
 
 # merge to one comprehensive table -----------------------------------------------------------------------------------------------
@@ -287,6 +334,12 @@ SOY_MUN <- SOY_MUN %>%  left_join(LSTOCK_MUN[,c(1,3:13)], by = "co_mun")
 
 # add storage capacity
 SOY_MUN <- SOY_MUN %>%  left_join(STORAGE_MUN[,2:3], by = "co_mun")
+
+# add per capita oil acquisition
+SOY_MUN <- SOY_MUN %>% left_join(OIL_ACQ_STATE, by = "nm_state")
+
+# add soy biodiesel capacity
+SOY_MUN <- SOY_MUN %>%  left_join(DIESEL_CAP_MUN[,c("co_mun", "diesel_cap_soy")], by = "co_mun")
 
 # re-add name for MU 9999999 (MUNICIPIO NAO DECLARADO) if applicable --- NOTE: no longer necessary as these exports are allocated above
 # SOY_MUN$nm_mun[SOY_MUN$co_mun == 9999999] <- "MUNICIPIO N?O DECLARADO"  
@@ -402,3 +455,6 @@ if (write){
   saveRDS(MUN_capital_dist, file = "intermediate_data/MUN_capital_dist.rds")
   
 }
+
+rm(list=ls())
+gc()

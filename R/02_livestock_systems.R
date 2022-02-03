@@ -68,7 +68,7 @@ RumSys <- crop(RumSys, GEO_MUN_SOY_WGS84)
 # chicken and pigs --------------------------------------------------------------------------------------------------
 
 # compute total number of animals per MU through zonal sum statistic 
-# NOTE that the Polygons in WGS84 are used to comute sums but results are added to the original file
+# NOTE that the Polygons in WGS84 are used to compute sums but results are added to the original file
 GEO_MUN_SOY$ChExt <- exact_extract(ChExt, GEO_MUN_SOY_WGS84, 'sum')
 GEO_MUN_SOY$ChInt <- exact_extract(ChInt, GEO_MUN_SOY_WGS84, 'sum')
 GEO_MUN_SOY$PgExt <- exact_extract(PgExt, GEO_MUN_SOY_WGS84, 'sum')
@@ -297,3 +297,6 @@ if (write){
   saveRDS(GEO_MUN_SOY, file = "intermediate_data/GEO_MUN_SOY_02.rds")
   # st_write(GEO_MUN_SOY, "intermediate_data/GEO_MUN_SOY.gpkg", driver = "GPKG", overwrite=TRUE, layer_options = "ENCODING=ISO-8859-1", delete_dsn=TRUE)
 }
+
+rm(list=ls())
+gc()

@@ -1,7 +1,8 @@
 ### Leontief inverse ###
 
 # what is changed:
-# - nothing
+# - calculation of A matrix made more efficient by sparse approach
+# - inversion of matrix (solve) is done with sparse = TRUE to get output as sparse dgC matrix and improve speed
 
 library("data.table")
 library("Matrix")
@@ -12,27 +13,29 @@ write = TRUE
 
 prep_solve <- function(year, Z, Y, X,
                        adj_X = FALSE, adj_A = TRUE, adj_diag = FALSE) {
-
+  
   if(adj_X) {X <- X + 1e-10}
-
-  A <- Matrix(0, nrow(Z), ncol(Z))
-  idx <- X != 0
-  # CHNAGED index here
-  idx <- c(1:nrow(A))[idx]
-  A[, idx] <- t(t(Z[, idx]) / X[idx])
-  # TODO: use sparse matrix hack here as well
-  #A <- Z
-  #A[, idx]@x <- A[, idx]@x / rep.int(X[idx], diff(A[, idx]@p))
+  
+  # A <- Matrix(0, nrow(Z), ncol(Z))
+  # idx <- X != 0
+  # idx <- c(1:nrow(A))[idx] # CHANGED index here
+  # A[, idx] <- t(t(Z[, idx]) / X[idx])
+  
+  # CHANGED: use sparse matrix method here as well
+  A <- Z
+  A@x <- A@x / rep.int(X, diff(A@p))
+  
   if(adj_A) {A[A < 0] <- 0}
-
   if(adj_diag) {diag(A)[diag(A) == 1] <- 1 - 1e-10}
+  
   L <- .sparseDiagonal(nrow(A)) - A
-
+  
   lu(L) # Computes LU decomposition and stores it in L
+  
+  L_inv <- solve(L, tol = .Machine[["double.eps"]], sparse = TRUE) # use sparse = TRUE!!!
 
-  L_inv <- solve(L, tol = .Machine[["double.eps"]])
   dimnames(L_inv) <- dimnames(Z)
-
+  
   return(L_inv)
 }
 
@@ -47,21 +50,19 @@ X <- readRDS("intermediate_data/FABIO/X.rds")
 
 
 for(year in years){
-
+  
   print(year)
-
+  
   adjust <- ifelse(year %in% years_singular, TRUE, FALSE)
-
+  
   L <- prep_solve(year = year, Z = Z_m[[as.character(year)]],
                   Y = Y[[as.character(year)]], X = X[, as.character(year)],
                   adj_diag = adjust)
   if (write) saveRDS(L, paste0("intermediate_data/FABIO/", year, "_L_mass.rds"))
-
+  
   L <- prep_solve(year = year, Z = Z_v[[as.character(year)]],
                   Y = Y[[as.character(year)]], X = X[, as.character(year)],
                   adj_diag = adjust)
   if (write) saveRDS(L, paste0("intermediate_data/FABIO/", year, "_L_value.rds"))
-
+  
 }
-
-

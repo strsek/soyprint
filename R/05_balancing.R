@@ -137,7 +137,7 @@ IMP_MUN_SOY <- mutate(IMP_MUN_SOY,
 if(write){
   saveRDS(SOY_MUN, file = "intermediate_data/SOY_MUN_fin.rds")
   saveRDS(GEO_MUN_SOY, file = "intermediate_data/GEO_MUN_SOY_fin.rds")
-  saveRDS(CBS_SOY, file = "intermediate_data/CBS_SOY.rds")
+  saveRDS(CBS_SOY, file = "intermediate_data/CBS_SOY_bal.rds")
   #write.csv2(CBS_SOY, file = "intermediate_data/CBS_SOY.csv")
   saveRDS(EXP_MUN_SOY, file = "intermediate_data/EXP_MUN_SOY_cbs.rds")
   saveRDS(IMP_MUN_SOY, file = "intermediate_data/IMP_MUN_SOY_cbs.rds")
@@ -145,3 +145,4 @@ if(write){
 
 # clear environment
 rm(list = ls())
+gc()

@@ -9,7 +9,7 @@ write = TRUE
 
 # load and format data ---------------------------------------------------------------------------------
 SOY_MUN <- readRDS("intermediate_data/SOY_MUN_00.rds")
-CBS_SOY <- read.xlsx("input_data/CBS_SOY_2013_FAO.xlsx")
+CBS_SOY <- openxlsx::read.xlsx("input_data/CBS_SOY_2013_FAO.xlsx")
 
 # format FAO CBS
 CBS_SOY <- CBS_SOY[-c(1,2, nrow(CBS_SOY)),]
@@ -80,3 +80,6 @@ if (write == TRUE) {
   saveRDS(CBS_SOY, file = "intermediate_data/CBS_SOY.rds")
   saveRDS(consistency, file = "intermediate_data/FAO_consistency.rds")
 }
+
+rm(list=ls())
+gc()

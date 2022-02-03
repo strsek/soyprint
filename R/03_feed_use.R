@@ -121,3 +121,6 @@ if (write){
   saveRDS(SOY_MUN, file = "intermediate_data/SOY_MUN_03.rds")
   saveRDS(GEO_MUN_SOY, file = "intermediate_data/GEO_MUN_SOY_03.rds")
 }  
+
+rm(list=ls())
+gc()

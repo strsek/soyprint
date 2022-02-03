@@ -18,43 +18,44 @@ SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.rds")
 
 # plot data ------------------------
 
-plot_funct <- function(variable, title = NA, unit = NA, ...){
+plot_funct <- function(variable, title = NA, unit = NA, lowcol = "transparent", highcol = "darkgreen", ...){
   thesubset <- GEO_MUN_SOY[pull(SOY_MUN, variable)>0,]
   thedata <- st_drop_geometry(thesubset)
   theplot <- ggplot(thesubset, aes(fill = pull(thedata, variable)), size = 0.01) +
                 labs(title = ifelse(!is.na(title), title, variable))+
                 geom_sf(color = "transparent")+            
                # scale_fill_viridis(direction = -1, na.value = "transparent", name = paste(unit)) + 
-                scale_fill_gradient(direction = -1, low = "white", high = "darkgreen", na.value = "transparent", name = paste(unit)) + 
+                scale_fill_gradient(low = lowcol, high = highcol, na.value = "transparent", name = paste(unit)) + 
                 geom_sf(data = GEO_states, fill = "transparent", color = "grey", size = 0.1)+
                 theme_void()+ # or minimal
-                theme(plot.title = element_text(hjust = 0.5), plot.margin = margin(0.5, 1, 0.5, 1, "cm"))
+                theme(plot.title = element_text(hjust = 0.5), plot.margin = margin(t = -0.0, r = -0.2, b = -0.1, l = -0.5, "cm"),
+                      legend.margin=margin(0,0,0,0), legend.box.margin=margin(t=0,r=0,b= 0,l=-40))
   return(theplot)
 }
 #
 
-g_prod_bean <- plot_funct(variable = "prod_bean", title = "Soybean production", unit = "tons")
-g_prod_oil  <- plot_funct(variable = "prod_oil", title = "Soy oil  production", unit = "tons")
-g_prod_cake <- plot_funct(variable = "prod_cake", title = "Soy cake production", unit = "tons")
+g_prod_bean <- plot_funct(variable = "prod_bean", title = "Soybean production", unit = "tons",  lowcol = "grey95", highcol = "darkgreen")
+g_prod_oil  <- plot_funct(variable = "prod_oil", title = "Soy oil  production", unit = "tons",  lowcol = "grey95", highcol = "darkgreen")
+g_prod_cake <- plot_funct(variable = "prod_cake", title = "Soy cake production", unit = "tons", lowcol = "grey95", highcol = "darkgreen")
 
-g_exp_bean <- plot_funct(variable = "exp_bean", title = "Soy bean exports", unit = "tons")
-g_exp_oil <-  plot_funct(variable = "exp_oil", title = "Soy oil exports", unit = "tons")
-g_exp_cake <- plot_funct(variable = "exp_cake", title = "Soy cake exports", unit = "tons")
+g_exp_bean <- plot_funct(variable = "exp_bean", title = "Soy bean exports", unit = "tons", lowcol = "grey95", highcol = "darkblue")
+g_exp_oil <-  plot_funct(variable = "exp_oil", title = "Soy oil exports", unit = "tons", lowcol = "grey95",   highcol = "darkblue")
+g_exp_cake <- plot_funct(variable = "exp_cake", title = "Soy cake exports", unit = "tons",  lowcol = "grey95", highcol = "darkblue")
 
-g_imp_bean <- plot_funct(variable = "imp_bean", title = "Soy bean imports", unit = "tons")
-g_imp_oil  <- plot_funct(variable = "imp_oil",  title =  "Soy oil imports", unit = "tons")
-g_imp_cake <- plot_funct(variable = "imp_cake", title = "Soy cake imports", unit = "tons")
+g_imp_bean <- plot_funct(variable = "imp_bean", title = "Soy bean imports", unit = "tons", lowcol = "grey95", highcol = "purple4")
+g_imp_oil  <- plot_funct(variable = "imp_oil",  title =  "Soy oil imports", unit = "tons", lowcol = "grey95", highcol = "purple4")
+g_imp_cake <- plot_funct(variable = "imp_cake", title = "Soy cake imports", unit = "tons", lowcol = "grey95", highcol = "purple4")
 
-g_food_bean <- plot_funct(variable = "food_bean", title = "Soy bean food use", unit = "tons")
-g_food_oil  <- plot_funct(variable = "food_oil",  title =  "Soy oil food use", unit = "tons")
+g_food_bean <- plot_funct(variable = "food_bean", title = "Soy bean food use", unit = "tons", lowcol = "grey95", highcol = "darkorange")
+g_food_oil  <- plot_funct(variable = "food_oil",  title =  "Soy oil food use", unit = "tons", lowcol = "grey95", highcol = "darkorange")
 
-g_proc_bean <-  plot_funct(variable = "proc_bean", title = "Soy bean processing use", unit = "tons")
-g_feed_bean <-  plot_funct(variable = "feed_bean",  title =  "Soy bean feed use", unit = "tons")
-g_feed_cake <-  plot_funct(variable = "feed_cake",  title =  "Soy cake feed use", unit = "tons")
+g_proc_bean <-  plot_funct(variable = "proc_bean", title = "Soy bean processing use", unit = "tons", lowcol = "grey95", highcol = "deeppink")
+g_feed_bean <-  plot_funct(variable = "feed_bean",  title =  "Soy bean feed use",     unit = "tons", lowcol = "grey95", highcol = "firebrick4")
+g_feed_cake <-  plot_funct(variable = "feed_cake",  title =  "Soy cake feed use",     unit = "tons", lowcol = "grey95", highcol = "firebrick4")
 
-g_seed_bean  <-  plot_funct(variable = "seed_bean",  title =  "Soy bean seed use", unit = "tons")
-g_other_oil  <-  plot_funct(variable = "other_oil",  title =  "Soy oil other use", unit = "tons")
-g_stock_bean <-  plot_funct(variable = "stock_bean",  title =  "Soy bean storage addition", unit = "tons")
+g_seed_bean  <-  plot_funct(variable = "seed_bean",  title =  "Soy bean seed use",          unit = "tons", lowcol = "grey95", highcol = "darkgreen")
+g_other_oil  <-  plot_funct(variable = "other_oil",  title =  "Soy oil other use",          unit = "tons", lowcol = "grey95", highcol = "tan4")
+g_stock_bean <-  plot_funct(variable = "stock_bean",  title =  "Soy bean storage addition", unit = "tons", lowcol = "grey95", highcol = "darkgreen")
 
 #g_proc_cap <- plot_funct(variable = "proc_cap", title = "Processing capacity \n (tons/day)")
 #g_ref_cap  <- plot_funct(variable = "ref_cap", title = "Refining capacity \n (tons/day)")
@@ -71,17 +72,24 @@ g_stock_bean <-  plot_funct(variable = "stock_bean",  title =  "Soy bean storage
 #comparison <- (g_prod | g_exp_tot | g_exp_bean | g_exp_oil | g_exp_cake ) / (g_proc | g_refbot | g_proc_cap | g_ref_cap | g_bot_cap) / (g_cattle | g_pig | g_poultry | g_sheep | g_pop)
 comparison <- (g_prod_bean | g_prod_oil | g_prod_cake | g_exp_bean | g_exp_oil | g_exp_cake ) / 
               (g_imp_bean  | g_imp_oil  | g_imp_cake  | g_food_bean| g_food_oil| g_seed_bean) / 
-              (g_feed_bean | g_feed_cake| g_other_oil | g_stock_bean)
+              (g_feed_bean | g_feed_cake| g_other_oil | g_stock_bean) 
 
-comparison_bean <- (g_prod_bean | g_imp_bean | g_exp_bean | g_proc_bean | g_food_bean | g_feed_bean |g_seed_bean | g_stock_bean)
-comparison_oil  <- (g_prod_oil  | g_imp_oil  | g_exp_oil  | g_food_oil  | g_other_oil)
-comparison_cake <- (g_prod_cake | g_imp_cake | g_exp_cake | g_feed_cake)
+comparison_bean <- (g_prod_bean | g_imp_bean )/ 
+                    (g_exp_bean | g_proc_bean)/ 
+                    (g_food_bean| g_feed_bean)#/
+                   #(g_seed_bean | g_stock_bean) #+ plot_layout(ncol = 2)
+comparison_oil  <- (g_prod_oil  | g_imp_oil  )/
+                    (g_exp_oil  | g_food_oil) /
+                    (g_other_oil | plot_spacer())# + plot_layout(ncol = 2, nrow = 3)
+comparison_cake <- (g_prod_cake | g_imp_cake) / 
+                   (g_exp_cake | g_feed_cake) /
+                   (plot_spacer() | plot_spacer())#  + plot_layout(ncol = 2)
 
 if(write){
-ggsave(plot = comparison, filename = "comparison.png", device = "png", width = 60, height = 30, units = "cm")
-ggsave(plot = comparison_bean, filename = "comparison_bean.png", device = "png",  width = 96, height = 10, units = "cm")
-ggsave(plot = comparison_oil , filename = "comparison_oil.png", device = "png", width = 60, height = 10, units = "cm")
-ggsave(plot = comparison_cake, filename = "comparison_cake.png", device = "png", width = 48, height = 10, units = "cm")
+ggsave(plot = comparison, filename = "results/maps/comparison.png", device = "png", width = 15.02, height = 23.77, units = "cm", scale = 1.5)
+ggsave(plot = comparison_bean, filename = "results/maps/comparison_bean.png", device = "png",  width = 15.02, height = 23.77, units = "cm", scale = 1.5)
+ggsave(plot = comparison_oil , filename = "results/maps/comparison_oil.png", device = "png", width = 15.02, height = 23.77, units = "cm", scale = 1.5)
+ggsave(plot = comparison_cake, filename = "results/maps/comparison_cake.png", device = "png", width = 15.02, height = 23.77, units = "cm", scale = 1.5)
 }
 
 # plot with mapview (ool, but very heavy: only manageable for individual layers)

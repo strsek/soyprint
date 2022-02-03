@@ -13,13 +13,14 @@ library(reshape2)
 library(gdxrrw) # if not installed, tun install_github("GAMS-dev/gdxrrw/gdxrrw")
 library(gdxdt)
 library(tidyr)
+library(tibble)
 
 ## set GAMS directory according to location where GAMS is installed on your PC ##
 # see https://github.com/GAMS-dev/gdxrrw for further info
 #igdx("C:/GAMS/34") 
 igdx("~/gams37.1_linux_x64_64_sfx")
 
-write = FALSE
+write = TRUE
 
 # load data
 SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.rds")
@@ -332,4 +333,6 @@ if (write) {
   #saveRDS(flows_simple, file = "intermediate_data/flows_GAMS_simple.rds")
 }
 
+# clear environment
 rm(list = ls())
+gc()

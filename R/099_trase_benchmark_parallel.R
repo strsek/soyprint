@@ -12,6 +12,7 @@ library(mapview)
 library(sf)
 library(leafsync)
 library(patchwork)
+library(gmodels)
 
 write = TRUE
 
@@ -26,7 +27,7 @@ source("R/00_function_library.R")
 SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.rds")
 GEO_MUN_SOY <- readRDS("intermediate_data/GEO_MUN_SOY_02.rds")
 GEO_states <- st_read("input_data/geo/GADM_boundaries/gadm36_BRA_1.shp", stringsAsFactors = FALSE)
-EXP_MUN_SOY <- readRDS("intermediate_data/EXP_MUN_SOY.rds") # original data before cbs harmonization!
+EXP_MUN_SOY <- readRDS("intermediate_data/EXP_MUN_SOY.rds")
 
 # trase data for Brazilian soy
 trase <- read.csv("input_data/BRAZIL_SOY_2.5.1_TRASE.csv", stringsAsFactors = FALSE)
@@ -34,7 +35,7 @@ trase <- read.csv("input_data/BRAZIL_SOY_2.5.1_TRASE.csv", stringsAsFactors = FA
 trase_names <- read.csv2("input_data/trase_names.csv", fileEncoding="UTF-8-BOM", stringsAsFactors = FALSE)
 
 # supply chain results
-source_to_export_list <- readRDS("intermediate_data/source_to_export_list_old.RDS")
+source_to_export_list <- readRDS("intermediate_data/source_to_export_list.RDS")
 
 regions <- readRDS("intermediate_data/regions.rds")
 regions_btd <- distinct(regions, CO_BTD, ISO_BTD) %>% arrange(CO_BTD) 
@@ -92,19 +93,30 @@ trase_mun <- trase_mun %>%
 
 # match TRASE with own results -----------------------------------------------------------
 
+# results_list <- sapply(names(source_to_export_list), function(fl){
+# # translate flows of oil and cake into soybean equivalents and aggregate
+# # NOTE: we need to use OUR OWN equivalence factor here, 
+# #  which comes from the national average conversion factor from soybean to cake and oil according to FAO CBS! (see script 01_consumption_and_processing)
+# results_mun_agg <- source_to_export_list[[fl]] %>% 
+#   mutate(value = ifelse(item_code != "bean", value*1.023466, value)) %>% # conversion factor of trase: 1.031
+#   group_by(from_code, to_code) %>% 
+#   summarise(value = sum(value, na.rm = T), .groups = "drop") %>%
+#   mutate(from_code = as.numeric(from_code)) %>%
+#   rename("co_mun" = "from_code", !!str_c(fl) := "value")
+# }, USE.NAMES = TRUE, simplify = FALSE)
+
 results_list <- sapply(names(source_to_export_list), function(fl){
-# translate flows of oil and cake into soybean equivalents and aggregate
-# NOTE: we need to use OUR OWN equivalence factor here, 
-#  which comes from the national average conversion factor from soybean to cake and oil according to FAO CBS! (see script 01_consumption_and_processing)
-results_mun_agg <- source_to_export_list[[fl]] %>% 
-  mutate(value = ifelse(item_code != "bean", value*1.023466, value)) %>% # conversion factor of trase: 1.031
-  group_by(from_code, to_code) %>% 
-  summarise(value = sum(value, na.rm = T), .groups = "drop") %>%
-  mutate(from_code = as.numeric(from_code)) %>%
-  rename("co_mun" = "from_code", !!str_c(fl) := "value")
+  results_mun_agg <- as.data.table(source_to_export_list[[fl]])  
+  results_mun_agg[item_code != "bean", value := value*1.023466] # conversion factor of trase: 1.031
+  results_mun_agg <- results_mun_agg[, list(value = sum(value)), by = c("from_code", "to_code")]
+  results_mun_agg[, from_code := as.numeric(from_code)]
+  setnames(results_mun_agg, c("from_code", "value"), c("co_mun", str_c(fl)))
 }, USE.NAMES = TRUE, simplify = FALSE)
 
+
 # join results of different models
+#results_df <- results_list %>% 
+#  reduce(full_join, by = c("co_mun", "to_code")) 
 results_df <- results_list %>% 
   reduce(full_join, by = c("co_mun", "to_code")) 
 
@@ -155,32 +167,105 @@ comp_state <- comp_mun %>%
   summarise(across(c("trase", names(results_list)), sum, na.rm = TRUE), .groups = "drop")
 
 # aggregate by region
+comp_mun_by_region <- comp_mun %>% 
+  group_by(to_region) %>% 
+  summarise(across(c("trase", names(results_list)), sum, na.rm = TRUE), .groups = "drop")
+
 comp_state_by_region <- comp_mun %>% 
   group_by(co_state, to_region) %>% 
   summarise(across(c("trase", names(results_list)), sum, na.rm = TRUE), .groups = "drop")
 
-# total exports by destination region
-exp_by_dest <- comp_mun %>% 
-  group_by(to_code, to_region) %>% 
-  summarise(across(c("trase", names(results_list)), sum, na.rm = TRUE), .groups = "drop")
+
+## compute confidence intervals for bs results and compare to trase -------------------------------------------------------------
+
+comp_mun_bs <- comp_mun[,which(colnames(comp_mun) == "00001"):ncol(comp_mun)]
+#comp_mun <- comp_mun[,1:(which(colnames(comp_mun) == "00001")-1)]
+comp_mun_ci95 <- ci_funct(comp_mun_bs, level = 95, stats = c("lower", "upper"))
+comp_mun_ci99 <- ci_funct(comp_mun_bs, level = 99, stats = c("lower", "upper"))
+
+# add CIs
+comp_mun <- cbind(comp_mun, comp_mun_ci95, comp_mun_ci99) %>% 
+  relocate(lower95:upper99, .after = euclid)
+
+# add mean, min and max
+comp_mun <- comp_mun %>% mutate(mean = apply(as.matrix(comp_mun_bs), 1, mean),
+                                min = apply(as.matrix(comp_mun_bs), 1, min),
+                                max = apply(as.matrix(comp_mun_bs), 1, max),
+                                .after = euclid)
+
+# check if trase falls within Ci ranges
+comp_mun <- comp_mun %>% mutate(trase_inrangemax = (trase >= min & trase <= max),
+                                trase_inrange95 = (trase >= lower95 & trase <= upper95),
+                                trase_inrange99 = (trase >= lower99 & trase <= upper99), 
+                                .after = upper99)
+
+
+# compute difference statistics
+comp_mun <- comp_mun %>% mutate(diff_trase_mean = abs(trase - mean), .after = trase)
+comp_mun <- comp_mun %>% mutate(sle_trase_mean = sle(trase, mean), .after = trase)
+comp_mun <- comp_mun %>% mutate(ape_trase_mean = ape(trase, mean), .after = trase)
+
+comp_mun <- comp_mun %>% mutate(ape_trase_euclid = ape(trase, euclid), .after = euclid)
+comp_mun <- comp_mun %>% mutate(ape_mean_model= ape(mean, euclid), .after = euclid)
+
+# same on state level
+comp_state_bs <- comp_state[,which(colnames(comp_state) == "00001"):ncol(comp_state)]
+#comp_state <- comp_state[,1:(which(colnames(comp_state) == "00001")-1)]
+comp_state_ci95 <- ci_funct(comp_state_bs, level = 95, stats = c("lower", "upper"))
+comp_state_ci99 <- ci_funct(comp_state_bs, level = 99, stats = c("lower", "upper"))
+
+comp_state <- cbind(comp_state, comp_state_ci95,comp_state_ci99) %>% 
+  relocate(lower95:upper95, .after = euclid)
+
+comp_state <- comp_state %>% mutate(mean = apply(as.matrix(comp_state_bs), 1, mean),
+                                    min = apply(as.matrix(comp_state_bs), 1, min),
+                                    max = apply(as.matrix(comp_state_bs), 1, max),
+                                    .after = euclid)
+
+
+comp_mun_by_region_bs <- comp_mun_by_region[,which(colnames(comp_mun_by_region) == "00001"):ncol(comp_mun_by_region)]
+comp_mun_by_region_ci95 <- ci_funct(comp_mun_by_region_bs, level = 95, stats = c("lower", "upper"))
+comp_mun_by_region_ci99 <- ci_funct(comp_mun_by_region_bs, level = 99, stats = c("lower", "upper"))
+comp_mun_by_region <- cbind(comp_mun_by_region, comp_mun_by_region_ci95, comp_mun_by_region_ci99) %>% 
+  relocate(lower95:upper95, .after = euclid)
+comp_mun_by_region <- comp_mun_by_region %>% mutate(mean = apply(as.matrix(comp_mun_by_region_bs), 1, mean),
+                                    min = apply(as.matrix(comp_mun_by_region_bs), 1, min),
+                                    max = apply(as.matrix(comp_mun_by_region_bs), 1, max),
+                                    .after = euclid)
+
+comp_state_by_region_bs <- comp_state_by_region[,which(colnames(comp_state_by_region) == "00001"):ncol(comp_state_by_region)]
+comp_state_by_region_ci95 <- ci_funct(comp_state_by_region_bs, level = 95, stats = c("lower", "upper"))
+comp_state_by_region_ci99 <- ci_funct(comp_state_by_region_bs, level = 99, stats = c("lower", "upper"))
+comp_state_by_region <- cbind(comp_state_by_region, comp_state_by_region_ci95, comp_state_by_region_ci99) %>% 
+  relocate(lower95:upper95, .after = euclid)
+comp_state_by_region <- comp_state_by_region %>% mutate(mean = apply(as.matrix(comp_state_by_region_bs), 1, mean),
+                                                    min = apply(as.matrix(comp_state_by_region_bs), 1, min),
+                                                    max = apply(as.matrix(comp_state_by_region_bs), 1, max),
+                                                    .after = euclid)
+
+## or: form ci over origns by destination?
+
+
+# compare to  total exports by destination -------------------------------------------------------
+
+# select results to compare
+res <- c("trase", "euclid", "mean")
+
+exp_by_dest <- dplyr::select(comp_mun, c(co_state:trase, euclid, mean)) %>% 
+  group_by(to_code, to_name, to_region) %>% 
+  summarise(across(all_of(res), sum, na.rm = TRUE), .groups = "drop") #summarise(across(c("trase", names(results_list)), sum, na.rm = TRUE), .groups = "drop")  #summarise(across(c(trase:mean), sum, na.rm = TRUE), .groups = "drop")
 # add comex export values
 exp_nat <- EXP_MUN_SOY %>% 
-  mutate(export = ifelse(item_code != 2555, export*1.023466, export)) %>%
+  mutate(export = ifelse(product != "bean", export*1.023466, export)) %>%
   group_by(to_name) %>% 
-  summarise(export = sum(export, na.rm = TRUE))
+  summarise(comex = sum(export, na.rm = TRUE))
 exp_by_dest <- full_join(exp_by_dest,exp_nat, by = c("to_code" = "to_name"))
-
-exp_comp <- exp_by_dest %>% 
-  #select(c(to_code, to_region, trase, euclid, intermod, export)) %>% 
-  mutate(trase_euclid_diff = trase - euclid, 
-         trase_comex_diff = trase - export, 
-         euclid_comex_diff = euclid - export)
 
 exp_by_dest_region <- exp_by_dest %>% 
   group_by(to_region) %>% 
-  summarise(across(c("trase", names(results_list), "export"), sum, na.rm = TRUE), .groups = "drop")
+  summarise(across(all_of(res), sum, na.rm = TRUE), .groups = "drop") #summarise(across(c("trase", names(results_list), "export"), sum, na.rm = TRUE), .groups = "drop")
 
-sapply(filter(exp_by_dest, to_code != "BRA")[,3:ncol(exp_by_dest)], sum, na.rm = TRUE)
+sapply(filter(exp_by_dest, to_code != "BRA")[,c(res, "comex")], sum, na.rm = TRUE)
 
 # # export sums
 # exp_total <- colSums(filter(exp_by_dest, to_code != "BRA")[,2:3])
@@ -188,12 +273,18 @@ sapply(filter(exp_by_dest, to_code != "BRA")[,3:ncol(exp_by_dest)], sum, na.rm =
 # flow_total <- colSums(exp_by_dest[,2:3])
 # flow_total["diff"] <- flow_total[2] - flow_total[1]
 
-# total flows by MU
+
+# compare total flows by MU to production ------------------------------------------------------------
+
 comp_mun_total <- comp_mun %>% 
+  dplyr::select(c(co_state:trase, euclid, mean)) %>%
   group_by(co_state, nm_state, co_mun, nm_mun) %>% 
-  summarise(across(c("trase", names(results_list)), sum, na.rm = TRUE), .groups = "drop")
+  summarise(across(all_of(res), sum, na.rm = TRUE), .groups = "drop") #summarise(across(c("trase", names(results_list)), sum, na.rm = TRUE), .groups = "drop")
+
 # add soy production
-comp_mun_total <- full_join(comp_mun_total, dplyr::select(SOY_MUN, c(co_mun, prod_bean)), by = "co_mun") # prod_oil, prod_cake
+comp_mun_total <- full_join(comp_mun_total, 
+                            dplyr::select(SOY_MUN, c(co_mun, prod_bean)), 
+                            by = "co_mun") # prod_oil, prod_cake
 # add missing names
 comp_mun_total <- comp_mun_total %>% 
   dplyr::select(-c(nm_mun, co_state, nm_state)) %>% 
@@ -210,14 +301,14 @@ comp_mun_total <- comp_mun_total %>%
 
 # add columns for differences to trase
 comp_mun <- comp_mun %>% 
-  mutate(across(names(results_list), .fns = list(diff = ~ .-trase)))
+  mutate(across(all_of(res), .fns = list(diff = ~ .-trase)))
 comp_state <- comp_state %>% 
-  mutate(across(names(results_list), .fns = list(diff = ~ .-trase)))
+  mutate(across(all_of(res), .fns = list(diff = ~ .-trase)))
 comp_state_by_region <- comp_state_by_region %>% 
-  mutate(across(names(results_list), .fns = list(diff = ~ .-trase)))
+  mutate(across(all_of(res), .fns = list(diff = ~ .-trase)))
 comp_mun_total <- comp_mun_total %>% 
-  mutate(across(names(results_list), .fns = list(diff = ~ .-trase))) %>%
-  mutate(across(names(results_list), .fns = list(diff_prod = ~ .-prod_bean)))
+  mutate(across(all_of(res), .fns = list(diff = ~ .-trase))) %>%
+  mutate(across(all_of(res), .fns = list(diff_prod = ~ .-prod_bean)))
 
 
 # total differences (removing trase unknown origin)
@@ -245,23 +336,24 @@ comp_mun_total <- comp_mun_total %>%
 # plot data -----------------------------------------
 
 # xy plots 
+comp_plot <- filter(comp_mun, nm_mun != "UNKNOWN")
 
-#ggplot(comp_state, aes(x=trase, y = intermod))+
-#  geom_point(color = "darkgreen")+
-#  geom_abline(slope = 1) + 
-#  geom_abline(slope = 1.05, linetype="dashed", color = "blue")+
-#  geom_abline(slope = 0.95, linetype="dashed", color = "blue")+
-#  geom_abline(slope = 1.5, linetype="dashed", color = "cyan")+
-#  geom_abline(slope = 0.5, linetype="dashed", color = "cyan")
-#
-#
-ggplot(filter(comp_mun, nm_mun != "UNKNOWN"), aes(x=trase, y = intermod), color = "blue")+
-  geom_point(color = "red", alpha = 0.3)+
+ggplot(comp_plot, aes(x=trase, y = mean))+
+  geom_point(color = "darkgreen", alpha = 0.1)+
   geom_abline(slope = 1) + 
   geom_abline(slope = 1.05, linetype="dashed", color = "blue")+
   geom_abline(slope = 0.95, linetype="dashed", color = "blue")+
   geom_abline(slope = 1.5, linetype="dashed", color = "cyan")+
   geom_abline(slope = 0.5, linetype="dashed", color = "cyan")
+#
+#
+#ggplot(comp_mun, aes(x=trase, y = euclid), color = "blue")+
+#  geom_point(color = "red", alpha = 0.1)+
+#  geom_abline(slope = 1) + 
+#  geom_abline(slope = 1.05, linetype="dashed", color = "blue")+
+#  geom_abline(slope = 0.95, linetype="dashed", color = "blue")+
+#  geom_abline(slope = 1.5, linetype="dashed", color = "cyan")+
+#  geom_abline(slope = 0.5, linetype="dashed", color = "cyan")
 
 
 # gradient maps to compare results
@@ -275,27 +367,28 @@ GEO_states <- mutate(GEO_states, nm_state = substr(HASC_1, 4,5))
 GEO_STATE_SOY_dest <- GEO_states %>% left_join(filter(comp_state, to_code == dest))
 
 # select results to compare
-res <- names(comp_mun)[7:9] ; names(res)<-res
+res <- c("trase", "euclid", "mean")#names(comp_mun)[7:9]
+names(res)<-res
 #res <- res[1]
 
 # generate ggplots (using gg_funct from function library)
 exp_dest <- lapply(res, gg_funct, GEO = GEO_MUN_SOY_dest, unit = "tons", title = '', pal = "plasma")
 exp_dest <- map2(exp_dest, res, ~ .x + ggtitle(.y))
-wrap <- wrap_plots(exp_dest, nrow = ceiling(length(exp_dest)/3))
+(wrap <- wrap_plots(exp_dest, nrow = ceiling(length(exp_dest)/3)))
 ggsave(paste0("results/benchmark_",dest,".png"), bg='transparent', scale = 2, dpi = 600)
 
 exp_dest_state <- lapply(res, gg_funct, GEO = GEO_STATE_SOY_dest, unit = "tons")
 exp_dest_state <- map2(exp_dest_state, res, ~ .x + ggtitle(.y))
-wrap_state <- wrap_plots(exp_dest_state, nrow = ceiling(length(exp_dest_state)/3))
+(wrap_state <- wrap_plots(exp_dest_state, nrow = ceiling(length(exp_dest_state)/3)))
 ggsave(paste0("results/benchmark_state_",dest,".png"), width = 48,  height = 20, units = "cm")
   
 # mapview approach (using mv_funct from function library)
-exp_dest_mv <- lapply(res, mv_funct,  GEO = GEO_MUN_SOY_dest, cutoff = 1)
-sync <- sync(exp_dest_mv, ncol = 2)
+exp_dest_mv <- lapply(res, mv_funct,  GEO = GEO_MUN_SOY_dest, cutoff = 10)
+(sync <- sync(exp_dest_mv, ncol = 3))
 save_tags(sync, paste0("results/benchmark_",dest,".html"), selfcontained=TRUE)
           
-exp_dest_mv_state <- lapply(res, mv_funct,  GEO = GEO_STATE_SOY_dest)
-sync_state <- sync(exp_dest_mv_state, ncol = 2)
+exp_dest_mv_state <- lapply(res, mv_funct,  GEO = GEO_STATE_SOY_dest,cutoff = 10)
+(sync_state <- sync(exp_dest_mv_state, ncol = 2))
 save_tags(sync, paste0("results/benchmark_state_",dest,".html"), selfcontained=TRUE)
 
 
@@ -306,3 +399,7 @@ if (write){
   write.csv2(comp_mun_total, "intermediate_data/comp_mun_total.csv")
 }
 
+saveRDS(comp_mun, "intermediate_data/comp_mun_summary.rds")
+saveRDS(comp_state, "intermediate_data/comp_state_summary.rds")
+saveRDS(comp_mun_by_region, "intermediate_data/comp_mun_by_region.rds")
+saveRDS(comp_state_by_region, "intermediate_data/comp_state_by_region.rds")

@@ -77,3 +77,25 @@ save_tags <- function (tags, file, selfcontained = F, libdir = "./lib")
   }
   return(file)
 }
+
+
+## nicely named confidence intervals of a matrix returned as df
+library(gmodels)
+library(dplyr)
+
+ci_funct <- function(x, level = 95, margin = 1, stats = c("lower", "upper", "mean", "sd")){
+     t(apply(as.matrix(x), margin, function(mat) {ci(mat, confidence = level/100)})) %>% 
+     as.data.frame() %>% 
+    # rename(!!paste0("upper",level) := `CI upper`, 
+    #        !!paste0("lower",level) := `CI lower`, 
+    #        !!paste0("mean",level) := Estimate, 
+    #        !!paste0("sd",level) := `Std. Error`) %>%
+     rename("upper" = `CI upper`, 
+            "lower" = `CI lower`, 
+            "mean" = Estimate, 
+            "sd" = `Std. Error`) %>%
+     dplyr::select(one_of(stats))  %>%
+     rename_with(~str_c(.,level), everything())
+    #rename(across(.fns = function(x){paste0(x,level)}))
+}
+
