@@ -3,11 +3,18 @@
 library(Matrix)
 library(data.table)
 
-L <- readRDS("intermediate_data/FABIO/2013_L_mass.rds")
+LA_mass <- readRDS("intermediate_data/FABIO/2013_L_mass.rds")
+LB_mass <- readRDS("intermediate_data/FABIO/2013_B_inv_mass.rds")
+LA_value <- readRDS("intermediate_data/FABIO/2013_L_value.rds")
+LB_value <- readRDS("intermediate_data/FABIO/2013_B_inv_value.rds")
 X <- readRDS("intermediate_data/FABIO/X.rds")
 X <- X
-Y <- readRDS("intermediate_data/FABIO/Y.rds")
-Y <- Y$`2013`
+YA <- readRDS("intermediate_data/FABIO/Y_hybrid.rds")
+YA <- YA$`2013`
+load("/mnt/nfs_fineprint/tmp/exiobase/pxp/2013_Y.RData")
+YB <- as(Y, "sparseMatrix"); rm(Y)
+load("/mnt/nfs_fineprint/tmp/exiobase/Y.codes.RData")
+load("/mnt/nfs_fineprint/tmp/exiobase/pxp/IO.codes.RData")
 E <- readRDS("/mnt/nfs_fineprint/tmp/fabio/v2/E.rds")
 E <- E$`2013`
 l_mun <- read.csv("input_data/soy_areas_mapbiomas.csv") 
@@ -49,20 +56,37 @@ setkey(E, area_code, comm_code)
 # compute demand-driven production and footprints ------------------------------------
 
 # aggregate final demand categories
-colnames(Y) <- sub("_.*", "", colnames(Y))
-sum_mat <- as(sapply(unique(colnames(Y)),"==",colnames(Y)), "Matrix")*1
-Y_agg <- Y %*% sum_mat 
+# for YA
+colnames(YA) <- sub("_.*", "", colnames(YA))
+sum_mat <- as(sapply(unique(colnames(YA)),"==",colnames(YA)), "Matrix")*1
+YA_agg <- YA %*% sum_mat 
+# for YB
+dimnames(YB) <- list(paste0(IO.codes$Country.Code,"_",IO.codes$Product.Code),Y.codes$`Region Name`)
+sum_mat <- as(sapply(unique(colnames(YB)),"==",colnames(YB)), "Matrix")*1
+YB_agg <- YB %*% sum_mat 
   
 # calculate production embodied in final demand impulse
-P <- L %*% Y_agg
+PA_mass  <- LA_mass  %*% YA_agg
+PA_value <- LA_value %*% YA_agg
+PB_mass  <- LB_mass  %*% YB_agg
+PB_value <- LB_value %*% YB_agg
 
 # calculate municipal land-use footprints
 l <- as.vector(E$landuse / X)
 l[!is.finite(l)] <- 0
-FP <- l*P
+FA_mass  <- l*PA_mass
+FA_value <- l*PA_value
+FB_mass  <- l*PB_mass 
+FB_value <- l*PB_value
 
+P_mass  <- list(PA_mass,  PB_mass)
+P_value <- list(PA_value, PB_value)
+F_mass  <- list(FA_mass,  FB_mass)
+F_value <- list(FA_value, FB_value)
 
 # Store results -----------------------
-saveRDS(P, "results/P.rds")
-saveRDS(FP, "results/FP.rds")
+saveRDS(P_mass , "results/P_mass.rds")
+saveRDS(P_value, "results/P_value.rds")
+saveRDS(F_mass , "results/F_mass.rds")
+saveRDS(F_value, "results/F_value.rds")
 
