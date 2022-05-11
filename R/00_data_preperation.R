@@ -17,7 +17,7 @@ write = TRUE
 # load raw data -----------------------------------------------------------------------------------------------------------------------------------------------
 
 # IBGE GEO-municipality names
-MUN <- read.xlsx("input_data/GEO_MUN_2013_IBGE_merged.xlsx") 
+MUN <- openxlsx::read.xlsx("input_data/GEO_MUN_2013_IBGE_merged.xlsx") 
 # export and import (COMEX)
 EXP_MUN <- read.csv2(file = "input_data/EXP_2013_MUN_COMEX.csv", header = TRUE, stringsAsFactors = FALSE)
 IMP_MUN <- read.csv2(file = "input_data/IMP_2013_MUN_COMEX.csv", header = TRUE, stringsAsFactors = FALSE)
@@ -28,8 +28,8 @@ PAIS <- read.csv2(file = "input_data/PAIS_COMEX.csv", header = TRUE, fileEncodin
 # production (IBGE)
 PROD_MUN <- read.csv(file = "input_data/Production_tabela1612_IBGE.csv", header = TRUE, skip = 2, encoding = "UTF-8", stringsAsFactors = FALSE)
 # processing facilities (ABIOVE)
-PROC_MUN_proc <- read.xlsx("input_data/Processing_facilities_2013_ABIOVE.xlsx", sheet = "processing_MUN", colNames = T) 
-PROC_MUN_refbot <- read.xlsx("input_data/Processing_facilities_2013_ABIOVE.xlsx", sheet = "refining_bottling_MUN", colNames = T) 
+PROC_MUN_proc <- openxlsx::read.xlsx("input_data/Processing_facilities_2013_ABIOVE.xlsx", sheet = "processing_MUN", colNames = T) 
+PROC_MUN_refbot <- openxlsx::read.xlsx("input_data/Processing_facilities_2013_ABIOVE.xlsx", sheet = "refining_bottling_MUN", colNames = T) 
 # population (IBGE)
 POP_MUN <- read.csv(file = "input_data/Population_tabela6579_IBGE.csv", header = TRUE, skip = 1, encoding = "UTF-8", stringsAsFactors = FALSE)
 # livestock (IBGE)
@@ -40,8 +40,8 @@ STORAGE_MUN <- st_read("input_data/geo/IBGE_logistic_network/armazens_2014.shp")
 # per-capita soy oil acquisition (IBGE POF)
 OIL_ACQ_STATE <- openxlsx::read.xlsx("input_data/POF_soy_oil_2017_IBGE.xlsx", sheet = 1)
 # biodiesel production facilities and regional material inputs (ANP)
-DIESEL_CAP_MUN <- read.xlsx("input_data/Biodiesel_capacity_2013_ANP.xlsx", sheet = "capacity", startRow = 2, colNames = T) 
-DIESEL_MAT_REG <- read.xlsx("input_data/Biodiesel_capacity_2013_ANP.xlsx", sheet = "materials", startRow = 2, colNames = T) 
+DIESEL_CAP_MUN <- openxlsx::read.xlsx("input_data/Biodiesel_capacity_2013_ANP.xlsx", sheet = "capacity", startRow = 2, colNames = T) 
+DIESEL_MAT_REG <- openxlsx::read.xlsx("input_data/Biodiesel_capacity_2013_ANP.xlsx", sheet = "materials", startRow = 2, colNames = T) 
 
 
 # prepare, harmonize and format data ----------------------------------------------------------------------------------------------------------------------
@@ -88,7 +88,8 @@ EXP_MUN_SOY <- EXP_MUN_SOY %>% mutate(co_mun_corr = ifelse(nm_state_comex == "SP
 
 # match corrected MU codes with MU names & states from the IBGE GEO-municipalities 
 EXP_MUN_SOY <- EXP_MUN_SOY %>% left_join(MUN, by=c("co_mun_corr" = "co_mun")) %>% relocate(nm_mun, .after = nm_mun_comex)  %>% relocate(nm_state, .after = nm_state_comex) %>% relocate(co_state, .before = nm_state_comex) %>% arrange(co_mun_corr)
-sum(is.na(EXP_MUN_SOY$nm_mun)) # only 7 items unmatched and these are exports from "MUNICIPIO N?O DECLARADO" in Comex 
+#sum(is.na(EXP_MUN_SOY$nm_mun)) # only 7 items unmatched and these are exports from "MUNICIPIO N?O DECLARADO" in Comex 
+# NOTE: undeclared origin no longer present in updated comex dataset !
 
 # check if state and municipality names from COMEX and IBGE match each other
 all.equal(EXP_MUN_SOY$nm_state_comex[1:2220], EXP_MUN_SOY$nm_state[1:2220])
@@ -100,6 +101,8 @@ names(EXP_MUN_SOY)
 (checksum_1 <- c(sum(EXP_MUN_SOY$export), sum(EXP_MUN_SOY$export_dol)))
 
 # allocate "MUNICIPIO NAO DECLARADO" exports to municipalities who export in the corresponding countries 
+# NOTE: undeclared origin no longer present in updated comex dataset !
+# --> this can be commented out, but it does not change the data
 # e.g. undeclared exports to China are allocated to municipalities who already export to china, according to their share in total (declared) exports (tons) to China
 # separate undeclared exports from the main table:
 EXP_MUN_SOY_ND <- filter(EXP_MUN_SOY, co_mun == 9999999) %>% rename("export_ND" = "export", "export_dol_ND" = "export_dol")
