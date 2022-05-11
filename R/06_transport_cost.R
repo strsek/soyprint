@@ -16,7 +16,7 @@ library(abind)
 library(janitor)
 
 # should results be written to file?
-write = FALSE
+write = TRUE
 
 # load data -------------------------------------------------------------------
 
@@ -103,6 +103,7 @@ rm(osm_poly)
 ## fill missing maxspeed values: 2 options
 
 # NOTE: computationally intensive, uncomment if needed 
+# NOTE: consider unionizing neighboring segments of same type!!
 
 option = 2
 
@@ -132,7 +133,7 @@ if(option == 1) {
   osm2014 <- left_join(osm2014, maxspeed_mun, by = c("fclass", "mun"))
   osm2014 <- left_join(osm2014, maxspeed_state, by = c("fclass", "state"))
   osm2014 <- left_join(osm2014, maxspeed_BRA, by = c("fclass"))
-  osm2014 <- mutate(osm2014, maxspeed_mf_fin = coalesce(maxspeed, maxspeed_mun_ref, maxspeed_mun, maxspeed_state, maxspeed_BRA))
+  osm2014 <- mutate(osm2014, maxspeed_fin = coalesce(maxspeed, maxspeed_mun_ref, maxspeed_mun, maxspeed_state, maxspeed_BRA))
 
 } else {
   
@@ -161,8 +162,8 @@ if(option == 1) {
   osm2014 <- mutate(osm2014, 
                     #conduct_mf = maxspeed_mf_fin/80, 
                     #conduct_mf_sqrt = sqrt(maxspeed_mf_fin/80), 
-                    conduct = maxspeed_nn_fin/80, 
-                    conduct_sqrt = sqrt(maxspeed_nn_fin/80))
+                    conduct = maxspeed_fin/80, 
+                    conduct_sqrt = sqrt(maxspeed_fin/80))
 }
 
 
@@ -186,7 +187,7 @@ ext <- as.character(st_bbox(GEO_MUN_SOY))
 # rasterize from file to file with resolution of 5000m
 src <- "intermediate_data/osm2014.gpkg"
 gdal_utils('rasterize', src, "intermediate_data/osm2014_rasterized.tif", 
-           options = c("-tr", "5000", "5000", "-a", "maxspeed_nn_fin", "-te", ext, "-a_nodata", "NA", "-at"))
+           options = c("-tr", "5000", "5000", "-a", "maxspeed_fin", "-te", ext, "-a_nodata", "NA", "-at"))
 # "conductance version"
 src <- "intermediate_data/osm2014conduct.gpkg"
 gdal_utils('rasterize', src, "intermediate_data/osm2014conduct_rasterized.tif", 
@@ -420,16 +421,16 @@ dimnames(road_dist_port_MUN) <- list(ports_dest$cdi_tuaria, SOY_MUN$co_mun)
 #stopCluster(clust)
 
 # check an exemplary pair of MUs
-A <- MUN_capitals[1,]
-B <- MUN_capitals[1337,]
+A <- MUN_capitals[5310,]
+B <- MUN_capitals[3810,]
 AtoB <- shortestPath(transition_corr_osm, as_Spatial(A), as_Spatial(B), output = "SpatialLines")
-(cost_AtoB <- costDistance(transition_corr_osm, as_Spatial(MUN_capitals[c(1,1337),])))
+(cost_AtoB <- costDistance(transition_corr_osm, as_Spatial(MUN_capitals[c(5310,3810),])))
 # for reference: suggested route on google maps has 4018 km 
 # view on map
 m1 <- mapview(osm2014_rast, maxpixels =  1000000) #, st_as_sf(AtoB)
 m2 <- mapview(AtoB, color = 'cyan') 
 m3 <- mapview(list(A,B), zcol = "nm_mun", col.regions = list("yellow", "green"))
-m1+m2+m3+mapview(AtoB, color = 'blue')
+m1+m2+m3+mapview(AtoB, color = 'cyan')
 
 
 ## rail ------------------------
