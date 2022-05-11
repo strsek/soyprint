@@ -11,7 +11,7 @@ write = TRUE
 #source("R/function_library.R")
 
 # load data
-SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.RDS")
+SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.rds")
 MUN_capital_dist <- readRDS("intermediate_data/MUN_capital_dist.rds")
 #MUN_road_dist <- readRDS("intermediate_data/MUN_road_dist.rds")
 #MUN_road_dist_osm <- readRDS("intermediate_data/MUN_road_dist_osm.rds")
@@ -22,10 +22,10 @@ flows <- lapply(dist, function(d){
   MUN_dist <- d
   class(MUN_dist) <- "numeric"
 
-  a_bean <- SOY_MUN$excess_supply_bean
-  b_bean <- SOY_MUN$excess_use_bean
-  names(a_bean) <- SOY_MUN$co_mun
-  names(b_bean) <- SOY_MUN$co_mun
+  #a_bean <- SOY_MUN$excess_supply_bean
+  #b_bean <- SOY_MUN$excess_use_bean
+  #names(a_bean) <- SOY_MUN$co_mun
+  #names(b_bean) <- SOY_MUN$co_mun
   
   product <- c("bean", "oil", "cake")
   
