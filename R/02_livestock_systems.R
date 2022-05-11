@@ -38,7 +38,7 @@ Buffalo <- raster("input_data/geo/FAO_gridded_livestock/5_Bf_2010_Da.tif")
 RumSys <- raster("input_data/geo/FAO_gridded_livestock/glps_gleam_61113_10km.tif")
 
 # feedlot cattle data (IBGE 2006 census)
-feedlot <- read.xlsx("input_data/FeedlotCattle_2006_tabela919_IBGE.xlsx", rows = 6:5455, na.strings = c("X", "-"))
+feedlot <- openxlsx::read.xlsx("input_data/FeedlotCattle_2006_tabela919_IBGE.xlsx", rows = 6:5455, na.strings = c("X", "-"))
 
 # crop data to extent of Brazil
 GEO_MUN_SOY_WGS84 <- st_transform(GEO_MUN_SOY, crs = st_crs(ChExt))

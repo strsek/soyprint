@@ -10,7 +10,7 @@ write = TRUE
 # load data ---------
 SOY_MUN <- readRDS("intermediate_data/SOY_MUN_02.rds")
 GEO_MUN_SOY <- readRDS("intermediate_data/GEO_MUN_SOY_02.rds")
-feed_ratios <- read.xlsx("input_data/Feed_ratios_FAO.xlsx", sheet = 2)
+feed_ratios <- openxlsx::read.xlsx("input_data/Feed_ratios_FAO.xlsx", sheet = 2)
 CBS_SOY <- read.csv2("intermediate_data/CBS_SOY.csv", row.names = 1)#readRDS("intermediate_data/CBS_SOY.rds")
 
 
