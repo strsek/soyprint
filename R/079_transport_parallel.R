@@ -11,6 +11,8 @@ library(gdxdt)
 library(tidyr)
 library(tibble)
 
+# initialize external GDX libraries
+igdx("~/gams37.1_linux_x64_64_sfx") 
 
 # prepare constant base data (independent of iteration) ----------------------------------------
 
@@ -144,7 +146,7 @@ system.time(
     # c_water <- rnorm(1, 0.027, 0.01)
     # m_switch <- rnorm(1, 2.22, 0.1) # intermodal cargo transfer markup (for switching modes)
     
-    c_road <- runif(1, 0.0129, 0.1214)
+    c_road <- runif(1, 0.0129, 0.1738)
     c_rail_short <- runif(1, 0.0055, 0.0645) # < 1000 km
     c_rail_long <- c_rail_short # no longer have this distinction!
     c_water <- runif(1, 0.0044, 0.0316)
