@@ -25,7 +25,12 @@ plot_funct <- function(variable, title = NA, unit = NA, lowcol = "transparent", 
                 labs(title = ifelse(!is.na(title), title, variable))+
                 geom_sf(color = "transparent")+            
                # scale_fill_viridis(direction = -1, na.value = "transparent", name = paste(unit)) + 
-                scale_fill_gradient(low = lowcol, high = highcol, na.value = "transparent", name = paste(unit)) + 
+               #scale_fill_gradient(low = lowcol, high = highcol, 
+               #                    na.value = "transparent", 
+               #                    #breaks = quantile(pull(thedata, variable)),
+               #                    #trans = "boxcox",
+               #                    name = paste(unit)) + 
+                scale_fill_steps(n.breaks = 10, nice.breaks = TRUE) +
                 geom_sf(data = GEO_states, fill = "transparent", color = "grey", size = 0.1)+
                 theme_void()+ # or minimal
                 theme(plot.title = element_text(hjust = 0.5), plot.margin = margin(t = -0.0, r = -0.2, b = -0.1, l = -0.5, "cm"),
@@ -101,3 +106,31 @@ ggsave(plot = comparison_cake, filename = "results/maps/comparison_cake.png", de
 #m_refbot_fac <- mapview(GEO_MUN_SOY, zcol = "ref_total", map.types = "CartoDB.Positron")
 #sync(m_prod, m_exp_t, m_proc_fac, m_refbot_fac)
 
+
+### shortest path plot
+#osm2014_rast[is.na(osm2014_rast)] <- 10
+network_dat <- gplot_data(osm2014_rast, maxpixels = ncell(osm2014_rast))# %>% dplyr::filter(!is.na(value))
+AtoB_sf <- st_as_sf(AtoB)
+
+(path_map <- ggplot() +
+    geom_tile(data = dplyr::filter(network_dat, !is.na(value)), 
+              aes(x = x, y = y, fill = value) ) +
+    geom_sf(data = AtoB_sf, fill = "transparent", color = "cyan", size = 1.2) + # gray19 lightgrey
+    #scale_fill_gradient("Land use\nprobability",
+    #                    low = 'yellow', high = 'blue',
+    #                    na.value = NA) +
+    geom_sf(data = A, fill = "yellow", color = "yellow", size = 4) +
+    geom_sf_label(data = rbind(A,B), aes(label = nm_mun), nudge_y = c(150000,-150000), size = 4) + #, -50000)
+    geom_sf(data = B, fill = "green", color = "green", size = 4) +
+    scale_fill_viridis(direction = 1, option = "magma")+
+    coord_sf(datum = sf::st_crs(osm2014_rast)) +
+    labs(fill = "maxspeed") + 
+    theme_void()+
+    theme(plot.title = element_text(hjust = 0.5, size = 10), 
+          plot.margin = margin(t = -0.0, r = -0.2, b = -0.1, l = -0.2, "cm"),
+          legend.margin=margin(0,0,0,0), 
+          legend.box.margin=margin(t=0,r=0,b= 0,l=-60))
+  #coord_quickmap()
+)
+
+ggsave(plot = path_map, filename = "results/maps/path_example.png", device = "png", width = 12, height = 10, units = "cm", scale = 2)
