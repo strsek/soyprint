@@ -1,4 +1,4 @@
-####### transport optimization within R, using the transport package #######
+####### simple transport optimization within R, using the transport package #######
 
 library(transport)
 library(openxlsx)
@@ -13,23 +13,17 @@ write = TRUE
 # load data
 SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.rds")
 MUN_capital_dist <- readRDS("intermediate_data/MUN_capital_dist.rds")
-#MUN_road_dist <- readRDS("intermediate_data/MUN_road_dist.rds")
-#MUN_road_dist_osm <- readRDS("intermediate_data/MUN_road_dist_osm.rds")
 
-dist <- list(euclid = MUN_capital_dist)#, IBGE = MUN_road_dist, OSM = MUN_road_dist_osm)
+
+# specify distance type: we only use Euclidean here, but any other cost/distance type could also be used 
+dist <- list(euclid = MUN_capital_dist)
 
 flows <- lapply(dist, function(d){
   MUN_dist <- d
   class(MUN_dist) <- "numeric"
 
-  #a_bean <- SOY_MUN$excess_supply_bean
-  #b_bean <- SOY_MUN$excess_use_bean
-  #names(a_bean) <- SOY_MUN$co_mun
-  #names(b_bean) <- SOY_MUN$co_mun
-  
   product <- c("bean", "oil", "cake")
-  
-  
+
   MUN_transport <- sapply(product, function(x){
     suppliers <- SOY_MUN$co_mun[pull(SOY_MUN, paste0("excess_supply_",x))>0]
     demanders <- SOY_MUN$co_mun[pull(SOY_MUN, paste0("excess_use_",x))>0]
@@ -51,7 +45,7 @@ flows <- lapply(dist, function(d){
 
 
 if (write){
-  saveRDS(flows, file = "intermediate_data/flows_R.rds")
+  saveRDS(flows, file = "intermediate_data/flows_euclid.rds")
   
 }
 
