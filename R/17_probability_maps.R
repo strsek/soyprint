@@ -15,24 +15,27 @@ library(viridis)
 # prepare footprint results ----------------------------------
 
 regions <- fread("input_data/FABIO/inst/regions_full.csv")
+items <-  fread("input_data/FABIO/inst/items_full.csv")
 
 # load production footprints
 P_mass  <- readRDS("results/P_mass.rds")
 P_value <- readRDS("results/P_value.rds")
 
 # append food/nonfood to colnames
-colnames(P_mass$A) <- paste0(colnames(P_mass$A),"_food")
-colnames(P_mass$B) <- paste0(colnames(P_mass$B),"_nonfood")
-colnames(P_value$A) <- paste0(colnames(P_value$A),"_food")
-colnames(P_value$B) <- paste0(colnames(P_value$B),"_nonfood")
+colnames(P_mass$A_country) <- paste0(colnames(P_mass$A_country),"_food")
+colnames(P_mass$B_country) <- paste0(colnames(P_mass$B_country),"_nonfood")
+colnames(P_value$A_country) <- paste0(colnames(P_value$A_country),"_food")
+colnames(P_value$B_country) <- paste0(colnames(P_value$B_country),"_nonfood")
 
 # bind
-P_mass <- cbind(P_mass$A, P_mass$B)
-P_value <- cbind(P_value$A, P_value$B)
+P_mass <-  cbind(P_mass$A_country,  P_mass$B_country, P_mass$A_product,  P_mass$B_product, "total_food" = rowSums(P_mass$A_product), "total_nonfood" = rowSums(P_mass$B_product))
+P_value <- cbind(P_value$A_country, P_value$B_country,P_value$A_product,P_value$B_product, "total_food" = rowSums(P_value$A_product), "total_nonfood" = rowSums(P_value$B_product))
 
 
 # load MU polygons and project to WGS84
 GEO_MUN_SOY <- readRDS("intermediate_data/GEO_MUN_SOY_fin.rds") %>% st_transform(crs = 4326)
+GEO_states <- st_read("input_data/geo/GADM_boundaries/gadm36_BRA_1.shp", stringsAsFactors = FALSE) %>% st_transform(crs = 4326)
+
 
 # helper function (add to library)
 is.finite.data.frame <- function(obj){
@@ -103,146 +106,228 @@ burn_rast <- function(rast, poly, class, value, file, zeroes = TRUE, subarea = F
 # prob_tile1 <- burn_rast(rast = tiles[[1]], poly = GEO_MUN_SOY, value = "co_state", class = 1, file = "prob_tile1.tif")
 # mapview(prob_tile1)
 
-for (reg in c("EU")) {
+for (reg in c("EU", "CHN")) {  #
   for(type in c("food", "nonfood")) {
-    for(alloc in c("mass", "value")){
+    for(alloc in c("mass", "value")) { # , 
 
 # # select final demand region
 # reg <- "CHN"
-# # select foo/nonfood
+# # select food/nonfood
 # type <- "food"
-# #select allocation method
-# alloc <- "value"
+# # select allocation method
+# alloc <- "mass"
+# #or: select product
+# prod <- "c101"
 
-geo <- if(alloc == "mass") GEO_MUN_P_mass else GEO_MUN_P_value
-
-if(reg == "EU") {
-  EU <- c("AUT", "BGR", "DNK", "FIN", "FRA", "DEU", "GRC", "HUN", "HRV", "IRL", "ITA", "MLT", "NLD", "CZE", "POL", "PRT", "ROU", "SVN", "SVK", "ESP", "SWE", "GBR", "BEL", "LUX", "LVA", "LTU", "EST", "CYP")
-  names(geo)[sub("_.*", "", names(geo)) %in% EU] <- paste0("EU_", sub(".*_", "", names(geo)[sub("_.*", "", names(geo)) %in% EU]))
-  mat <- as.matrix(st_drop_geometry(geo)[,which(names(st_drop_geometry(geo)) =="ARM_food"):ncol(st_drop_geometry(geo))])
-  sum_mat <- as(sapply(unique(colnames(mat)),"==",colnames(mat)), "Matrix")*1
-  mat <- mat %*% sum_mat
-  geo <- bind_cols(geo[,1:(which(names(geo) =="ARM_food")-1)], as.data.frame(as.matrix(mat)))
-}
-
-# create directory
-dir <- paste0("results/mb_tiles/",reg,"_",type,"_",alloc)
-ifelse(!dir.exists(dir), dir.create(dir, recursive = TRUE), "Folder exists already")
-target <- paste0(reg,"_",type)
-
-# apply to tile list
-system.time(
-prob_tiles <- mclapply(names(tiles), function(x) {
-  burn_rast(rast = tiles[[x]], 
-            poly = geo, 
-            value = target, class = 1, zeroes = FALSE,
-            file = paste0(dir,"/",x))
-  }, mc.cores = 12)
-)
-
-# build a vrt
-gdalUtilities::gdalbuildvrt(gdalfile = sapply(prob_tiles, filename), output.vrt = paste0(dir,"/prob.vrt"))
-prob_vrt <- raster(paste0(dir,"/prob.vrt"))
-#mapview(prob_vrt, na.color = "transparent")
-
-
-# resample: two options
-
-# # 1: with gdal: saves resampled tiles to file
-# # NOTE: this is not strictly necessary, as we can also create a resampled vrt out of the original tiles
-# gdal_resample <- function(r, factor, outdir, method = 'near', load = FALSE) {
-#   
-#   #Geometry attributes
-#   t1 <- c(xmin(r), ymin(r), 
-#           xmax(r), ymax(r))
-#   res <- res(r) * factor
-#   
-#   #Temporal files
-#   fname <- sub("^.+/", "", filename(r))
-#   inname <- sub(paste0(getwd(),"/"), "", filename(r)) #paste0(indir,fname)
-#   outname <- paste0(outdir,fname)
-# 
-#   #GDAL time!
-#   gdalUtilities::gdalwarp(srcfile = inname, dstfile = outname, 
-#            tr = res, te = t1, r = method, overwrite = TRUE)
-#   
-#   if (load) {
-#     resample_raster = raster(outname)
-#     return(resample_raster)
-#   } else {
-#     cat("file", fname, "successfully resampled and saved to", outdir)
-#     return()
-#   }
-# }
-# 
-# system.time(
-# prob_tiles_agg <- mclapply(prob_tiles, gdal_resample, factor = 16, outdir = "results/mb_tiles/resampled/", load = TRUE, mc.cores = 12)
-# )
-# 
-# gdalUtilities::gdalbuildvrt(gdalfile = sapply(prob_tiles_agg, filename), output.vrt = "results/mb_tiles/resampled/mb_test.vrt")
-# prob_agg_vrt <- raster("results/mb_tiles/resampled/mb_test.vrt")
-# 
-# mapview(prob_agg_vrt, na.color = "transparent")
-
-
-# 2: directly build a vrt from high-res tiles with desired resolution:
-gdalUtilities::gdalbuildvrt(gdalfile = sapply(prob_tiles, filename), 
-                                             output.vrt = paste0(dir, "/prob_agg.vrt"),
-                                             r = "nearest", # TODO: what resampling method?
-                                             tr = res(prob_tiles[[1]])*16)
-
-prob_agg_vrt <- raster(paste0(dir,"/prob_agg.vrt"))
-#mapview(prob_agg_vrt, na.color = "transparent")# plot
-
-
-# plot -----------------------------------------
-
-GEO_states <- st_read("input_data/geo/GADM_boundaries/gadm36_BRA_1.shp", stringsAsFactors = FALSE)
-
-# using solution from https://stackoverflow.com/questions/47116217/overlay-raster-layer-on-map-in-ggplot2-in-r/47190738#47190738
-
-# function to reshape raster into data frame
-# this is nice because it only retains information of non-NA cells and their position!
-gplot_data <- function(x, maxpixels = 500000)  {
-  x <- raster::sampleRegular(x, maxpixels, asRaster = TRUE)
-  coords <- raster::xyFromCell(x, seq_len(raster::ncell(x)))
-  ## Extract values
-  dat <- utils::stack(as.data.frame(raster::getValues(x))) 
-  names(dat) <- c('value', 'variable')
-  
-  dat <- dplyr::as_tibble(data.frame(coords, dat))
-  
-  if (!is.null(levels(x))) {
-    dat <- dplyr::left_join(dat, levels(x)[[1]], 
-                            by = c("value" = "ID"))
-  }
-  dat
-}
-
-prob_dat <- gplot_data(prob_agg_vrt, maxpixels = ncell(prob_agg_vrt)) %>% dplyr::filter(!is.na(value))
-
-# plot
-(prob_map <- ggplot() +
-  geom_sf(data = GEO_states, fill = "gray19", color = "lightgrey", size = 0.1) + # 
-  geom_tile(data = dplyr::filter(prob_dat, !is.na(value)), 
-            aes(x = x, y = y, fill = value) ) +
-  #scale_fill_gradient("Land use\nprobability",
-  #                    low = 'yellow', high = 'blue',
-  #                    na.value = NA) +
-  scale_fill_viridis()+
-  coord_sf(datum = sf::st_crs(prob_agg_vrt)) +
-  labs(fill = "probability", title = paste(reg, type, "consumption: land-use probability,", alloc, "allocation")) + 
-  theme_void()+
-  theme(plot.title = element_text(hjust = 0.5, size = 10), 
-        plot.margin = margin(t = -0.0, r = -0.2, b = -0.1, l = -0.2, "cm"),
-        legend.margin=margin(0,0,0,0), 
-        legend.box.margin=margin(t=0,r=0,b= 0,l=-60))
-#coord_quickmap()
-)
-  
-ggsave(filename = paste0(dir,"/prob_map_",reg,"_",type,"_",alloc,".png"), prob_map, width = 12, height = 10, units = "cm", scale = 2)  
+    geo <- if(alloc == "mass") GEO_MUN_P_mass else GEO_MUN_P_value
+    
+    if(reg == "EU") {
+     EU <- c("AUT", "BGR", "DNK", "FIN", "FRA", "DEU", "GRC", "HUN", "HRV", "IRL", "ITA", "MLT", "NLD", "CZE", "POL", "PRT", "ROU", "SVN", "SVK", "ESP", "SWE", "GBR", "BEL", "LUX", "LVA", "LTU", "EST", "CYP")
+     names(geo)[sub("_.*", "", names(geo)) %in% EU] <- paste0("EU_", sub(".*_", "", names(geo)[sub("_.*", "", names(geo)) %in% EU]))
+     mat <- as.matrix(st_drop_geometry(geo)[,which(names(st_drop_geometry(geo)) =="ARM_food"):ncol(st_drop_geometry(geo))])
+     sum_mat <- as(sapply(unique(colnames(mat)),"==",colnames(mat)), "Matrix")*1
+     mat <- mat %*% sum_mat
+     geo <- bind_cols(geo[,1:(which(names(geo) =="ARM_food")-1)], as.data.frame(as.matrix(mat)))
+    }
+    
+    # create directory
+    dir <- paste0("results/mb_tiles/",reg,"_",type,"_",alloc)
+    ifelse(!dir.exists(dir), dir.create(dir, recursive = TRUE), "Folder exists already")
+    target <- paste0(reg,"_",type)
+    
+    if(length(dir(dir,all.files=FALSE)) == 0) {
+    
+    # apply to tile list
+    system.time(
+    prob_tiles <- mclapply(names(tiles), function(x) {
+     burn_rast(rast = tiles[[x]], 
+               poly = geo, 
+               value = target, class = 1, zeroes = FALSE,
+               file = paste0(dir,"/",x))
+     }, mc.cores = 12)
+    )
+    
+    # build a vrt
+    gdalUtilities::gdalbuildvrt(gdalfile = sapply(prob_tiles, filename), output.vrt = paste0(dir,"/prob.vrt"))
+    prob_vrt <- raster(paste0(dir,"/prob.vrt"))
+    #mapview(prob_vrt, na.color = "transparent")
+    
+    
+    # resample: two options
+    
+    # # 1: with gdal: saves resampled tiles to file
+    # # NOTE: this is not strictly necessary, as we can also create a resampled vrt out of the original tiles
+    # gdal_resample <- function(r, factor, outdir, method = 'near', load = FALSE) {
+    #   
+    #   #Geometry attributes
+    #   t1 <- c(xmin(r), ymin(r), 
+    #           xmax(r), ymax(r))
+    #   res <- res(r) * factor
+    #   
+    #   #Temporal files
+    #   fname <- sub("^.+/", "", filename(r))
+    #   inname <- sub(paste0(getwd(),"/"), "", filename(r)) #paste0(indir,fname)
+    #   outname <- paste0(outdir,fname)
+    # 
+    #   #GDAL time!
+    #   gdalUtilities::gdalwarp(srcfile = inname, dstfile = outname, 
+    #            tr = res, te = t1, r = method, overwrite = TRUE)
+    #   
+    #   if (load) {
+    #     resample_raster = raster(outname)
+    #     return(resample_raster)
+    #   } else {
+    #     cat("file", fname, "successfully resampled and saved to", outdir)
+    #     return()
+    #   }
+    # }
+    # 
+    # system.time(
+    # prob_tiles_agg <- mclapply(prob_tiles, gdal_resample, factor = 16, outdir = "results/mb_tiles/resampled/", load = TRUE, mc.cores = 12)
+    # )
+    # 
+    # gdalUtilities::gdalbuildvrt(gdalfile = sapply(prob_tiles_agg, filename), output.vrt = "results/mb_tiles/resampled/mb_test.vrt")
+    # prob_agg_vrt <- raster("results/mb_tiles/resampled/mb_test.vrt")
+    # 
+    # mapview(prob_agg_vrt, na.color = "transparent")
+    
+    
+    # 2: directly build a vrt from high-res tiles with desired resolution:
+    gdalUtilities::gdalbuildvrt(gdalfile = sapply(prob_tiles, filename), 
+                                                output.vrt = paste0(dir, "/prob_agg.vrt"),
+                                                r = "nearest", # TODO: what resampling method?
+                                                tr = res(prob_tiles[[1]])*16)
+    
+    }
+    
+    prob_agg_vrt <- raster(paste0(dir,"/prob_agg.vrt"))
+    #mapview(prob_agg_vrt, na.color = "transparent")# plot
+    
+    
+    # plot -----------------------------------------
+    
+    
+    # using solution from https://stackoverflow.com/questions/47116217/overlay-raster-layer-on-map-in-ggplot2-in-r/47190738#47190738
+    
+    # function to reshape raster into data frame
+    # this is nice because it only retains information of non-NA cells and their position!
+    gplot_data <- function(x, maxpixels = 500000)  {
+      x <- raster::sampleRegular(x, maxpixels, asRaster = TRUE)
+      coords <- raster::xyFromCell(x, seq_len(raster::ncell(x)))
+      ## Extract values
+      dat <- utils::stack(as.data.frame(raster::getValues(x))) 
+      names(dat) <- c('value', 'variable')
+      
+      dat <- dplyr::as_tibble(data.frame(coords, dat))
+      
+      if (!is.null(levels(x))) {
+        dat <- dplyr::left_join(dat, levels(x)[[1]], 
+                                by = c("value" = "ID"))
+      }
+      dat
+    }
+    
+    prob_dat <- gplot_data(prob_agg_vrt, maxpixels = ncell(prob_agg_vrt)) %>% dplyr::filter(!is.na(value))
+    
+    # plot
+    (prob_map <- ggplot() +
+      geom_sf(data = GEO_states, fill = "transparent", color = "darkgrey", size = 0.4) + # "gray19", "lightgrey"
+      geom_tile(data = dplyr::filter(prob_dat, !is.na(value)), 
+                aes(x = x, y = y, fill = value) ) +
+      #scale_fill_gradient("Land use\nprobability",
+      #                    low = 'yellow', high = 'blue',
+      #                    na.value = NA) +
+      scale_fill_viridis(direction = -1, limits = c(1,80))+
+      coord_sf(datum = sf::st_crs(prob_agg_vrt)) +
+      labs(fill = "probability", title = paste(reg, type, "consumption: land-use probability,", alloc, "allocation")) + 
+      theme_void()+
+      theme(plot.title = element_text(hjust = 0.5, size = 10), 
+            plot.margin = margin(t = -0.0, r = -0.2, b = -0.1, l = -0.2, "cm"),
+            legend.margin=margin(0,0,0,0), 
+            legend.box.margin=margin(t=0,r=0,b= 0,l=-60))
+    #coord_quickmap()
+    )
+      
+    ggsave(filename = paste0("results/footprints/prob_map_",reg,"_",type,"_",alloc,".png"), prob_map, width = 12, height = 10, units = "cm", scale = 2)  
 
 
     }
   }
 }
+
+
+
+# or by product
+
+for (prod in c("c110", "c114", "c116", "c117", "c118", "total_food", "total_nonfood")) { # 
+    for(alloc in c("mass", "value")){
+      
+       # or: select product
+      # prod <- "c101"
+      
+      geo <- if(alloc == "mass") GEO_MUN_P_mass else GEO_MUN_P_value
+      
+      # create directory
+      dir <- paste0("results/mb_tiles/",prod,"_",alloc)
+      ifelse(!dir.exists(dir), dir.create(dir, recursive = TRUE), "Folder exists already")
+      target <- prod
+      
+      if(length(dir(dir,all.files=FALSE)) == 0) {
+      
+      # apply to tile list
+      system.time(
+        prob_tiles <- mclapply(names(tiles), function(x) {
+          burn_rast(rast = tiles[[x]], 
+                    poly = geo, 
+                    value = target, class = 1, zeroes = FALSE,
+                    file = paste0(dir,"/",x))
+        }, mc.cores = 12)
+      )
+      
+      # build a vrt
+      gdalUtilities::gdalbuildvrt(gdalfile = sapply(prob_tiles, filename), output.vrt = paste0(dir,"/prob.vrt"))
+      prob_vrt <- raster(paste0(dir,"/prob.vrt"))
+      #mapview(prob_vrt, na.color = "transparent")
+      
+      
+      # resample: directly build a vrt from high-res tiles with desired resolution:
+      gdalUtilities::gdalbuildvrt(gdalfile = sapply(prob_tiles, filename), 
+                                  output.vrt = paste0(dir, "/prob_agg.vrt"),
+                                  r = "nearest", # TODO: what resampling method?
+                                  tr = res(prob_tiles[[1]])*16)
+      
+      }
+      
+      prob_agg_vrt <- raster(paste0(dir,"/prob_agg.vrt"))
+      #mapview(prob_agg_vrt, na.color = "transparent")# plot
+      
+      
+      # plot -----------------------------------------
+      
+      prob_dat <- gplot_data(prob_agg_vrt, maxpixels = ncell(prob_agg_vrt)) %>% dplyr::filter(!is.na(value))
+      
+      # plot
+      (prob_map <- ggplot() +
+          geom_sf(data = GEO_states, fill = "transparent", color = "darkgrey", size = 0.4) + # gray19 lightgrey
+          geom_tile(data = dplyr::filter(prob_dat, !is.na(value)), 
+                    aes(x = x, y = y, fill = value) ) +
+          #scale_fill_gradient("Land use\nprobability",
+          #                    low = 'yellow', high = 'blue',
+          #                    na.value = NA) +
+          scale_fill_viridis(direction = -1, limits = c(1,80))+
+          coord_sf(datum = sf::st_crs(prob_agg_vrt)) +
+          labs(fill = "probability", title = paste(ifelse(substr(target,1,1)=="c",items$item[items$comm_code  == target],target), "consumption: land-use probability,", alloc, "allocation")) + 
+          theme_void()+
+          theme(plot.title = element_text(hjust = 0.5, size = 10), 
+                plot.margin = margin(t = -0.0, r = -0.2, b = -0.1, l = -0.2, "cm"),
+                legend.margin=margin(0,0,0,0), 
+                legend.box.margin=margin(t=0,r=0,b= 0,l=-60))
+        #coord_quickmap()
+      )
+      
+      ggsave(filename = paste0("results/footprints/prob_map_",target,"_",alloc,".png"), prob_map, width = 12, height = 10, units = "cm", scale = 2)  
+      
+      
+    }
+  }
+
