@@ -3,7 +3,7 @@
 # what is changed:
 # - supply table is extended by municipal soy supply (taken from extended cbs)
 # - grazing is not added for municipalities, as this supply remains national
-# - prices: for Brazilian municipal products, the national price of brazil is used
+# - prices: for Brazilian municipal products, the national price of Brazil is used
 
 
 library("data.table")

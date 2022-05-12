@@ -223,8 +223,8 @@ IMP_SOY <- IMP_NAT_SOY %>%
 
 if (write){
   
-  # export data for Martin
-   saveRDS(EXP_MUN_SOY, file = "intermediate_data/EXP_MUN_SOY.rds")
+  # export data 
+   saveRDS(EXP_MUN_SOY, file = "intermediate_data/EXP_MUN_SOY.rds") # consider renaming to "_harm" or the likes
    saveRDS(IMP_MUN_SOY, file = "intermediate_data/IMP_MUN_SOY.rds")
    saveRDS(EXP_NAT_SOY, file = "intermediate_data/EXP_NAT_SOY.rds")
    saveRDS(IMP_NAT_SOY, file = "intermediate_data/IMP_NAT_SOY.rds")
