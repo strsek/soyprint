@@ -2,6 +2,7 @@
 ##### Benchmark comparison of sub-national supply chain results with TRASE data #####
 
 library(dplyr)
+library(data.table)
 library(tidyr)
 library(ggplot2)
 library(stringr)
@@ -13,6 +14,7 @@ library(sf)
 library(leafsync)
 library(patchwork)
 library(gmodels)
+library(Metrics)
 
 write = TRUE
 
@@ -144,13 +146,16 @@ comp_mun[,6:ncol(comp_mun)][is.na(comp_mun[,6:ncol(comp_mun)])] <- 0
 regions_btd <- filter(regions, ISO_BTD != "ROW", btd == TRUE) %>% 
   dplyr::select(c(CO_BTD, ISO_BTD, name, region)) %>% 
   distinct(CO_BTD, ISO_BTD, region, .keep_all = TRUE)
+EU <- c("AUT", "BGR", "DNK", "FIN", "FRA", "DEU", "GRC", "HUN", "HRV", "IRL", "ITA", "MLT", "NLD", "CZE", "POL", "PRT", "ROU", "SVN", "SVK", "ESP", "SWE", "GBR", "BEL", "LUX", "LVA", "LTU", "EST", "CYP")
+regions_btd <- regions_btd %>% mutate(region = ifelse(ISO_BTD %in% EU, "EU", region))
 comp_mun <- comp_mun %>% 
   left_join(dplyr::select(regions_btd, c(ISO_BTD, name, region)), by = c("to_code" = "ISO_BTD")) %>%
   rename(to_name = name, to_region = region) %>% 
   relocate(to_name, to_region, .after = to_code) %>%
   # separate China as distinct region
   mutate(to_region = ifelse(to_code == "CHN", "China", to_region)) %>%
-  mutate(to_region = ifelse(to_code == "ROW", "ROW", to_region))
+  mutate(to_region = ifelse(to_code == "ROW", "ROW", to_region)) %>%
+  mutate(to_region = ifelse(to_code == "BRA", "Brazil", to_region))
 
 # drop land-use (optional)
 comp_mun <- dplyr::select(comp_mun, -landuse)
@@ -168,18 +173,18 @@ comp_state <- comp_mun %>%
 
 # aggregate by region
 comp_mun_by_region <- comp_mun %>% 
-  group_by(to_region) %>% 
+  group_by(co_mun, nm_mun, co_state, nm_state, to_region) %>% 
   summarise(across(c("trase", names(results_list)), sum, na.rm = TRUE), .groups = "drop")
 
 comp_state_by_region <- comp_mun %>% 
-  group_by(co_state, to_region) %>% 
+  group_by(co_state, nm_state, to_region) %>% 
   summarise(across(c("trase", names(results_list)), sum, na.rm = TRUE), .groups = "drop")
 
 
 ## compute confidence intervals for bs results and compare to trase -------------------------------------------------------------
 
 comp_mun_bs <- comp_mun[,which(colnames(comp_mun) == "00001"):ncol(comp_mun)]
-#comp_mun <- comp_mun[,1:(which(colnames(comp_mun) == "00001")-1)]
+comp_mun <- dplyr::select(comp_mun, c(co_state:euclid))
 comp_mun_ci95 <- ci_funct(comp_mun_bs, level = 95, stats = c("lower", "upper"))
 comp_mun_ci99 <- ci_funct(comp_mun_bs, level = 99, stats = c("lower", "upper"))
 
@@ -191,7 +196,11 @@ comp_mun <- cbind(comp_mun, comp_mun_ci95, comp_mun_ci99) %>%
 comp_mun <- comp_mun %>% mutate(mean = apply(as.matrix(comp_mun_bs), 1, mean),
                                 min = apply(as.matrix(comp_mun_bs), 1, min),
                                 max = apply(as.matrix(comp_mun_bs), 1, max),
-                                .after = euclid)
+                                sd = apply(as.matrix(comp_mun_bs), 1, sd),
+                                .after = euclid) %>%
+                          mutate(cv = sd/mean,
+                                 .after = max) %>%
+                          replace_na(list(cv = 0))
 
 # check if trase falls within Ci ranges
 comp_mun <- comp_mun %>% mutate(trase_inrangemax = (trase >= min & trase <= max),
@@ -210,7 +219,7 @@ comp_mun <- comp_mun %>% mutate(ape_mean_model= ape(mean, euclid), .after = eucl
 
 # same on state level
 comp_state_bs <- comp_state[,which(colnames(comp_state) == "00001"):ncol(comp_state)]
-#comp_state <- comp_state[,1:(which(colnames(comp_state) == "00001")-1)]
+comp_state <- comp_state[,1:(which(colnames(comp_state) == "00001")-1)]
 comp_state_ci95 <- ci_funct(comp_state_bs, level = 95, stats = c("lower", "upper"))
 comp_state_ci99 <- ci_funct(comp_state_bs, level = 99, stats = c("lower", "upper"))
 
@@ -224,6 +233,7 @@ comp_state <- comp_state %>% mutate(mean = apply(as.matrix(comp_state_bs), 1, me
 
 
 comp_mun_by_region_bs <- comp_mun_by_region[,which(colnames(comp_mun_by_region) == "00001"):ncol(comp_mun_by_region)]
+comp_mun_by_region <- comp_mun_by_region[,1:(which(colnames(comp_mun_by_region) == "00001")-1)]
 comp_mun_by_region_ci95 <- ci_funct(comp_mun_by_region_bs, level = 95, stats = c("lower", "upper"))
 comp_mun_by_region_ci99 <- ci_funct(comp_mun_by_region_bs, level = 99, stats = c("lower", "upper"))
 comp_mun_by_region <- cbind(comp_mun_by_region, comp_mun_by_region_ci95, comp_mun_by_region_ci99) %>% 
@@ -234,6 +244,7 @@ comp_mun_by_region <- comp_mun_by_region %>% mutate(mean = apply(as.matrix(comp_
                                     .after = euclid)
 
 comp_state_by_region_bs <- comp_state_by_region[,which(colnames(comp_state_by_region) == "00001"):ncol(comp_state_by_region)]
+comp_state_by_region <- comp_state_by_region[,1:(which(colnames(comp_state_by_region) == "00001")-1)]
 comp_state_by_region_ci95 <- ci_funct(comp_state_by_region_bs, level = 95, stats = c("lower", "upper"))
 comp_state_by_region_ci99 <- ci_funct(comp_state_by_region_bs, level = 99, stats = c("lower", "upper"))
 comp_state_by_region <- cbind(comp_state_by_region, comp_state_by_region_ci95, comp_state_by_region_ci99) %>% 
@@ -243,8 +254,15 @@ comp_state_by_region <- comp_state_by_region %>% mutate(mean = apply(as.matrix(c
                                                     max = apply(as.matrix(comp_state_by_region_bs), 1, max),
                                                     .after = euclid)
 
-## or: form ci over origns by destination?
+## or: form ci over origins by destination?
 
+# # compute source shares by destination
+# comp_mun_ss <- comp_mun %>% select(c(co_state:to_region, trase, mean, euclid)) %>% 
+#   group_by(to_code, to_name) %>% mutate(trase = trase/sum(trase), mean = mean/sum(mean), euclid = euclid/sum(euclid)) %>%
+#   mutate(across(trase:euclid, ~replace_na(.x, 0)))
+# 
+# 
+# cor(comp_mun_ss$trase, comp_mun_ss$mean)
 
 # compare to  total exports by destination -------------------------------------------------------
 
@@ -356,15 +374,36 @@ ggplot(comp_plot, aes(x=trase, y = mean))+
 #  geom_abline(slope = 0.5, linetype="dashed", color = "cyan")
 
 
+comp_mun$density <- get_density(comp_mun$mean, comp_mun$cv, n = 100)
+
+ggplot(comp_mun, aes(x=mean, y = cv, color = density))+
+  geom_point(alpha = 0.4, shape = 1) + 
+  scale_color_viridis()+
+  labs(y = "coefficient of variation", "mean (tons)") +
+  theme_minimal()
+  
+
+
 # gradient maps to compare results
 
 # select destination country
-dest <- "CHN"
+dest <- "BRA"
 
 # merge results with GEOdata
 GEO_MUN_SOY_dest <- GEO_MUN_SOY %>% left_join(filter(comp_mun, to_code == dest))# %>% replace(is.na(.), 0)
 GEO_states <- mutate(GEO_states, nm_state = substr(HASC_1, 4,5))
 GEO_STATE_SOY_dest <- GEO_states %>% left_join(filter(comp_state, to_code == dest))
+
+
+# # or by destination region
+# # select destination country
+# dest <- "EU"
+# 
+# # merge results with GEOdata
+# GEO_MUN_SOY_dest <- GEO_MUN_SOY %>% left_join(filter(comp_mun_by_region, to_region == dest))# %>% replace(is.na(.), 0)
+# GEO_states <- mutate(GEO_states, nm_state = substr(HASC_1, 4,5))
+# GEO_STATE_SOY_dest <- GEO_states %>% left_join(filter(comp_state_by_region, to_region == dest))
+
 
 # select results to compare
 res <- c("trase", "euclid", "mean")#names(comp_mun)[7:9]
@@ -375,12 +414,12 @@ names(res)<-res
 exp_dest <- lapply(res, gg_funct, GEO = GEO_MUN_SOY_dest, unit = "tons", title = '', pal = "plasma")
 exp_dest <- map2(exp_dest, res, ~ .x + ggtitle(.y))
 (wrap <- wrap_plots(exp_dest, nrow = ceiling(length(exp_dest)/3)))
-ggsave(paste0("results/benchmark_",dest,".png"), bg='transparent', scale = 2, dpi = 600)
+ggsave(paste0("results/benchmark_",dest,".png"), wrap, bg='transparent', scale = 2, width = 30,  height = 10, units = "cm", dpi = 600)
 
 exp_dest_state <- lapply(res, gg_funct, GEO = GEO_STATE_SOY_dest, unit = "tons")
 exp_dest_state <- map2(exp_dest_state, res, ~ .x + ggtitle(.y))
 (wrap_state <- wrap_plots(exp_dest_state, nrow = ceiling(length(exp_dest_state)/3)))
-ggsave(paste0("results/benchmark_state_",dest,".png"), width = 48,  height = 20, units = "cm")
+ggsave(paste0("results/benchmark_state_",dest,".png"), wrap_state, bg='transparent', scale = 2, width = 30,  height = 10, units = "cm")
   
 # mapview approach (using mv_funct from function library)
 exp_dest_mv <- lapply(res, mv_funct,  GEO = GEO_MUN_SOY_dest, cutoff = 10)
