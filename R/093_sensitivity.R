@@ -22,7 +22,7 @@ SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.rds")
 co_mun <- SOY_MUN$co_mun
 
 # load inter-municpality flows
-flows_euclid <- readRDS("intermediate_data/flows_R.rds")
+flows_euclid <- readRDS("intermediate_data/flows_euclid.rds")
 bs_files <- list.files("./GAMS/bs_res", pattern="*.rds", full.names=F)
 flows_bs <- lapply(bs_files, function(file){
   readRDS(paste0("./GAMS/bs_res/", file))

@@ -1,3 +1,5 @@
+## running the inter-modal transport optimization in parallel with different input paramter settings
+
 library(doParallel)
 library(parallel)
 library(foreach)
@@ -135,6 +137,8 @@ system.time(
   #) %dopar% {
    ) %dorng% {
     
+     cat("\n iteration", i, "\n")
+     
     # create temporary files to write intermediate files to
     gdx_cost <- tempfile(tmpdir = "./GAMS/bs_tmp", fileext = ".gdx")
     gdx_out <- tempfile(tmpdir = "./GAMS/bs_tmp", fileext = ".gdx")

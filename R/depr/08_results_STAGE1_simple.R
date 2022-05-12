@@ -13,7 +13,7 @@ write = FALSE
 #flows_GAMS <- readRDS("intermediate_data/flows_GAMS_simple.rds")
 #flows_euclid <- readRDS("intermediate_data/flows_R.rds")
 #flows_road <- readRDS("intermediate_data/flows_road.rds")
-flows <- readRDS("intermediate_data/flows_R.rds")
+flows <- readRDS("intermediate_data/flows_euclid.rds")
 X_a_b_tot <- readRDS("intermediate_data/X_a_b_tot.rds")
 flows <- c(flows, "intermod" = list(X_a_b_tot))
 
