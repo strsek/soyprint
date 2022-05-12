@@ -3,7 +3,7 @@
 .RData
 .RData
 .Ruserdata
-/intermediate_data/*
+intermediate_data/*
 .Rproj*
 GEO_MUN_2013_IBGE_merged.gpkg
 MUN_dist_long.csv
@@ -19,11 +19,14 @@ gis_osm_roads_free_1*
 /lib
 /input_data/FABIO/FABIO_exp/pure
 /input_data/FABIO/FABIO_exp/v0
+/input_data/geo/mapbiomas_roads
 /results*
 /old*
 /GAMS/bs_res
 /GAMS/bs_tmp
 /GAMS/old
+btd_bal.rds
 
-# scripts no longer used
+# scripts/files no longer used
 R/old
+input_data/old
