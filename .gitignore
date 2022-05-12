@@ -4,7 +4,7 @@
 .RData
 .Ruserdata
 intermediate_data/*
-.Rproj*
+#.Rproj
 GEO_MUN_2013_IBGE_merged.gpkg
 MUN_dist_long.csv
 transport_cost.csv
