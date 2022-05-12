@@ -519,35 +519,36 @@ cargo_water_wide_agg <- Reduce('+', cargo_water_wide)
 all(is.finite(water_dist[cargo_water_wide_agg>0]))
 
 
-# generate cost matrices out of distance matrices ---------------------------------------------------
-
+# # generate cost matrices out of distance matrices ---------------------------------------------------
+# 
+# NOTE: THIS IS NOW MOVED TO THE SENSITIVITY ANALYSIS
 # TODO: these are the crucial parameters for sensitivity analysis, besides the maxspeed weight above
-
-## using cost values from Góes & Lopes (2018)
-c_road <- 0.1624
-c_rail_short <- 0.0792 # < 1000 km
-c_rail_long <- 0.0614 # > 1000 km
-c_water <- 0.027
-m_switch <- 2.22 # intermodal cargo transfer markup (for switching modes)
-
-
-## road ----
-
-road_cost_MUN <- c_road * road_dist_MUN / 1000
-road_cost_MUN_stat <- c_road * road_dist_MUN_stat / 1000 + m_switch # adding switching cost 
-road_cost_MUN_port <- c_road * road_dist_MUN_port / 1000 + m_switch
-road_cost_stat_MUN <- c_road * road_dist_stat_MUN / 1000 + m_switch
-road_cost_port_MUN <- c_road * road_dist_port_MUN / 1000 + m_switch
-
-## rail ----
-
-rail_cost <- rail_dist
-rail_cost[rail_dist < 1000000] <- rail_dist[rail_dist < 1000000] * c_rail_short / 1000
-rail_cost[rail_dist >= 1000000] <- rail_dist[rail_dist >= 1000000] * c_rail_long / 1000
-
-## water ----
-
-water_cost <- water_dist * c_water / 1000
+# 
+# ## using cost values from Góes & Lopes (2018)
+# c_road <- 0.1624
+# c_rail_short <- 0.0792 # < 1000 km
+# c_rail_long <- 0.0614 # > 1000 km
+# c_water <- 0.027
+# m_switch <- 2.22 # intermodal cargo transfer markup (for switching modes)
+# 
+# 
+# ## road ----
+# 
+# road_cost_MUN <- c_road * road_dist_MUN / 1000
+# road_cost_MUN_stat <- c_road * road_dist_MUN_stat / 1000 + m_switch # adding switching cost 
+# road_cost_MUN_port <- c_road * road_dist_MUN_port / 1000 + m_switch
+# road_cost_stat_MUN <- c_road * road_dist_stat_MUN / 1000 + m_switch
+# road_cost_port_MUN <- c_road * road_dist_port_MUN / 1000 + m_switch
+# 
+# ## rail ----
+# 
+# rail_cost <- rail_dist
+# rail_cost[rail_dist < 1000000] <- rail_dist[rail_dist < 1000000] * c_rail_short / 1000
+# rail_cost[rail_dist >= 1000000] <- rail_dist[rail_dist >= 1000000] * c_rail_long / 1000
+# 
+# ## water ----
+# 
+# water_cost <- water_dist * c_water / 1000
 
 
 # check modal split according to rail/water data ----------------------------------------
@@ -562,8 +563,6 @@ modal_volumes <- data.frame(road = rep(NA,3),
 prod <- c(sum(SOY_MUN$prod_bean), sum(SOY_MUN$prod_cake), sum(SOY_MUN$prod_oil))
 modal_volumes$road <- prod-rowSums(modal_volumes, na.rm = TRUE)
 modal_split <- modal_volumes/prod
-# check shares of soy in total rail/water (interior) transport
-
 
 
 # write results ------------------------------------------------------------------------
@@ -593,14 +592,14 @@ if(write){
   #saveRDS(rail_dist, file = "intermediate_data/rail_dist.RDS")
   
   # cost matrices
-  save(road_cost_MUN, 
-       road_cost_MUN_stat, 
-       road_cost_MUN_port,
-       road_cost_stat_MUN, 
-       road_cost_port_MUN, 
-       water_cost,
-       rail_cost,
-       file = "intermediate_data/cost_matrices.Rdata")
+  #save(road_cost_MUN, 
+  #     road_cost_MUN_stat, 
+  #     road_cost_MUN_port,
+  #     road_cost_stat_MUN, 
+  #     road_cost_port_MUN, 
+  #     water_cost,
+  #     rail_cost,
+  #     file = "intermediate_data/cost_matrices.Rdata")
   
   #saveRDS(road_cost_MUN, file = "intermediate_data/road_cost_MUN.RDS")
   #saveRDS(road_cost_MUN_stat, file = "intermediate_data/road_cost_MUN_stat.RDS")
