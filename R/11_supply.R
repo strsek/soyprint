@@ -8,7 +8,7 @@
 
 library("data.table")
 
-write = FALSE 
+write = TRUE 
 
 regions <- fread("input_data/FABIO/inst/regions_full.csv")
 items <- fread("input_data/FABIO/inst/items_full.csv")
@@ -231,3 +231,7 @@ setkey(sup, year, area_code, comm_code, proc_code)
 if(write){
   saveRDS(sup, "intermediate_data/FABIO/sup.rds")
 }
+
+rm(list = ls())
+gc()
+

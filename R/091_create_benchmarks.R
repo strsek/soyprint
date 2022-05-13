@@ -354,3 +354,7 @@ if (write){
   saveRDS(EXP_NAT_wide, "intermediate_data/EXP_NAT_wide.rds")
 }
 
+
+rm(list = ls())
+gc()
+

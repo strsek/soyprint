@@ -425,3 +425,6 @@ comp_mun_dest_stats <- comp_mun_long %>% group_by(to_code) %>%
   summarise(across(downscale:multimode, .fns = list(diff = ~ sum(abs(.-trase)), msle = ~ msle(trase,.), rmse = ~rmse(trase,.)), #mape = ~ mape(trase,.)
                    .names = "{.fn}_{.col}")) 
   
+
+rm(list = ls())
+gc()

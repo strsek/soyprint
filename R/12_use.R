@@ -11,7 +11,7 @@ library("data.table")
 library("Matrix")
 source("input_data/FABIO/01_tidy_functions.R")
 
-write = FALSE
+write = TRUE
 
 # should feedstock optimization be calculated? (or take from stored results)
 optimize <- FALSE
@@ -561,7 +561,7 @@ if (optimize) {
   if (write) saveRDS(results, paste0("./intermediate_data/FABIO/optim_results_",Sys.Date(),".rds"))
 
   } else {
-  results <- readRDS("intermediate_data/FABIO/optim_results_2021-12-09.rds")
+  results <- readRDS("intermediate_data/FABIO/optim_results_2021-11-04.rds")
 }
 
 # Add process information
@@ -622,3 +622,6 @@ if (write){
   saveRDS(use_fd, "intermediate_data/FABIO/use_fd_final.rds")
   saveRDS(sup, "intermediate_data/FABIO/sup_final.rds")
 }
+
+rm(list = ls())
+gc()

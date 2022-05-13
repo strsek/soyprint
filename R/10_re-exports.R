@@ -315,3 +315,6 @@ if (write){
   saveRDS(btd_final, "intermediate_data/FABIO/btd_final.rds")
   saveRDS(cbs_full, "intermediate_data/FABIO/cbs_full.rds")
 }
+
+rm(list = ls())
+gc()

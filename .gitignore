@@ -17,8 +17,9 @@ gis_osm_roads_free_1*
 *.gdx
 /temp
 /lib
-/input_data/FABIO/FABIO_exp/pure
-/input_data/FABIO/FABIO_exp/v0
+/input_data/FABIO
+#/input_data/FABIO/FABIO_exp/pure
+#/input_data/FABIO/FABIO_exp/v0
 /input_data/geo/mapbiomas_roads
 /results*
 /old*
@@ -26,6 +27,7 @@ gis_osm_roads_free_1*
 /GAMS/bs_tmp
 /GAMS/old
 btd_bal.rds
+cplex.opt
 
 # scripts/files no longer used
 R/old

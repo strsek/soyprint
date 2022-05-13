@@ -430,3 +430,7 @@ if (write) {
   saveRDS(mr_use, "intermediate_data/FABIO/mr_use.rds")
   saveRDS(mr_use_fd, "intermediate_data/FABIO/mr_use_fd.rds")
 }
+
+rm(list = ls())
+gc()
+
