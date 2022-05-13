@@ -19,7 +19,7 @@ library(tidyr)
 library(tibble)
 source("input_data/FABIO/01_tidy_functions.R")
 
-write = FALSE
+write = TRUE
 
 # load data ---------------------------------------------------------------
 
@@ -41,7 +41,7 @@ areas <- sort(unique(cbs$area_code))
 # sub-national soy trade: imports, exports and intra-municipal trade flows
 exp <- readRDS("intermediate_data/EXP_MUN_SOY_cbs.rds")
 imp <- readRDS("intermediate_data/IMP_MUN_SOY_cbs.rds")
-intra <- readRDS("intermediate_data/X_a_b_tot_nn.rds")
+intra <- readRDS("intermediate_data/flows_mu.rds") # readRDS("intermediate_data/X_a_b_tot_nn.rds")
 
 
 # prepare reallocation of re-exports --------------------------------------
@@ -66,6 +66,10 @@ btd_MUN_intra <- intra %>%
   dplyr::select(!product) %>%
   rename("from_code" = "co_orig", "to_code" = "co_dest") %>%
   relocate(item_code, .before = from_code)
+# select multimodal results as main results to move forward
+btd_MUN_intra <- btd_MUN_intra %>% 
+  dplyr::select(!euclid) %>%
+  rename(value = mean)
 
 # append to btd_soy table (after removing BRA)
 btd_soy_ext <- btd_soy %>% 
@@ -285,7 +289,7 @@ btd_final <- lapply(items$item_code, function(x) {
 btd_final <- rbindlist(btd_final)
 
 # set negative values to zero
-# TODO: just a temporary fix!
+# NOTE: no longer necessary since there are no negative values
 #btd_soy_final$value[btd_soy_final$value <0] <- 0
 
 # add commodity code and year
