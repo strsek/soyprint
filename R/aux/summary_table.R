@@ -1,5 +1,5 @@
 
-### create a summary table fro all cbs items on municpality level ###
+### create nice paper summary table for all cbs items on municpality level ###
 
 library(dplyr)
 library(sf)
