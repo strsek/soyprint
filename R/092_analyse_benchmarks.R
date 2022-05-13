@@ -22,7 +22,7 @@ library(xtable)
 # load function library
 source("R/00_function_library.R")
 
-write = FALSE
+write = TRUE
 options(scipen = 99999)
 
 # load data ----------
@@ -81,26 +81,28 @@ exp_dest <- lapply(res, gg_funct,
                    GEO = GEO_MUN_SOY_dest, cutoff = 10, unit = "kilotons", title = '', pal = "plasma", limits = limits)
 exp_dest <- map2(exp_dest, res, ~ .x + ggtitle(.y))
 (wrap <- wrap_plots(exp_dest, nrow = ceiling(length(exp_dest)/2), guides = "collect"))
-if(write) ggsave(paste0("results/map_benchmark_",dest,".png"), wrap, bg='transparent', scale = 1.5, width = 20,  height = 20, units = "cm")
+if(write) ggsave(paste0("results/maps/map_benchmark_",dest,".png"), wrap, bg='transparent', scale = 1.5, width = 20,  height = 20, units = "cm")
 
-}
 
 limits_state <- c(min(resdata_state[resdata_state>0]), max(resdata_state))
 exp_dest_state <- lapply(res, gg_funct, 
                          GEO = GEO_STATE_SOY_dest, unit = "tons", cutoff = 10, pal = "plasma", limits = limits_state)
 exp_dest_state <- map2(exp_dest_state, res, ~ .x + ggtitle(.y))
 (wrap_state <- wrap_plots(exp_dest_state, nrow = ceiling(length(exp_dest_state)/2), guides = "collect"))
-if(write) ggsave(paste0("results/map_benchmark_state_",dest,".png"), wrap_state, bg='transparent', scale = 1.5, width = 30,  height = 10, units = "cm")
+if(write) ggsave(paste0("results/maps/map_benchmark_state_",dest,".png"), wrap_state, bg='transparent', scale = 1.5, width = 30,  height = 10, units = "cm")
 
-# mapview approach (using mv_funct from function library)
-exp_dest_mv <- lapply(res, mv_funct,  GEO = GEO_MUN_SOY_dest, cutoff = 10)
-(sync <- sync(exp_dest_mv, ncol = 2))
-#save_tags(sync, paste0("results/benchmark_",dest,".html"), selfcontained=TRUE)
+# interactive mapview approach (using mv_funct from function library)
+# UNCOMMENT IF NEEDED!
 
-exp_dest_mv_state <- lapply(res, mv_funct,  GEO = GEO_STATE_SOY_dest,cutoff = 10)
-(sync_state <- sync(exp_dest_mv_state, ncol = 2))
-#save_tags(sync, paste0("results/benchmark_state_",dest,".html"), selfcontained=TRUE)
+# exp_dest_mv <- lapply(res, mv_funct,  GEO = GEO_MUN_SOY_dest, cutoff = 0)
+# (sync <- sync(exp_dest_mv, ncol = 2))
+# #save_tags(sync, paste0("results/benchmark_",dest,".html"), selfcontained=TRUE)
+# 
+# exp_dest_mv_state <- lapply(res, mv_funct,  GEO = GEO_STATE_SOY_dest,cutoff = 10)
+# (sync_state <- sync(exp_dest_mv_state, ncol = 2))
+# #save_tags(sync, paste0("results/benchmark_state_",dest,".html"), selfcontained=TRUE)
 
+}
 
 
 # compute focal sums/means -----------------------------------------------------------------------
@@ -204,70 +206,14 @@ comp_mun_long <- rbindlist(comp_mun_long_dest)
 #comp_mun_long <- arrange(comp_mun_long, desc(exp_nat))
   
 
-## scatterplots ---------------------------------------------------------------
+
+# scatterplots ---------------------------------------------------------------
 
 models <- c("multimode", "euclid", "downscale"); names(models) = models
 w_nms <- c("base", "mean_q")
 names(w_nms) <- w_nms
 
-# on global level
-#layout <- '
-#           AB
-#           CD
-#           EF
-#'
-scatter_global <- lapply(models, function(mod){
-  scatter_base <- scatter_funct(comp_mun_long, paste(mod), "trase")
-  scatter_mean_q <- scatter_funct(comp_mun_long, paste0(mod,"_mean_q"), "trase_mean_q")
-  #scatter_sum_q  <- scatter_funct(comp_mun_long, paste0(mod,"_sum_q"), "trase_sum_q")
-  #scatter_mean_100 <- scatter_funct(comp_mun_long, paste0(mod,"_mean_100"), "trase_mean_100")
-  #scatter_sum_100  <- scatter_funct(comp_mun_long, paste0(mod,"_sum_100"), "trase_sum_100")
-  #scatter_mean_id  <- scatter_funct(comp_mun_long, paste0(mod,"_mean_id"), "trase_mean_id")
-  #return(list(base = scatter_base, 
-  #            mean_q = scatter_mean_q, sum_q = scatter_sum_q, 
-  #            mean_100 = scatter_mean_100, sum_100 = scatter_sum_100,
-  #            mean_id = scatter_mean_id))
-  #patch <- wrap_plots(A = scatter_base, B = scatter_mean_q, C = scatter_sum_q, D = scatter_mean_100, E = scatter_sum_100, F = scatter_mean_id, design = layout, guides = "collect")
-  patch = scatter_base + scatter_mean_q + plot_layout(guides = 'collect')
-  return(patch)
-  })
-
-
-
-scatter_global <- lapply(w_nms, function(w){
-    lapply(models, function(mod){
-      if(w != "base"){w = paste0("_",w)} else {w = ""}
-      scatter <- scatter_funct(comp_mun_long, paste0(mod,w), paste0("trase",w), legend = FALSE,
-                               ylab = "TRASE", xlab = mod,
-                               col = "firebrick") 
-      return(scatter) 
-    })
-  })
-
-scatter_global <- lapply(models, function(mod){
-    lapply(w_nms, function(w){
-    if(w != "base"){w = paste0("_",w)} else {w = ""}
-    scatter <- scatter_funct(comp_mun_long, paste0(mod,w), paste0("trase",w), legend = TRUE,
-                             ylab = "TRASE", xlab = mod,
-                             col = "firebrick",
-                             alph = 0.4) 
-    return(scatter) 
-  })
-})
-
-scatter_global <- lapply(models, function(mod){
-  lapply(w_nms, function(w){
-    if(w != "base"){w = paste0("_",w)} else {w = ""}
-    bw = ifelse(w == "",100, 50)
-    scatter <- scatter_funct_dens2(comp_mun_long, paste0(mod,w), paste0("trase",w), legend = FALSE,
-                             bwx = bw, bwy = bw,
-                              ylab = "TRASE", xlab = mod,
-                             col = "firebrick",
-                             alph = 0.4) 
-    return(scatter) 
-  })
-})
-
+## globally ------------------
 
 scatter_global <- lapply(w_nms, function(w){
     gg <- lapply(models, function(mod){
@@ -288,40 +234,19 @@ scatter_global <- lapply(w_nms, function(w){
 })
 
 
-#scatter_global$multimode$base <- scatter_global$multimode$base + labs(title = "direct") + theme(plot.title = element_text(hjust = 0.5))
-#scatter_global$multimode$mean_q <- scatter_global$multimode$mean_q + labs(title = "focal mean") + theme(plot.title = element_text(hjust = 0.5))
-
-
-#scat_wrap_global <- wrap_plots(c(scatter_global$multimode, scatter_global$euclid, scatter_global$downscale), nrow = 3)
+# combine plots
 scat_wrap_global <- scatter_global$base / scatter_global$mean_q
-ggsave(scat_wrap_global, file = "results/scatter_global.png", height = 20, width = 38, units = "cm")
-
-# by country
-
-scatter_dest <- lapply(comp_mun_long_dest[c("BRA", "CHN", "NLD", "DEU")], function(comp_dest){
-  scatter_list <- lapply(models, function(mod){
-    scatter_base <- scatter_funct(comp_dest, paste(mod), "trase", legend = FALSE)
-    scatter_mean_q <- scatter_funct(comp_dest, paste0(mod,"_mean_q"), "trase_mean_q", legend = FALSE)
-    scatter_sum_q  <- scatter_funct(comp_dest, paste0(mod,"_sum_q"), "trase_sum_q", legend = FALSE)
-    scatter_mean_100 <- scatter_funct(comp_dest, paste0(mod,"_mean_100"), "trase_mean_100", legend = FALSE)
-    scatter_sum_100  <- scatter_funct(comp_dest, paste0(mod,"_sum_100"), "trase_sum_100", legend = FALSE)
-    scatter_mean_id  <- scatter_funct(comp_mun_long, paste0(mod,"_mean_id"), "trase_mean_id", legend = FALSE)
-    #return(list(base = scatter_base, 
-    #            mean_q = scatter_mean_q, sum_q = scatter_sum_q, 
-    #            mean_100 = scatter_mean_100, sum_100 = scatter_sum_100,
-    #            mean_id = scatter_mean_id))
-    patch <- wrap_plots(A = scatter_base, B = scatter_mean_q, C = scatter_sum_q, D = scatter_mean_100, E = scatter_sum_100, design = layout, guides = "collect")
-    return(patch)
-    })
-})
+ggsave(scat_wrap_global, file = "results/figures/scatter_global.png", height = 20, width = 38, units = "cm")
 
 
-w_nms <- c("", "mean_q")
+
+## by country ------------------------------------
+
+w_nms <- c("base", "mean_q")
 names(w_nms) <- w_nms
 targets <- c("CHN", "ESP", "NOR"); names(targets) <- targets
 targets_long <- c("China", "Spain", "Norway"); names(targets_long) <- targets
 target_cols <- c("darkblue", "firebrick", "darkmagenta"); names(target_cols) = targets
-models <- c("multimode", "euclid", "downscale"); names(models) = models
 
 scatter_dest <- lapply(targets, function(targ){
   comp_dest <- comp_mun_long_dest[[targ]]
@@ -343,35 +268,17 @@ scatter_dest <- lapply(targets, function(targ){
   })
 })
 
+
 scatter_targets <-  scatter_dest$CHN$mean_q / scatter_dest$ESP$mean_q / scatter_dest$NOR$mean_q
 #scatter_targets[[1]][[2]] <-  scatter_targets[[1]][[2]] + labs(title = 'China') + theme(plot.title = element_text(hjust = 0.5))
 #scatter_targets[[2]][[2]] <-  scatter_targets[[2]][[2]] + labs(title = 'Spain') + theme(plot.title = element_text(hjust = 0.5))
 #scatter_targets[[3]][[2]] <-  scatter_targets[[3]][[2]] + labs(title = 'Norway') + theme(plot.title = element_text(hjust = 0.5))
 
-ggsave(scatter_targets, filename="results/scatter_targets.png", height = 15, width = 17.5, units = "cm", scale = 1.5)
+ggsave(scatter_targets, filename="results/figures/scatter_targets.png", height = 15, width = 17.5, units = "cm", scale = 1.5)
 
 
 
-## xy plots 
-#comp_plot <- filter(comp_mun, nm_mun != "UNKNOWN")
-#ggplot(comp_plot, aes(x=trase, y = multimode))+
-#  geom_point(color = "darkgreen", alpha = 0.1)+
-#  geom_abline(slope = 1) + 
-#  geom_abline(slope = 1.05, linetype="dashed", color = "blue")+
-#  geom_abline(slope = 0.95, linetype="dashed", color = "blue")+
-#  geom_abline(slope = 1.5, linetype="dashed", color = "cyan")+
-#  geom_abline(slope = 0.5, linetype="dashed", color = "cyan")
-
-
-#comp_mun$density <- get_density(comp_mun_long$multimode, comp_mun_long$trase, n = 100)
-#
-#ggplot(comp_mun, aes(x=multimode, y = cv, color = density))+
-#  geom_point(alpha = 0.4, shape = 1) + 
-#  scale_color_viridis()+
-#  labs(y = "coefficient of variation", "mean (tons)") +
-#  theme_minimal()
-
-# regressions
+# regressions --------------------------------------------------------------------------------------
 
 # globally
 reg_global <- lapply(models, function(mod){
@@ -384,9 +291,9 @@ reg_global <- lapply(models, function(mod){
   return(list(base = m_base$r.squared, mean_q = m_mean_q$r.squared, sum_q = m_sum_q$r.squared, mean_100 = m_mean_100$r.squared, sum_100 = m_sum_100$r.squared, mean_id = m_mean_id$r.squared)) 
 })
 
-dfs_global <- lapply(reg_global, data.frame, stringsAsFactors = FALSE)
-dfs_global <- bind_rows(dfs_global)
-rownames(dfs_global) <- names(models)
+reg_global <- lapply(reg_global, data.frame, stringsAsFactors = FALSE)
+reg_global <- bind_rows(reg_global)
+rownames(reg_global) <- names(models)
 #dfs_global <- t(dfs_global)
 
 # globally with country fixed effects
@@ -397,44 +304,42 @@ reg_global_fe <- lapply(models, function(mod){
   m_sum_100 <- lm(as.formula(paste0("trase_sum_100 ~ to_code + ",mod,"_sum_100 : to_code")), data = comp_mun_long) %>% summary
   m_mean_100 <- lm(as.formula(paste0("trase_mean_100 ~ to_code + ",mod,"_mean_100 : to_code")), data = comp_mun_long) %>% summary
   m_mean_id <- lm(as.formula(paste0("trase_mean_id ~ to_code + ",mod,"_mean_id : to_code")), data = comp_mun_long) %>% summary
-  return(list(base = m_base, mean_q = m_mean_q, sum_q = m_sum_q, mean_100 = m_mean_100, sum_100 = m_sum_100, mean_id = m_mean_id)) 
+  return(list(base = m_base$r.squared, mean_q = m_mean_q$r.squared, sum_q = m_sum_q$r.squared, mean_100 = m_mean_100$r.squared, sum_100 = m_sum_100$r.squared, mean_id = m_mean_id$r.squared)) 
 })
 
-reg_global_fe1 <- lapply(models, function(mod){
+reg_global_fe <- lapply(models, function(mod){
   m_base <- lm(as.formula(paste0("trase ~ ",mod,"*to_code")), data = comp_mun_long) %>% summary
   m_sum_q <- lm(as.formula(paste0("trase_sum_q ~ ",mod,"_sum_q * to_code")), data = comp_mun_long) %>% summary
   m_mean_q <- lm(as.formula(paste0("trase_mean_q ~ ",mod,"_mean_q * to_code")), data = comp_mun_long) %>% summary
   m_sum_100 <- lm(as.formula(paste0("trase_sum_100 ~ ",mod,"_sum_100 * to_code")), data = comp_mun_long) %>% summary
   m_mean_100 <- lm(as.formula(paste0("trase_mean_100 ~ ",mod,"_mean_100 * to_code")), data = comp_mun_long) %>% summary
   m_mean_id <- lm(as.formula(paste0("trase_mean_id ~ ",mod,"_mean_id * to_code")), data = comp_mun_long) %>% summary
-  return(list(base = m_base, mean_q = m_mean_q, sum_q = m_sum_q, mean_100 = m_mean_100, sum_100 = m_sum_100, mean_id = m_mean_id)) 
+  return(list(base = m_base$r.squared, mean_q = m_mean_q$r.squared, sum_q = m_sum_q$r.squared, mean_100 = m_mean_100$r.squared, sum_100 = m_sum_100$r.squared, mean_id = m_mean_id$r.squared)) 
 })
 
-# by destination
-w_nms <- c("",w_nms)
-names(w_nms) <- w_nms
+reg_global <- lapply(reg_global, data.frame, stringsAsFactors = FALSE)
+reg_global_fe <- bind_rows(reg_global_fe)
+rownames(reg_global_fe) <- names(models)
+
+
+# by destination ----------
+#w_nms <- c("base",w_nms)
+#names(w_nms) <- w_nms
 
 reg_dest <- lapply(comp_mun_long_dest, function(comp_dest){
   lapply(w_nms, function(w){
     lapply(models, function(mod){
-      if(w != "") w = paste0("_",w)
+      if(w != "base"){w = paste0("_",w)} else {w = ""}
       m<- lm(as.formula(paste0("trase",w," ~ ",mod,w)), data = comp_dest) %>% summary
       return(m$r.squared) 
     })
   })
 })
 
-'m_base <- lm(as.formula(paste0("trase ~ ",mod)), data = comp_dest) %>% summary
-m_sum_q <- lm(as.formula(paste0("trase_sum_q ~ ",mod,"_sum_q")), data = comp_dest) %>% summary
-m_mean_q <- lm(as.formula(paste0("trase_mean_q ~ ",mod,"_mean_q")), data = comp_dest) %>% summary
-m_sum_100 <- lm(as.formula(paste0("trase_sum_100 ~ ",mod,"_sum_100")), data = comp_dest) %>% summary
-m_mean_100 <- lm(as.formula(paste0("trase_mean_100 ~ ",mod,"_mean_100")), data = comp_dest) %>% summary
-m_mean_id <- lm(as.formula(paste0("trase_mean_id ~ ",mod,"_mean_id")), data = comp_mun_long) %>% summary
-return(list(base = m_base$r.squared, mean_q = m_mean_q$r.squared, sum_q = m_sum_q$r.squared, mean_100 = m_mean_100$r.squared, sum_100 = m_sum_100$r.squared, mean_id = m_mean_id$r.squared)) 
-'
-reg_dfs <- lapply(reg_dest, data.frame, stringsAsFactors = FALSE)
-reg_dfs <- bind_rows(reg_dfs)
-rownames(reg_dfs) <- names(comp_mun_long_dest)
+
+reg_dest <- lapply(reg_dest, data.frame, stringsAsFactors = FALSE)
+reg_dest <- bind_rows(reg_dest)
+rownames(reg_dest) <- names(comp_mun_long_dest)
 #dfs <- t(dfs)
 
 # simple pearson correlation
@@ -451,6 +356,11 @@ rownames(reg_dfs) <- names(comp_mun_long_dest)
 #  })
 #})
 
+
+
+# pearson corellation -------------------------------------------------------------------------
+
+# globally
 comp_mun_long <- as.data.frame(comp_mun_long)
 pearson_global <- lapply(w_nms, function(w){
   lapply(models, function(mod){
@@ -461,16 +371,15 @@ pearson_global <- lapply(w_nms, function(w){
     return(result) 
   })
 })
-pearson_global_df <- lapply(pearson_global, data.frame, stringsAsFactors = FALSE)
-pearson_global_df <- bind_rows(pearson_global_df)
-rownames(pearson_global_df) <- names(w_nms)
+pearson_global <- lapply(pearson_global, data.frame, stringsAsFactors = FALSE)
+pearson_global <- bind_rows(pearson_global)
+rownames(pearson_global) <- names(w_nms)
 
-
+# by destination
 pearson_dest <- lapply(comp_mun_long_dest, function(comp_dest){
-  #comp_dest <- as.data.frame(comp_dest)
   lapply(w_nms, function(w){
     lapply(models, function(mod){
-      if(w != "") w = paste0("_",w)
+      if(w != "base"){w = paste0("_",w)} else {w = ""}
       #coeff <- cor(comp_dest[paste0("trase",w)], comp_dest[paste0(mod,w)])
       test <- cor.test(x = unlist(comp_dest[paste0("trase",w)]), y = unlist(comp_dest[paste0(mod,w)]), method = "pearson", conf.level = 0.95)
       result <- paste0(round(test$estimate,4), stars.pval(test$p.value)) # ,"(", round(test$conf.int[1],4),",", round(test$conf.int[2],4), ")"
@@ -479,15 +388,15 @@ pearson_dest <- lapply(comp_mun_long_dest, function(comp_dest){
   })
 })
 
-pearson_df <- lapply(pearson_dest, data.frame, stringsAsFactors = FALSE)
-pearson_df <- bind_rows(pearson_df)
+pearson_dest <- lapply(pearson_dest, data.frame, stringsAsFactors = FALSE)
+pearson_dest <- bind_rows(pearson_dest)
 #rownames(pearson_df) <- names(comp_mun_long_dest)
-pearson_df <- mutate(pearson_df, to_code = names(comp_mun_long_dest), .before = multimode)
+pearson_dest <- mutate(pearson_dest, to_code = names(comp_mun_long_dest), .before = base.multimode)
 
 # add column for total exports in trase and my data
 pearson_df <- comp_nat %>% dplyr::select(c(to_code:to_name, trase, multimode)) %>% 
   rename(exports_trase = trase, exports_model = multimode) %>%
-  left_join(pearson_df, by = "to_code") %>%
+  left_join(pearson_dest, by = "to_code") %>%
   arrange(desc(exports_trase))
 # transform to kilotons
 pearson_df <- mutate(pearson_df, exports_trase = round(exports_trase/1000,3), exports_model = round(exports_model/1000,4))
@@ -502,9 +411,10 @@ EXP_NAT_wide_eq <- EXP_NAT_wide %>%  mutate(oil = oil*equi_fact, cake = cake * e
 pearson_df <- dplyr::left_join(pearson_df, EXP_NAT_wide_eq %>% dplyr::select(c(to_name, bean_share)), by = c("to_code" = "to_name"))
 pearson_df <- pearson_df %>% relocate(bean_share, .after = exports_model)
 
-# save to tex
+
+# save table to tex
 # extract only columns we need
-pearson_df_fin <- select(pearson_df, -c(to_name, starts_with("sum_"), ends_with("multimode"), contains("_id.")))
+pearson_df_fin <- select(pearson_df, -c(to_name, bean_share, starts_with("sum_"))) # ends_with("multimode"), contains("_id.")
 print(xtable(pearson_df_fin, caption = "Corrleation between different model approaches and TRASE by destination country",digits = 1), 
       file = "results/tables/pearson_dest.tex",
       include.rownames=FALSE)

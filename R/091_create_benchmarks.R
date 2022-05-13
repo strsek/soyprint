@@ -31,10 +31,11 @@ trase <- read.csv("input_data/BRAZIL_SOY_2.5.1_TRASE.csv", stringsAsFactors = FA
 # country name ISO correspondence
 trase_names <- read.csv2("input_data/trase_names.csv", fileEncoding="UTF-8-BOM", stringsAsFactors = FALSE)
 
-# supply chain results
-source_to_export_list <- readRDS("intermediate_data/source_to_export_list.rds")
-##
+# model results for source-to-importer flows
+# from subnational mean flows
 source_to_export_mean <- readRDS("intermediate_data/source_to_export_mean.rds")
+# separate by simulation
+source_to_export_list <- readRDS("intermediate_data/source_to_export_list.rds")
 source_to_export_list <- source_to_export_list[-1]
 source_to_export_list <- c(source_to_export_mean,source_to_export_list)
 ##
@@ -194,7 +195,7 @@ comp_mun <- comp_mun %>%
   mutate(to_region = ifelse(to_code == "ROW", "ROW", to_region), to_name= ifelse(to_code == "ROW", "ROW", to_name)) %>%
   mutate(to_region = ifelse(to_code == "BRA", "Brazil", to_region))
 
-# drop land-use (optional)
+# drop trase land-use (optional)
 comp_mun <- dplyr::select(comp_mun, -landuse)
 
 # add name for unknown origin
@@ -207,28 +208,16 @@ comp_mun <- as.data.table(comp_mun)
 setkey(comp_mun, co_state, to_code)
 
 # aggregate by state
-#comp_state <- comp_mun_dt %>% 
-#  group_by(co_state, nm_state, to_code, to_region) %>%  
-#  summarise(across(c("trase", "downscale", names(results_list)), sum, na.rm = TRUE), .groups = "drop")
-
 comp_state <- comp_mun[, lapply(.SD, sum, na.rm=TRUE), 
                        by =.(co_state, nm_state, to_code, to_region), 
                        .SDcols=c("trase", "downscale", names(results_list))]
 
 # aggregate by destination region
-#comp_mun_by_region <- comp_mun %>% 
-#  group_by(co_mun, nm_mun, co_state, nm_state, to_region) %>% 
-#  summarise(across(c("trase", "downscale", names(results_list)), sum, na.rm = TRUE), .groups = "drop")
-
 comp_mun_by_region <- comp_mun[, lapply(.SD, sum, na.rm=TRUE), 
                        by =.(co_mun, nm_mun, co_state, nm_state, to_region), 
                        .SDcols=c("trase", "downscale", names(results_list))]
 
 # aggregate by state and destination region
-#comp_state_by_region <- comp_state %>% 
-#  group_by(co_state, nm_state, to_region) %>% 
-#  summarise(across(c("trase", "downscale", names(results_list)), sum, na.rm = TRUE), .groups = "drop")
-
 comp_state_by_region <- comp_state[, lapply(.SD, sum, na.rm=TRUE), 
                                by =.(co_state, nm_state, to_region), 
                                .SDcols=c("trase", "downscale", names(results_list))]
