@@ -1,4 +1,4 @@
-### plot terriotiral division of brazil
+### create nice paper plot of territorial division of brazil
 
 library(ggplot2)
 library(dplyr)
