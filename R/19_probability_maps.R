@@ -12,14 +12,17 @@ library(ggplot2)
 library(rasterVis)
 library(viridis)
 
+# load function library
+source("R/00_function_library.R")
+
 # prepare footprint results ----------------------------------
 
 regions <- fread("input_data/FABIO/inst/regions_full.csv")
 items <-  fread("input_data/FABIO/inst/items_full.csv")
 
 # load production footprints
-P_mass  <- readRDS("results/P_mass.rds")
-P_value <- readRDS("results/P_value.rds")
+P_mass  <- readRDS("results/footprints/P_mass.rds")
+P_value <- readRDS("results/footprints/P_value.rds")
 
 # append food/nonfood to colnames
 colnames(P_mass$A_country) <- paste0(colnames(P_mass$A_country),"_food")
@@ -70,37 +73,13 @@ GEO_MUN_P_value <- dplyr::select(GEO_MUN_SOY, c(co_mun:nm_state, prod_bean)) %>%
 
 # prepare land-use tiles --------------------------------------
 
+# this uses the burn_rast function from the function library
+
 # load tiles in a list
 tile_names = list.files("input_data/geo/mb_tiles/",pattern="^.*.tif$")
 tile_paths = paste0("input_data/geo/mb_tiles/",tile_names)
 tiles <- lapply(tile_paths, raster)
 names(tiles) <- tile_names
-
-# create function to write probability values from transport model in to soy pixels for each MU
-# TODO: if a sub-region is selected (e.g. MT), make sure only those tiles are processes and written to file which overlap with the region
-burn_rast <- function(rast, poly, class, value, file, zeroes = TRUE, subarea = FALSE){
-  # if the target class is not contained in the raster or it does not overlap with the polygon extent, stop
-  if(!class %in% rast[] | !ifelse(subarea, st_intersects(st_as_sfc(st_bbox(poly)), st_as_sfc(st_bbox(rast)), sparse = F), TRUE)) {
-    return() # next # out <- NULL stop("no soy in tile") 
-  } else {
-    # optional: extract required class --> not needed if raster is already (0/1)
-    rast <- clamp(rast, class, class, useValues = FALSE) # rast[rast != class] <- NA ; rast[!is.na(rast)] <- 1
-    # optional: round if needed
-    poly <- mutate(poly, !!rlang::sym(value) := round(!!rlang::sym(value)))  # value_var <- rlang::sym(value)
-    if(!zeroes) poly <- filter(poly, !!rlang::sym(value) > 0 )
-    # rasterize
-    out <- fasterize::fasterize(poly, rast, field = value) # we could also create a raster brick by value/destination with "by"
-    # keep only soy pixels
-    out <- out * rast
-    # if a file name was specified write and load from file, otherwise load in memory (not suggested)
-    if (missing(file)) {
-      return(out)
-    } else {
-      writeRaster(out, filename=file, format="GTiff", datatype="INT1U", overwrite=TRUE)
-      raster(file) 
-    }
-  }
-}
 
 # test for one tile
 # prob_tile1 <- burn_rast(rast = tiles[[1]], poly = GEO_MUN_SOY, value = "co_state", class = 1, file = "prob_tile1.tif")
@@ -137,7 +116,7 @@ for (reg in c("EU", "CHN")) {  #
     
     if(length(dir(dir,all.files=FALSE)) == 0) {
     
-    # apply to tile list
+    # apply to tile list 
     system.time(
     prob_tiles <- mclapply(names(tiles), function(x) {
      burn_rast(rast = tiles[[x]], 
@@ -153,46 +132,7 @@ for (reg in c("EU", "CHN")) {  #
     #mapview(prob_vrt, na.color = "transparent")
     
     
-    # resample: two options
-    
-    # # 1: with gdal: saves resampled tiles to file
-    # # NOTE: this is not strictly necessary, as we can also create a resampled vrt out of the original tiles
-    # gdal_resample <- function(r, factor, outdir, method = 'near', load = FALSE) {
-    #   
-    #   #Geometry attributes
-    #   t1 <- c(xmin(r), ymin(r), 
-    #           xmax(r), ymax(r))
-    #   res <- res(r) * factor
-    #   
-    #   #Temporal files
-    #   fname <- sub("^.+/", "", filename(r))
-    #   inname <- sub(paste0(getwd(),"/"), "", filename(r)) #paste0(indir,fname)
-    #   outname <- paste0(outdir,fname)
-    # 
-    #   #GDAL time!
-    #   gdalUtilities::gdalwarp(srcfile = inname, dstfile = outname, 
-    #            tr = res, te = t1, r = method, overwrite = TRUE)
-    #   
-    #   if (load) {
-    #     resample_raster = raster(outname)
-    #     return(resample_raster)
-    #   } else {
-    #     cat("file", fname, "successfully resampled and saved to", outdir)
-    #     return()
-    #   }
-    # }
-    # 
-    # system.time(
-    # prob_tiles_agg <- mclapply(prob_tiles, gdal_resample, factor = 16, outdir = "results/mb_tiles/resampled/", load = TRUE, mc.cores = 12)
-    # )
-    # 
-    # gdalUtilities::gdalbuildvrt(gdalfile = sapply(prob_tiles_agg, filename), output.vrt = "results/mb_tiles/resampled/mb_test.vrt")
-    # prob_agg_vrt <- raster("results/mb_tiles/resampled/mb_test.vrt")
-    # 
-    # mapview(prob_agg_vrt, na.color = "transparent")
-    
-    
-    # 2: directly build a vrt from high-res tiles with desired resolution:
+    # resample: directly build a vrt from high-res tiles with desired resolution:
     gdalUtilities::gdalbuildvrt(gdalfile = sapply(prob_tiles, filename), 
                                                 output.vrt = paste0(dir, "/prob_agg.vrt"),
                                                 r = "nearest", # TODO: what resampling method?
@@ -206,30 +146,9 @@ for (reg in c("EU", "CHN")) {  #
     
     # plot -----------------------------------------
     
-    
-    # using solution from https://stackoverflow.com/questions/47116217/overlay-raster-layer-on-map-in-ggplot2-in-r/47190738#47190738
-    
-    # function to reshape raster into data frame
-    # this is nice because it only retains information of non-NA cells and their position!
-    gplot_data <- function(x, maxpixels = 500000)  {
-      x <- raster::sampleRegular(x, maxpixels, asRaster = TRUE)
-      coords <- raster::xyFromCell(x, seq_len(raster::ncell(x)))
-      ## Extract values
-      dat <- utils::stack(as.data.frame(raster::getValues(x))) 
-      names(dat) <- c('value', 'variable')
-      
-      dat <- dplyr::as_tibble(data.frame(coords, dat))
-      
-      if (!is.null(levels(x))) {
-        dat <- dplyr::left_join(dat, levels(x)[[1]], 
-                                by = c("value" = "ID"))
-      }
-      dat
-    }
-    
+    # reshape raster into data frame (see function library)
     prob_dat <- gplot_data(prob_agg_vrt, maxpixels = ncell(prob_agg_vrt)) %>% dplyr::filter(!is.na(value))
     
-    # plot
     (prob_map <- ggplot() +
       geom_sf(data = GEO_states, fill = "transparent", color = "darkgrey", size = 0.4) + # "gray19", "lightgrey"
       geom_tile(data = dplyr::filter(prob_dat, !is.na(value)), 
@@ -331,3 +250,5 @@ for (prod in c("c110", "c114", "c116", "c117", "c118", "total_food", "total_nonf
     }
   }
 
+rm(list = ls())
+gc()
