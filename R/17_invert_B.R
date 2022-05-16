@@ -1,11 +1,13 @@
-################################
-# invert B
-################################
+
+#### invert the hybrid B quadrant #######
+
 # Block matrix inversion:
 # B^-1 = -(A - BD^-1C)^-1 BD^-1
 # for C = 0 -->  B^-1 = -A^-1 BD^-1
 
 library(Matrix)
+
+write = TRUE
 
 #year=2013
 years <- 2013
@@ -41,8 +43,11 @@ for(year in years){
   A_inv <- readRDS(paste0("intermediate_data/FABIO/",  year, "_L_value.rds"))
   B_inv <- -A_inv %*% B %*% D_inv
   # B_inv <- as(B_inv, "dgCMatrix")
-  saveRDS(B_inv, paste0("intermediate_data/FABIO/", year, "_B_inv_value.rds"))
+  if (write) saveRDS(B_inv, paste0("intermediate_data/FABIO/", year, "_B_inv_value.rds"))
   
 }
+
+rm(list = ls())
+gc()
 
 

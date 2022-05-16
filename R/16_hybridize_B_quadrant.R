@@ -1,14 +1,12 @@
-## hybrid table
+## create hybrid MRIO using Exiobase
 
 library(Matrix)
 library(parallel)
 library(data.table)
 
-#Matrices necessary
-#sup <- readODS::read_ods("/mnt/nfs_fineprint/tmp/fabio/v2/hybrid/fabio-exiobase.ods", sheet = 1, skip = 1)
-#use <- readODS::read_ods("/mnt/nfs_fineprint/tmp/fabio/v2/hybrid/fabio-exiobase.ods", sheet = 2, skip = 1)
-#conc <- readODS::read_ods("/mnt/nfs_fineprint/tmp/fabio/v2/hybrid/fabio-exiobase.ods", sheet = 3)
+write = TRUE
 
+#Matrices necessary
 sup <- read.csv("input_data/FABIO/FABIO_hybrid/fabio-exio_sup.csv") 
 use <- read.csv("input_data/FABIO/FABIO_hybrid/fabio-exio_use.csv")
 conc <- read.csv("input_data/FABIO/FABIO_hybrid/fabio-exio_conc.csv")
@@ -170,8 +168,12 @@ names(output) <- years
 B <- lapply(output, `[[`, "B")
 Y_hybrid <- lapply(output, `[[`, "Y")
 
-saveRDS(B,"intermediate_data/FABIO/B.rds")
-saveRDS(Y_hybrid,"intermediate_data/FABIO/Y_hybrid.rds")
+if (write) {
+  saveRDS(B,"intermediate_data/FABIO/B.rds")
+  saveRDS(Y_hybrid,"intermediate_data/FABIO/Y_hybrid.rds")
+}
 
-rm(Y_all, output, B, Y_hybrid); gc()
+
+rm(Y_all, output, B, Y_hybrid)
+gc()
   

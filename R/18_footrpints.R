@@ -1,4 +1,4 @@
-### calculate footprints ###
+### calculate footprints on the level of municipalities ###
 
 library(Matrix)
 library(data.table)
@@ -42,7 +42,7 @@ l_mun <- merge(l_mun, cbs[,.(area_code, item_code, production)], by = c("item_co
 #l_mun[, production := NULL]
 
 soy_E <- unique(E[item_code %in% c(2555, 2571, 2590), .(item_code, item, comm_code, comm_group, group)])
-E_mun <- as.data.table(expand_grid(area_code = areas_mun$area_code, item_code = c(2555, 2571, 2590))) 
+E_mun <- as.data.table(expand.grid(area_code = areas_mun$area_code, item_code = c(2555, 2571, 2590))) 
 E_mun <- merge(E_mun, soy_E, by = "item_code")
 E_mun[, area := areas$area[match(area_code, areas$area_code)]]
 E_mun <- merge(E_mun, l_mun, by = c("area_code", "area", "item_code"), all.x = TRUE)
@@ -113,16 +113,18 @@ FA_value_product <- l*PA_value_product
 FB_mass_product  <-  l*PB_mass_product 
 FB_value_product <- l*PB_value_product
 
-
 P_mass  <- list("A_country" = PA_mass,  "B_country" = PB_mass,  "A_product" = PA_mass_product, "B_product" =  PB_mass_product)
 P_value <- list("A_country" = PA_value, "B_country" = PB_value, "A_product" = PA_value_product, "B_product" = PB_value_product)
 F_mass  <- list("A_country" = FA_mass,  "B_country" = FB_mass,  "A_product" = FA_mass_product,  "B_product" = FB_mass_product)
 F_value <- list("A_country" = FA_value, "B_country" = FB_value, "A_product" = FA_value_product, "B_product" = FB_value_product)
 
 # Store results -----------------------
-saveRDS(P_mass , "results/P_mass.rds")
-saveRDS(P_value, "results/P_value.rds")
-saveRDS(F_mass , "results/F_mass.rds")
-saveRDS(F_value, "results/F_value.rds")
+if (write){
+  saveRDS(P_mass , "results/footprints/P_mass.rds")
+  saveRDS(P_value, "results/footprints/P_value.rds")
+  saveRDS(F_mass , "results/footprints/F_mass.rds")
+  saveRDS(F_value, "results/footprints/F_value.rds")
+}
 
-
+rm(list = ls())
+gc()

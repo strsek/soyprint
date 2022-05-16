@@ -66,3 +66,7 @@ for(year in years){
   if (write) saveRDS(L, paste0("intermediate_data/FABIO/", year, "_L_value.rds"))
   
 }
+
+
+rm(list = ls())
+gc()
