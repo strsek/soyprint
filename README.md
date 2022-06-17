@@ -2,7 +2,7 @@
 
 
 ### Note for people interested in reproducing results:
-The model requires a wide range of input data for all modelling steps. All data is publicly and freely available, but cannot be provided here for download due to different copyright licenses. Instead, a list/script with links to download all data directly from its source will be provided soon. 
+The model requires a wide range of input data for all modelling steps. All data is publicly and freely available, but cannot directly be provided here for download due to different copyright licenses. Instead, a list/script with links to download all data directly from its source will be provided soon. 
 
 ----
 
