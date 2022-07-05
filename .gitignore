@@ -21,14 +21,22 @@ gis_osm_roads_free_1*
 #/input_data/FABIO/FABIO_exp/pure
 #/input_data/FABIO/FABIO_exp/v0
 /input_data/geo/mapbiomas_roads
-/results*
+#/results*
 /old*
 /GAMS/bs_res
 /GAMS/bs_tmp
 /GAMS/old
 btd_bal.rds
 cplex.opt
+F_mass.rds
+P_mass.rds
+F_value.rds
+P_value.rds
 
 # scripts/files no longer used
 R/old
 input_data/old
+results/old
+results/mb_tiles
+ignore
+
