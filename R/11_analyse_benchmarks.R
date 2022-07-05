@@ -22,7 +22,7 @@ library(xtable)
 # load function library
 source("R/00_function_library.R")
 
-write = TRUE
+write = FALSE
 options(scipen = 99999)
 
 # load data ----------
@@ -210,8 +210,7 @@ comp_mun_long <- rbindlist(comp_mun_long_dest)
 # scatterplots ---------------------------------------------------------------
 
 models <- c("multimode", "euclid", "downscale"); names(models) = models
-w_nms <- c("base", "mean_q")
-names(w_nms) <- w_nms
+w_nms <- c("base", "mean_q", "mean_100"); names(w_nms) <- w_nms
 
 ## globally ------------------
 
@@ -236,14 +235,14 @@ scatter_global <- lapply(w_nms, function(w){
 
 # combine plots
 scat_wrap_global <- scatter_global$base / scatter_global$mean_q
-ggsave(scat_wrap_global, file = "results/figures/scatter_global.png", height = 20, width = 38, units = "cm")
+if (write) ggsave(scat_wrap_global, file = "results/figures/scatter_global.png", height = 20, width = 38, units = "cm")
 
 
 
 ## by country ------------------------------------
 
-w_nms <- c("base", "mean_q")
-names(w_nms) <- w_nms
+#w_nms <- c("base", "mean_q")
+#names(w_nms) <- w_nms
 targets <- c("CHN", "ESP", "NOR"); names(targets) <- targets
 targets_long <- c("China", "Spain", "Norway"); names(targets_long) <- targets
 target_cols <- c("darkblue", "firebrick", "darkmagenta"); names(target_cols) = targets
@@ -274,7 +273,7 @@ scatter_targets <-  scatter_dest$CHN$mean_q / scatter_dest$ESP$mean_q / scatter_
 #scatter_targets[[2]][[2]] <-  scatter_targets[[2]][[2]] + labs(title = 'Spain') + theme(plot.title = element_text(hjust = 0.5))
 #scatter_targets[[3]][[2]] <-  scatter_targets[[3]][[2]] + labs(title = 'Norway') + theme(plot.title = element_text(hjust = 0.5))
 
-ggsave(scatter_targets, filename="results/figures/scatter_targets.png", height = 15, width = 17.5, units = "cm", scale = 1.5)
+if (write) ggsave(scatter_targets, filename="results/figures/scatter_targets.png", height = 15, width = 17.5, units = "cm", scale = 1.5)
 
 
 
@@ -415,16 +414,102 @@ pearson_df <- pearson_df %>% relocate(bean_share, .after = exports_model)
 # save table to tex
 # extract only columns we need
 pearson_df_fin <- select(pearson_df, -c(to_name, bean_share, starts_with("sum_"))) # ends_with("multimode"), contains("_id.")
-print(xtable(pearson_df_fin, caption = "Corrleation between different model approaches and TRASE by destination country",digits = 1), 
+if (write){
+  print(xtable(pearson_df_fin, caption = "Corrleation between different model approaches and TRASE by destination country",digits = 1), 
       file = "results/tables/pearson_dest.tex",
       include.rownames=FALSE)
+}
 
 
 # other statistics
 comp_mun_dest_stats <- comp_mun_long %>% group_by(to_code) %>% 
   summarise(across(downscale:multimode, .fns = list(diff = ~ sum(abs(.-trase)), msle = ~ msle(trase,.), rmse = ~rmse(trase,.)), #mape = ~ mape(trase,.)
                    .names = "{.fn}_{.col}")) 
-  
 
-rm(list = ls())
-gc()
+
+# rmse and rmsle ---------------------------------------------------------------------------------------
+
+# rmse
+# globally
+rmse_global <- lapply(w_nms, function(w){
+  lapply(models, function(mod){
+    if(w != "base"){w = paste0("_",w)} else {w = ""}
+    rmse <- rmse(actual = unlist(comp_mun_long[,paste0("trase",w)]), predicted = comp_mun_long[,paste0(mod,w)])
+    result <- round(rmse, 4)
+    return(result) 
+  })
+})
+rmse_global <- lapply(rmse_global, data.frame, stringsAsFactors = FALSE)
+rmse_global <- bind_rows(rmse_global)
+rownames(rmse_global) <- names(w_nms)
+
+# by destination
+rmse_dest <- lapply(comp_mun_long_dest, function(comp_dest){
+  lapply(w_nms, function(w){
+    lapply(models, function(mod){
+      if(w != "base"){w = paste0("_",w)} else {w = ""}
+      rmse <- rmse(actual = unlist(comp_dest[,paste0("trase",w)]), predicted = comp_dest[,paste0(mod,w)])
+      result <- round(rmse, 4)
+      return(result) 
+    })
+  })
+})
+
+rmse_dest <- lapply(rmse_dest, data.frame, stringsAsFactors = FALSE)
+rmse_dest <- bind_rows(rmse_dest)
+rmse_dest <- mutate(rmse_dest, to_code = names(comp_mun_long_dest), .before = base.multimode)
+# add global row
+rmse_global_row <- c("Total",  as.vector(t(rmse_global)))
+rmse_dest <- rbind(rmse_dest, rmse_global_row)
+
+# save table to tex
+# extract only columns we need
+if (write){
+  print(xtable(rmse_dest, caption = "RMSE between different model approaches and TRASE by destination country",digits = 1), 
+        file = "results/tables/rmse_dest.tex",
+        include.rownames=FALSE)
+}
+
+# rmsle 
+# globally
+rmsle_global <- lapply(w_nms, function(w){
+  lapply(models, function(mod){
+    if(w != "base"){w = paste0("_",w)} else {w = ""}
+    rmsle <- rmsle(actual = unlist(comp_mun_long[,paste0("trase",w)]), predicted = comp_mun_long[,paste0(mod,w)])
+    result <- round(rmsle, 4)
+    return(result) 
+  })
+})
+rmsle_global <- lapply(rmsle_global, data.frame, stringsAsFactors = FALSE)
+rmsle_global <- bind_rows(rmsle_global)
+rownames(rmsle_global) <- names(w_nms)
+
+# by destination
+rmsle_dest <- lapply(comp_mun_long_dest, function(comp_dest){
+  lapply(w_nms, function(w){
+    lapply(models, function(mod){
+      if(w != "base"){w = paste0("_",w)} else {w = ""}
+      rmsle <- rmsle(actual = unlist(comp_dest[,paste0("trase",w)]), predicted = comp_dest[,paste0(mod,w)])
+      result <- round(rmsle, 4)
+      return(result) 
+    })
+  })
+})
+
+
+rmsle_dest <- lapply(rmsle_dest, data.frame, stringsAsFactors = FALSE)
+rmsle_dest <- bind_rows(rmsle_dest)
+rmsle_dest <- mutate(rmsle_dest, to_code = names(comp_mun_long_dest), .before = base.multimode)
+
+names(rmsle_dest) <- paste0("rmsle_",names(rmsle_dest))
+names(rmse_dest) <- paste0("rmse_",names(rmse_dest))
+names(pearson_dest) <- paste0("r_",names(pearson_dest))
+
+#bind
+#metrics <- cbind(pearson_dest, rmse_dest[,-1], rmsle_dest[,-1])
+#write.csv(metrics, "r_rmse_rmsle.csv")
+
+rms <- cbind(rmse_dest, rmsle_dest[,-1])
+
+#rm(list = ls())
+#gc()
