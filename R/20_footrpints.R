@@ -4,6 +4,8 @@ library(Matrix)
 library(data.table)
 library(countrycode)
 
+write = TRUE
+
 LA_mass <- readRDS("intermediate_data/FABIO/2013_L_mass.rds")
 LB_mass <- readRDS("intermediate_data/FABIO/2013_B_inv_mass.rds")
 LA_value <- readRDS("intermediate_data/FABIO/2013_L_value.rds")
@@ -23,6 +25,7 @@ cbs <- readRDS("intermediate_data/FABIO/cbs_final.rds")
 areas <- unique(cbs[,.(area_code, area)])
 areas_mun <- areas[area_code > 1000,]
 regions <- fread("input_data/FABIO/inst/regions_full.csv")
+items <- fread("input_data/FABIO/inst/items_full.csv")
 
 
 # prepare land-use data ------------------------------------------------------------------------
@@ -72,6 +75,7 @@ dimnames(YB) <- list(paste0(IO.codes$Country.Code,"_",IO.codes$Product.Code),Y.c
 sum_mat <- as(sapply(unique(colnames(YB)),"==",colnames(YB)), "Matrix")*1
 YB_country <- YB %*% sum_mat 
   
+
 ## by consumer country: 
 
 # calculate production embodied in final demand impulse 
@@ -79,6 +83,11 @@ PA_mass  <- LA_mass  %*% YA_country
 PA_value <- LA_value %*% YA_country
 PB_mass  <- LB_mass  %*% YB_country
 PB_value <- LB_value %*% YB_country
+# append food/nonfood to colnames
+colnames(PA_mass) <-  paste0(colnames(PA_mass) ,"_food")
+colnames(PA_value) <- paste0(colnames(PA_value),"_food")
+colnames(PB_mass) <-  paste0(colnames(PB_mass) ,"_nonfood")
+colnames(PB_value) <- paste0(colnames(PB_value),"_nonfood")
 
 # calculate municipal land-use footprints by country
 l <- as.vector(E$landuse / X)
@@ -105,7 +114,7 @@ PA_value_product <- LA_value %*% YA_product
 PB_mass_product <-  LB_mass  %*% YB_product
 PB_value_product <- LB_value %*% YB_product
 
-# calculate municipal land-use footprints by country
+# calculate municipal land-use footprints by product
 l <- as.vector(E$landuse / X)
 l[!is.finite(l)] <- 0
 FA_mass_product  <-  l*PA_mass_product
@@ -113,10 +122,45 @@ FA_value_product <- l*PA_value_product
 FB_mass_product  <-  l*PB_mass_product 
 FB_value_product <- l*PB_value_product
 
-P_mass  <- list("A_country" = PA_mass,  "B_country" = PB_mass,  "A_product" = PA_mass_product, "B_product" =  PB_mass_product)
-P_value <- list("A_country" = PA_value, "B_country" = PB_value, "A_product" = PA_value_product, "B_product" = PB_value_product)
-F_mass  <- list("A_country" = FA_mass,  "B_country" = FB_mass,  "A_product" = FA_mass_product,  "B_product" = FB_mass_product)
-F_value <- list("A_country" = FA_value, "B_country" = FB_value, "A_product" = FA_value_product, "B_product" = FB_value_product)
+
+# for specifically relevant consumer products by country:
+
+# define relevant products:
+prod_sel <- list("c110", "c111", "c112", "c114", "c115", "c116", "c117", "c118")
+names(prod_sel) <- items$item[match(prod_sel, items$comm_code)]
+prod_group_sel <- list("dairy" = c("c110", "c111"), 
+                       "meat" = c("c114", "c115", "c116", "c117", "c118"),
+                       "meat-dairy" = c("c110", "c111", "c114", "c115", "c116", "c117", "c118"),
+                       "meat-dairy-eggs" = c("c110", "c111", "c112", "c114", "c115", "c116", "c117", "c118"))
+prod_sel <- c(prod_sel, prod_group_sel)
+
+PA_prod_country <- # lapply(c("mass", "value"), function(alloc){
+  sapply(names(prod_sel), function(prod_nm){
+    prod <- prod_sel[[prod_nm]]
+    YA_prod_country <- YA_country
+    YA_prod_country[!grepl(paste(prod,collapse="|"), rownames(YA_prod_country)),] <- 0 
+    colnames(YA_prod_country) <- paste0(colnames(YA_prod_country),"_",prod_nm)
+    PA_mass_prod_country <- LA_mass  %*% YA_prod_country
+    PA_value_prod_country <- LA_value  %*% YA_prod_country
+    #FA_mass_prod_country  <- l*PA_mass_prod_country
+    #FA_value_prod_country <- l*PA_value_prod_country
+    return(list(mass = PA_mass_prod_country, value = PA_value_prod_country))
+  }, USE.NAMES = TRUE, simplify = FALSE)
+#})
+
+PA_prod_country <- sapply(c("mass", "value"), function(alloc){
+  do.call("cbind", lapply(PA_prod_country, function(x) x[[alloc]]))
+}, USE.NAMES = TRUE, simplify = FALSE)
+
+FA_prod_country <- lapply(PA_prod_country, function(PA){
+  FA <- l*PA
+})
+
+
+P_mass  <- list("A_country" = PA_mass,  "B_country" = PB_mass,  "A_product" = PA_mass_product, "B_product" =  PB_mass_product, "A_product_country" = PA_prod_country$mass)
+P_value <- list("A_country" = PA_value, "B_country" = PB_value, "A_product" = PA_value_product, "B_product" = PB_value_product, "A_product_country" = PA_prod_country$value)
+F_mass  <- list("A_country" = FA_mass,  "B_country" = FB_mass,  "A_product" = FA_mass_product,  "B_product" = FB_mass_product, "A_prod_country" = FA_prod_country$mass)
+F_value <- list("A_country" = FA_value, "B_country" = FB_value, "A_product" = FA_value_product, "B_product" = FB_value_product, "A_prod_country" = FA_prod_country$value)
 
 # Store results -----------------------
 if (write){

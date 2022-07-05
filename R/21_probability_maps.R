@@ -24,15 +24,9 @@ items <-  fread("input_data/FABIO/inst/items_full.csv")
 P_mass  <- readRDS("results/footprints/P_mass.rds")
 P_value <- readRDS("results/footprints/P_value.rds")
 
-# append food/nonfood to colnames
-colnames(P_mass$A_country) <- paste0(colnames(P_mass$A_country),"_food")
-colnames(P_mass$B_country) <- paste0(colnames(P_mass$B_country),"_nonfood")
-colnames(P_value$A_country) <- paste0(colnames(P_value$A_country),"_food")
-colnames(P_value$B_country) <- paste0(colnames(P_value$B_country),"_nonfood")
-
-# bind
-P_mass <-  cbind(P_mass$A_country,  P_mass$B_country, P_mass$A_product,  P_mass$B_product, "total_food" = rowSums(P_mass$A_product), "total_nonfood" = rowSums(P_mass$B_product))
-P_value <- cbind(P_value$A_country, P_value$B_country,P_value$A_product,P_value$B_product, "total_food" = rowSums(P_value$A_product), "total_nonfood" = rowSums(P_value$B_product))
+# bind 
+P_mass <-  cbind(P_mass$A_country,  P_mass$B_country,  P_mass$A_product,  P_mass$B_product,  "total_food" = rowSums(P_mass$A_product),  "total_nonfood" = rowSums(P_mass$B_product),  P_mass$A_product_country)
+P_value <- cbind(P_value$A_country, P_value$B_country, P_value$A_product, P_value$B_product, "total_food" = rowSums(P_value$A_product), "total_nonfood" = rowSums(P_value$B_product), P_value$A_product_country)
 
 
 # load MU polygons and project to WGS84
@@ -51,13 +45,13 @@ P_mun_mass <- as.data.frame(as.matrix(P_mun_mass))
 P_mun_value <- P_value[as.numeric(sub("_.*", "", rownames(P_value)))>1000 & sub(".*_", "", rownames(P_value)) == "c021",]
 P_mun_value <- as.data.frame(as.matrix(P_mun_value))
 
-# transform into integer probabilities
+# transform into probabilities (do not round yet)
 P_mun_mass <- P_mun_mass/GEO_MUN_SOY$prod_bean # make sure they sum up to one!
 P_mun_mass[!is.finite(P_mun_mass)] <- 0
-P_mun_mass <- round(P_mun_mass*100)
+P_mun_mass <- P_mun_mass*100 # round(P_mun_mass*100)
 P_mun_value <- P_mun_value/GEO_MUN_SOY$prod_bean # make sure they sum up to one!
 P_mun_value[!is.finite(P_mun_value)] <- 0
-P_mun_value <- round(P_mun_value*100)
+P_mun_value <- P_mun_value*100 # round(P_mun_value*100)
 
 # change column names to ISO codes
 #colnames(P_mun_mass) <- regions$iso3c[match(colnames(P_mun_mass), regions$code)]
@@ -70,6 +64,7 @@ GEO_MUN_P_mass <- dplyr::select(GEO_MUN_SOY, c(co_mun:nm_state, prod_bean)) %>%
 P_mun_value <- mutate(P_mun_value, co_mun = as.numeric(sub("_.*", "", rownames(P_mun_value)))) %>% relocate(co_mun)
 GEO_MUN_P_value <- dplyr::select(GEO_MUN_SOY, c(co_mun:nm_state, prod_bean)) %>%
   left_join(P_mun_value, by = "co_mun") # or simply to cbind, as rows already math (but this is more safe)
+
 
 # prepare land-use tiles --------------------------------------
 
@@ -85,8 +80,8 @@ names(tiles) <- tile_names
 # prob_tile1 <- burn_rast(rast = tiles[[1]], poly = GEO_MUN_SOY, value = "co_state", class = 1, file = "prob_tile1.tif")
 # mapview(prob_tile1)
 
-for (reg in c("EU", "CHN")) {  #
-  for(type in c("food", "nonfood")) {
+for (reg in c("EU", "DEU", "CHN")) {  #
+  for(type in c("c116", "c117", "food")) { #"food", "nonfood"
     for(alloc in c("mass", "value")) { # , 
 
 # # select final demand region
@@ -108,6 +103,10 @@ for (reg in c("EU", "CHN")) {  #
      mat <- mat %*% sum_mat
      geo <- bind_cols(geo[,1:(which(names(geo) =="ARM_food")-1)], as.data.frame(as.matrix(mat)))
     }
+    
+    # round to intergers
+    geo <- mutate(geo, across(ARM_food:last_col(), round))
+    
     
     # create directory
     dir <- paste0("results/mb_tiles/",reg,"_",type,"_",alloc)
