@@ -303,13 +303,16 @@ exp_by_dest_region <- exp_by_dest %>%
 
 # add total exports in trase and comex exports separate by product
 trase_exp_known <- trase_mun %>% filter(co_mun != 9999999) %>% group_by(to_code) %>% summarise(trase_known = sum(trase))
-exp_summary <- exp_by_dest %>% select(c(to_code:trase, comex, euclid, multimode_mean, cake:bean)) %>% 
+exp_summary <- exp_by_dest %>% dplyr::select(c(to_code:trase, comex, euclid, multimode_mean, cake:bean)) %>% 
   left_join(trase_exp_known) 
  
-exp_summary <- exp_summary %>% select(to_code, to_name, trase, trase_known, euclid, multimode_mean, comex, bean, oil, cake)
+exp_summary <- exp_summary %>% dplyr::select(to_code, to_name, trase, trase_known, euclid, multimode_mean, comex, bean, oil, cake)
 exp_summary[is.na(exp_summary)] <- 0
 exp_summary <- arrange(exp_summary, desc(comex))
 exp_summary <- mutate(exp_summary, across(trase:cake, function(x){x/1000})) # to kilotons
+
+# add totals in bottom row
+exp_summary <- rbind(exp_summary, "Total" = c(NA, NA, colSums(exp_summary[,3:ncol(exp_summary)])))
 
 print(xtable(exp_summary, caption = "Eport summary",digits = 3), 
       file = "results/tables/export_summary_sorted.tex",

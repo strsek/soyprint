@@ -8,10 +8,10 @@ library(sf)
 library(leafsync)
 library(patchwork)
 
-write = FALSE
+write = TRUE
 
 # load data
-GEO_MUN_SOY <- readRDS("intermediate_data/GEO_MUN_SOY_03.rds")
+GEO_MUN_SOY <- readRDS("intermediate_data/GEO_MUN_SOY_fin.rds")
 GEO_states <- st_read("input_data/geo/GADM_boundaries/gadm36_BRA_1.shp", stringsAsFactors = FALSE)
 SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.rds")
 
@@ -21,23 +21,23 @@ SOY_MUN <- readRDS("intermediate_data/SOY_MUN_fin.rds")
 plot_funct <- function(variable, title = NA, unit = NA, lowcol = "transparent", highcol = "darkgreen", ...){
   thesubset <- GEO_MUN_SOY[pull(SOY_MUN, variable)>0,]
   thedata <- st_drop_geometry(thesubset)
-  theplot <- ggplot(thesubset, aes(fill = pull(thedata, variable)), size = 0.01) +
+  theplot <- ggplot(thesubset, aes(fill = pull(thedata, variable)), size = 0.4) +
                 labs(title = ifelse(!is.na(title), title, variable))+
                 geom_sf(color = "transparent")+            
-               # scale_fill_viridis(direction = -1, na.value = "transparent", name = paste(unit)) + 
-               #scale_fill_gradient(low = lowcol, high = highcol, 
-               #                    na.value = "transparent", 
-               #                    #breaks = quantile(pull(thedata, variable)),
-               #                    #trans = "boxcox",
-               #                    name = paste(unit)) + 
-                scale_fill_steps(n.breaks = 10, nice.breaks = TRUE) +
+                # scale_fill_viridis(direction = -1, na.value = "transparent", name = paste(unit)) + 
+                scale_fill_gradient(low = lowcol, high = highcol, 
+                                    na.value = "transparent", 
+                                    #breaks = quantile(pull(thedata, variable)),
+                                    #trans = "boxcox",
+                                    name = paste(unit)) + 
+                #scale_fill_steps(n.breaks = 10, nice.breaks = TRUE) +
                 geom_sf(data = GEO_states, fill = "transparent", color = "grey", size = 0.1)+
                 theme_void()+ # or minimal
                 theme(plot.title = element_text(hjust = 0.5), plot.margin = margin(t = -0.0, r = -0.2, b = -0.1, l = -0.5, "cm"),
                       legend.margin=margin(0,0,0,0), legend.box.margin=margin(t=0,r=0,b= 0,l=-40))
   return(theplot)
 }
-#
+
 
 g_prod_bean <- plot_funct(variable = "prod_bean", title = "Soybean production", unit = "tons",  lowcol = "grey95", highcol = "darkgreen")
 g_prod_oil  <- plot_funct(variable = "prod_oil", title = "Soy oil  production", unit = "tons",  lowcol = "grey95", highcol = "darkgreen")
@@ -91,10 +91,10 @@ comparison_cake <- (g_prod_cake | g_imp_cake) /
                    (plot_spacer() | plot_spacer())#  + plot_layout(ncol = 2)
 
 if(write){
-ggsave(plot = comparison, filename = "results/maps/comparison.png", device = "png", width = 15.02, height = 23.77, units = "cm", scale = 1.5)
-ggsave(plot = comparison_bean, filename = "results/maps/comparison_bean.png", device = "png",  width = 15.02, height = 23.77, units = "cm", scale = 1.5)
-ggsave(plot = comparison_oil , filename = "results/maps/comparison_oil.png", device = "png", width = 15.02, height = 23.77, units = "cm", scale = 1.5)
-ggsave(plot = comparison_cake, filename = "results/maps/comparison_cake.png", device = "png", width = 15.02, height = 23.77, units = "cm", scale = 1.5)
+  ggsave(plot = comparison, filename = "results/maps/map_cbs_all.png", device = "png", width = 15.02, height = 23.77, units = "cm", scale = 1.5)
+  ggsave(plot = comparison_bean, filename = "results/maps/map_cbs_bean.png", device = "png",  width = 15.02, height = 23.77, units = "cm", scale = 1.5)
+  ggsave(plot = comparison_oil , filename = "results/maps/map_cbs_oil.png", device = "png", width = 15.02, height = 23.77, units = "cm", scale = 1.5)
+  ggsave(plot = comparison_cake, filename = "results/maps/map_cbs_cake.png", device = "png", width = 15.02, height = 23.77, units = "cm", scale = 1.5)
 }
 
 # plot with mapview (ool, but very heavy: only manageable for individual layers)
@@ -133,4 +133,6 @@ AtoB_sf <- st_as_sf(AtoB)
   #coord_quickmap()
 )
 
-ggsave(plot = path_map, filename = "results/maps/path_example.png", device = "png", width = 12, height = 10, units = "cm", scale = 2)
+if(write){
+  ggsave(plot = path_map, filename = "results/maps/path_example.png", device = "png", width = 12, height = 10, units = "cm", scale = 2)
+}
