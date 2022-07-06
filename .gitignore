@@ -36,6 +36,7 @@ input_data
 
 # scripts/files no longer used
 R/old
+R/depr
 input_data/old
 results/old
 results/mb_tiles
