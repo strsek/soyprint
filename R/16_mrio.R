@@ -4,7 +4,7 @@
 # - calculation of transformation matrix made more efficient by sparse approach
 # - re-balancing changed to use character indexing and (optionally) to re-balance according to cbs production values
 
-library("Matrix")
+library(Matrix)
 
 write = TRUE
 

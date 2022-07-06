@@ -17,7 +17,7 @@ library(Matrix)
 library(dplyr)
 library(tidyr)
 library(tibble)
-source("input_data/FABIO/01_tidy_functions.R")
+source("auxiliary/fabio_tidy_functions.R")
 
 write = TRUE
 

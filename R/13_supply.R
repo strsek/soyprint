@@ -6,7 +6,7 @@
 # - prices: for Brazilian municipal products, the national price of Brazil is used
 
 
-library("data.table")
+library(data.table)
 
 write = TRUE 
 

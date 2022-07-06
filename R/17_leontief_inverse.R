@@ -4,8 +4,8 @@
 # - calculation of A matrix made more efficient by sparse approach
 # - inversion of matrix (solve) is done with sparse = TRUE to get output as sparse dgC matrix and improve speed
 
-library("data.table")
-library("Matrix")
+library(data.table)
+library(Matrix)
 
 write = TRUE
 

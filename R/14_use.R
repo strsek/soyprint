@@ -7,9 +7,9 @@
 # -- rounding is removed to avoid rounding errors
 
 
-library("data.table")
-library("Matrix")
-source("input_data/FABIO/01_tidy_functions.R")
+library(data.table)
+library(Matrix)
+source("auxiliary/fabio_tidy_functions.R")
 
 write = TRUE
 
