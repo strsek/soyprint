@@ -32,6 +32,7 @@ F_mass.rds
 P_mass.rds
 F_value.rds
 P_value.rds
+input_data
 
 # scripts/files no longer used
 R/old
